@@ -6,6 +6,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -16,6 +18,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .httpBasic().disable()
@@ -23,9 +30,10 @@ public class SecurityConfig {
                 .cors().and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/api/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/**").authenticated()
-                .antMatchers(HttpMethod.PUT, "/api/**").authenticated()
-                .antMatchers(HttpMethod.DELETE, "/api/**").authenticated()
+//                후에 세부 설정
+//                .antMatchers(HttpMethod.POST, "/api/**").authenticated()
+//                .antMatchers(HttpMethod.PUT, "/api/**").authenticated()
+//                .antMatchers(HttpMethod.DELETE, "/api/**").authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
