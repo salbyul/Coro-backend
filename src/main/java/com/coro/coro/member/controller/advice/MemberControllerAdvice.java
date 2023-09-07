@@ -25,7 +25,7 @@ public class MemberControllerAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(RuntimeException.class)
     public GlobalErrorResponse unknownException(final RuntimeException e) {
-        log.error("[Member]\n{}", e.getMessage());
+        e.printStackTrace();
         return GlobalErrorResponse.create();
     }
 }
