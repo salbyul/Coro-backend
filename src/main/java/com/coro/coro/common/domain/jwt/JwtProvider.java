@@ -4,7 +4,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,30 +15,31 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
-public class JwtTokenProvider {
+public class JwtProvider {
 
     @Value("${jwt.secretKey}")
     private String secretKey;
     private final UserDetailsService userDetailsService;
+    private Key key;
 
     //    토근 유효시간 30분
+    @SuppressWarnings("FieldCanBeLocal")
     private final long tokenValidTime = 30 * 60 * 1000L;
 
 
     @PostConstruct
     protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
+        key = createKey();
     }
 
     public String generateAccessToken(final String userNickname) {
@@ -49,7 +52,7 @@ public class JwtTokenProvider {
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + tokenValidTime))
-                .signWith(createKey())
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -63,11 +66,12 @@ public class JwtTokenProvider {
         Map<String, Object> header = new HashMap<>();
         header.put("alg", "HS256");
         header.put("typ", "JWT");
+        header.put("sub", "USER");
         return header;
     }
 
     private Key createKey() {
-        return new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS256.getJcaName());
+        return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
     public Authentication getAuthentication(final String token) {
@@ -76,25 +80,28 @@ public class JwtTokenProvider {
     }
 
     public String getUserNickname(final String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(createKey())
+        String subject = (String) Jwts.parserBuilder()
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
-                .getSubject();
+                .get("nickname");
+        log.info("subject: {}", subject);
+        return subject;
     }
 
     public String extractToken(final HttpServletRequest request) {
-        return request.getHeader("Authorization");
+        String authorization = request.getHeader("Authorization");
+        return authorization == null ? null : authorization.substring(authorization.indexOf(" ") + 1);
     }
 
     public boolean validateToken(final String token) {
         try {
             Jws<Claims> claims = Jwts.parserBuilder()
-                    .setSigningKey(createKey())
+                    .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token);
-            return claims.getBody().getExpiration().before(new Date());
+            return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
         }

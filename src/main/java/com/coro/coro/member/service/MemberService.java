@@ -1,6 +1,6 @@
 package com.coro.coro.member.service;
 
-import com.coro.coro.common.domain.jwt.JwtTokenProvider;
+import com.coro.coro.common.domain.jwt.JwtProvider;
 import com.coro.coro.common.response.error.ErrorType;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Slf4j
@@ -21,7 +22,7 @@ import java.util.List;
 @Service
 public class MemberService {
 
-    private final JwtTokenProvider tokenProvider;
+    private final JwtProvider tokenProvider;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -50,5 +51,12 @@ public class MemberService {
             throw new MemberException(ErrorType.MEMBER_NOT_FOUND);
         }
         return tokenProvider.generateAccessToken(member.getNickname());
+    }
+
+//    TODO 지우기
+    @PostConstruct
+    public void postConstruct() {
+        MemberRegisterRequest requestMember = new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임");
+        this.register(requestMember);
     }
 }

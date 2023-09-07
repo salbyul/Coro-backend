@@ -10,9 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
@@ -21,8 +18,6 @@ class MemberServiceTest {
 
     @Autowired
     MemberService memberService;
-    @PersistenceContext
-    EntityManager em;
 
     @BeforeEach
     void setUp() {
@@ -32,7 +27,8 @@ class MemberServiceTest {
     @Test
     @DisplayName("[로그인] 정상적인 로그인의 경우")
     void login() {
-        memberService.login(new MemberLoginRequest("asdf@asdf.com", "asdf1234!@"));
+        String token = memberService.login(new MemberLoginRequest("asdf@asdf.com", "asdf1234!@"));
+        System.out.println(token);
     }
 
     @Test

@@ -1,8 +1,6 @@
 package com.coro.coro.member.controller;
 
-import com.coro.coro.common.domain.jwt.JwtTokenProvider;
 import com.coro.coro.common.response.APIResponse;
-import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.service.MemberService;
@@ -21,7 +19,7 @@ public class MemberController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public APIResponse register(@RequestBody MemberRegisterRequest requestMember) {
+    public APIResponse register(final @RequestBody MemberRegisterRequest requestMember) {
         log.info("member: {}", requestMember);
         memberService.register(requestMember);
         return APIResponse.create();
@@ -29,9 +27,15 @@ public class MemberController {
 
     @PutMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public APIResponse login(@RequestBody MemberLoginRequest requestMember) {
+    public APIResponse login(final @RequestBody MemberLoginRequest requestMember) {
         String token = memberService.login(requestMember);
         return APIResponse.create()
                 .addObject("token", token);
+    }
+
+    @PostMapping("/test")
+    public APIResponse test() {
+        log.info("테스트 통과!");
+        return APIResponse.create();
     }
 }
