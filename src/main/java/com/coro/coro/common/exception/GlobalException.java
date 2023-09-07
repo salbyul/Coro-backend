@@ -10,6 +10,7 @@ public class GlobalException extends RuntimeException {
     private final ErrorType errorType;
 
     public GlobalException(final String domain, final ErrorType errorType) {
+        super(errorType.getMessage());
         this.domain = domain;
         this.errorType = errorType;
     }
