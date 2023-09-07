@@ -32,10 +32,4 @@ public class MemberController {
         return APIResponse.create()
                 .addObject("token", token);
     }
-
-    @PostMapping("/test")
-    public APIResponse test() {
-        log.info("테스트 통과!");
-        return APIResponse.create();
-    }
 }
