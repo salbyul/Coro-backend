@@ -11,6 +11,7 @@ public enum ErrorType {
 
     //    Member
     MEMBER_NOT_FOUND("100", "해당 Member가 없습니다."),
+
     EMAIL_NULL("110", "Email 값이 비어있습니다."),
     EMAIL_DUPLICATE("111", "Email 값이 중복됩니다."),
     EMAIL_NOT_VALID("112", "Email 값의 형태가 올바르지 않습니다."),

@@ -53,7 +53,7 @@ public class MemberService {
         return tokenProvider.generateAccessToken(member.getNickname());
     }
 
-//    TODO 지우기
+    //    TODO 지우기
     @PostConstruct
     public void postConstruct() {
         MemberRegisterRequest requestMember = new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임");

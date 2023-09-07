@@ -19,9 +19,7 @@ public class MemberControllerAdvice {
         return DomainErrorResponse.create(e.getDomain(), e.getErrorType());
     }
 
-    /*
-    Member 도메인에서 확인되지 않은 예외
-     */
+    /* Member 도메인에서 확인되지 않은 예외 */
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(RuntimeException.class)
     public GlobalErrorResponse unknownException(final RuntimeException e) {
