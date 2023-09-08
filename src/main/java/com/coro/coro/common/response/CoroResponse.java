@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
 @Getter
 public abstract class CoroResponse {
 
-    private final LocalDateTime dateTime;
+    private final String dateTime;
 
     protected CoroResponse() {
-        this.dateTime = LocalDateTime.now();
+        this.dateTime = LocalDateTime.now().toString();
     }
 }

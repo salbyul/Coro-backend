@@ -24,4 +24,8 @@ public class GlobalErrorResponse extends CoroResponse {
     public static GlobalErrorResponse create() {
         return new GlobalErrorResponse();
     }
+
+    public static GlobalErrorResponse create(final ErrorType errorType) {
+        return new GlobalErrorResponse(errorType);
+    }
 }

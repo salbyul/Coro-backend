@@ -4,6 +4,7 @@ import com.coro.coro.common.domain.jwt.JwtProvider;
 import com.coro.coro.common.response.error.ErrorType;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
+import com.coro.coro.member.dto.request.MemberModifyRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.repository.MemberRepository;
@@ -12,8 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Slf4j
@@ -51,5 +52,11 @@ public class MemberService {
             throw new MemberException(ErrorType.MEMBER_NOT_FOUND);
         }
         return tokenProvider.generateAccessToken(member.getNickname());
+    }
+
+    /* 회원 수정 */
+    @Transactional
+    public void modify(final MemberModifyRequest requestMember, final MultipartFile multipartFile) {
+
     }
 }
