@@ -13,12 +13,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/members")
-public class MemberController {
+public class MemberController implements MemberControllerDocs {
 
     private final MemberService memberService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Override
     public APIResponse register(final @RequestBody MemberRegisterRequest requestMember) {
         log.info("member: {}", requestMember);
         memberService.register(requestMember);
@@ -27,6 +28,7 @@ public class MemberController {
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
+    @Override
     public APIResponse login(final @RequestBody MemberLoginRequest requestMember) {
         String token = memberService.login(requestMember);
         return APIResponse.create()

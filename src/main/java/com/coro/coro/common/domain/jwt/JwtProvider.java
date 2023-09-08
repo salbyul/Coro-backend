@@ -86,7 +86,6 @@ public class JwtProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .get("nickname");
-        log.info("subject: {}", subject);
         return subject;
     }
 
