@@ -25,7 +25,7 @@ public class MemberController {
         return APIResponse.create();
     }
 
-    @PutMapping("/login")
+    @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     public APIResponse login(final @RequestBody MemberLoginRequest requestMember) {
         String token = memberService.login(requestMember);
