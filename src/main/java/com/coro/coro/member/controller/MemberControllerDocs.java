@@ -1,6 +1,7 @@
 package com.coro.coro.member.controller;
 
 import com.coro.coro.common.response.APIResponse;
+import com.coro.coro.member.domain.User;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
 import com.coro.coro.member.dto.request.MemberModifyRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,5 +43,5 @@ public interface MemberControllerDocs {
     APIResponse login(final @RequestBody MemberLoginRequest requestMember);
 
     @Operation(summary = "유저 정보 변경")
-    APIResponse modify(final @RequestPart(required = false) MultipartFile multipartFile, final @RequestPart MemberModifyRequest requestMember);
+    APIResponse update(final @RequestPart(required = false) MultipartFile multipartFile, final @RequestPart MemberModifyRequest requestMember, final @AuthenticationPrincipal User user);
 }

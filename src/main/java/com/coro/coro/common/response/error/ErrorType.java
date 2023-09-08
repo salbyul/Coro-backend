@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorType {
 
     UNKNOWN("000", "정의되지 않은 에러입니다."),
+
+    //    Auth
     AUTH_ERROR("001", "인증 에러입니다."),
 
     //    Member

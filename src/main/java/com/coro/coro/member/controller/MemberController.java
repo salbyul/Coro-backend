@@ -1,6 +1,7 @@
 package com.coro.coro.member.controller;
 
 import com.coro.coro.common.response.APIResponse;
+import com.coro.coro.member.domain.User;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
 import com.coro.coro.member.dto.request.MemberModifyRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
@@ -8,19 +9,17 @@ import com.coro.coro.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.persistence.EntityManager;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/members")
-public class MemberController implements MemberControllerDocs {
+public class MemberController implements MemberControllerDocs{
 
     private final MemberService memberService;
-    private final EntityManager em;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -43,7 +42,8 @@ public class MemberController implements MemberControllerDocs {
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     @Override
-    public APIResponse modify(final @RequestPart(required = false) MultipartFile multipartFile, final @RequestPart MemberModifyRequest requestMember) {
+    public APIResponse update(final @RequestPart(required = false) MultipartFile multipartFile, final @RequestPart(name = "member") MemberModifyRequest requestMember, final @AuthenticationPrincipal User user) {
+        memberService.update(user.getId(), requestMember, multipartFile);
         return APIResponse.create();
     }
 }

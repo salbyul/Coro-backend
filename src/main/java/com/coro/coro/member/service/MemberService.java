@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Slf4j
@@ -48,15 +49,37 @@ public class MemberService {
     public String login(final MemberLoginRequest requestMember) {
         Member member = memberRepository.findByEmail(requestMember.getEmail())
                 .orElseThrow(() -> new MemberException(ErrorType.MEMBER_NOT_FOUND));
-        if (!passwordEncoder.matches(requestMember.getPassword(), member.getPassword())) {
+
+        comparePassword(requestMember.getPassword(), member.getPassword());
+
+        return tokenProvider.generateAccessToken(member.getNickname());
+    }
+
+    private void comparePassword(final String password, final String target) {
+        if (!passwordEncoder.matches(password, target)) {
             throw new MemberException(ErrorType.MEMBER_NOT_FOUND);
         }
-        return tokenProvider.generateAccessToken(member.getNickname());
     }
 
     /* 회원 수정 */
     @Transactional
-    public void modify(final MemberModifyRequest requestMember, final MultipartFile multipartFile) {
+    public void update(final Long id, final MemberModifyRequest requestMember, final MultipartFile multipartFile) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new MemberException(ErrorType.MEMBER_NOT_FOUND));
+        comparePassword(requestMember.getOriginalPassword(), member.getPassword());
 
+        member.changeTo(requestMember);
+        member.encryptPassword(passwordEncoder);
+
+//        TODO 프로필 사진 변경
+
+    }
+
+//    테스트용 메서드 (삭제 예정)
+    @Transactional
+    @PostConstruct
+    public void init() {
+        MemberRegisterRequest requestMember = new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임");
+        register(requestMember);
     }
 }

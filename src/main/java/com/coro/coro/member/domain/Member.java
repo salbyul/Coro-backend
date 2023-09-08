@@ -1,6 +1,7 @@
 package com.coro.coro.member.domain;
 
 import com.coro.coro.common.domain.BaseEntity;
+import com.coro.coro.member.dto.request.MemberModifyRequest;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.util.MemberValidator;
 import lombok.AccessLevel;
@@ -57,5 +58,11 @@ public class Member extends BaseEntity {
                 throw new MemberException(NICKNAME_DUPLICATE);
             }
         }
+    }
+
+    public void changeTo(final MemberModifyRequest requestMember) {
+        this.introduction = requestMember.getIntroduction();
+        this.password = requestMember.getNewPassword();
+        MemberValidator.validateRegistration(this);
     }
 }
