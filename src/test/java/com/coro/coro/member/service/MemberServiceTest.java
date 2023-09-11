@@ -1,6 +1,5 @@
 package com.coro.coro.member.service;
 
-import com.coro.coro.common.response.error.ErrorType;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
 import com.coro.coro.member.dto.request.MemberModifyRequest;
