@@ -1,6 +1,7 @@
 package com.coro.coro.member.domain;
 
 import com.coro.coro.common.domain.BaseEntity;
+import com.coro.coro.group.domain.Moim;
 import com.coro.coro.member.dto.request.MemberModifyRequest;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.util.MemberValidator;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
@@ -27,6 +29,9 @@ public class Member extends BaseEntity {
     private String password;
     private String nickname;
     private String introduction;
+
+    @OneToMany(mappedBy = "leader")
+    private List<Moim> groupList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private MemberState state;
