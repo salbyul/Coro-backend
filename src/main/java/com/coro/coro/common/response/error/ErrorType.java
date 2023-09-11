@@ -9,6 +9,9 @@ public enum ErrorType {
 
     UNKNOWN("000", "정의되지 않은 에러입니다."),
 
+    //    Auth
+    AUTH_ERROR("001", "인증 에러입니다."),
+
     //    Member
     MEMBER_NOT_FOUND("100", "해당 Member가 없습니다."),
 

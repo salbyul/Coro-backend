@@ -4,6 +4,7 @@ import com.coro.coro.common.domain.jwt.JwtProvider;
 import com.coro.coro.common.response.error.ErrorType;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
+import com.coro.coro.member.dto.request.MemberModifyRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.repository.MemberRepository;
@@ -13,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Slf4j
@@ -47,9 +47,25 @@ public class MemberService {
     public String login(final MemberLoginRequest requestMember) {
         Member member = memberRepository.findByEmail(requestMember.getEmail())
                 .orElseThrow(() -> new MemberException(ErrorType.MEMBER_NOT_FOUND));
-        if (!passwordEncoder.matches(requestMember.getPassword(), member.getPassword())) {
+        comparePassword(requestMember.getPassword(), member.getPassword());
+
+        return tokenProvider.generateAccessToken(member.getNickname());
+    }
+
+    private void comparePassword(final String password, final String target) {
+        if (!passwordEncoder.matches(password, target)) {
             throw new MemberException(ErrorType.MEMBER_NOT_FOUND);
         }
-        return tokenProvider.generateAccessToken(member.getNickname());
+    }
+
+    /* 회원 수정 */
+    @Transactional
+    public void update(final Long id, final MemberModifyRequest requestMember) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new MemberException(ErrorType.MEMBER_NOT_FOUND));
+        comparePassword(requestMember.getOriginalPassword(), member.getPassword());
+
+        member.changeTo(requestMember);
+        member.encryptPassword(passwordEncoder);
     }
 }

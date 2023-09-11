@@ -23,7 +23,7 @@ public class MemberControllerAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(RuntimeException.class)
     public GlobalErrorResponse unknownException(final RuntimeException e) {
-        e.printStackTrace();
+        log.error("", e);
         return GlobalErrorResponse.create();
     }
 }

@@ -80,13 +80,12 @@ public class JwtProvider {
     }
 
     public String getUserNickname(final String token) {
-        String subject = (String) Jwts.parserBuilder()
+        return (String) Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .get("nickname");
-        return subject;
     }
 
     public String extractToken(final HttpServletRequest request) {
