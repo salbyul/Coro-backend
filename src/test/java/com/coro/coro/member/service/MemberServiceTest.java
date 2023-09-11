@@ -1,13 +1,18 @@
 package com.coro.coro.member.service;
 
+import com.coro.coro.common.response.error.ErrorType;
+import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
+import com.coro.coro.member.dto.request.MemberModifyRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.exception.MemberException;
+import com.coro.coro.member.repository.MemberRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
@@ -19,6 +24,10 @@ class MemberServiceTest {
 
     @Autowired
     MemberService memberService;
+    @Autowired
+    MemberRepository memberRepository;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
@@ -139,5 +148,24 @@ class MemberServiceTest {
     void loginFailByPassword() {
         assertThatThrownBy(() -> memberService.login(new MemberLoginRequest("asdf@asdf.com", "asdf1234!#")))
                 .isInstanceOf(MemberException.class);
+    }
+
+    @Test
+    @DisplayName("[회원수정] 정상적인 회원 수정")
+    void updateMember() {
+        MemberModifyRequest requestMember = new MemberModifyRequest("asdf1234!@", "qwer1234!@", "바뀐 소개입니다.");
+        memberService.update(1L, requestMember);
+        Member member = memberRepository.findById(1L).orElseThrow();
+        assertThat(passwordEncoder.matches(requestMember.getNewPassword(), member.getPassword())).isTrue();
+        assertThat(member.getIntroduction()).isEqualTo(requestMember.getIntroduction());
+    }
+
+    @Test
+    @DisplayName("[회원수정] 틀린 비밀번호의 경우")
+    void updateFailByPassword() {
+        MemberModifyRequest requestMember = new MemberModifyRequest("asdf1234!", "qwer1234!@", "바뀐 소개입니다.");
+        assertThatThrownBy(() -> memberService.update(1L, requestMember))
+                .isInstanceOf(MemberException.class)
+                .hasMessage(MEMBER_NOT_FOUND.getMessage());
     }
 }
