@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Tag(name = "Member", description = "유저")
 public interface MemberControllerDocs {
 
@@ -29,7 +31,7 @@ public interface MemberControllerDocs {
             @Parameter(name = "password", description = "비밀번호", example = "asdf1234!@"),
             @Parameter(name = "nickname", description = "닉네임", example = "코로")
     })
-    APIResponse register(final @RequestBody MemberRegisterRequest requestMember);
+    APIResponse register(@RequestBody final MemberRegisterRequest requestMember);
 
     @Operation(summary = "로그인")
     @ApiResponses(value = {
@@ -40,8 +42,8 @@ public interface MemberControllerDocs {
             @Parameter(name = "email", description = "이메일", example = "asdf@asdf.com"),
             @Parameter(name = "password", description = "비밀번호", example = "asdf1234!@")
     })
-    APIResponse login(final @RequestBody MemberLoginRequest requestMember);
+    APIResponse login(@RequestBody final MemberLoginRequest requestMember);
 
     @Operation(summary = "유저 정보 변경")
-    APIResponse update(final @RequestPart(required = false) MultipartFile multipartFile, final @RequestPart MemberModifyRequest requestMember, final @AuthenticationPrincipal User user);
+    APIResponse update(@RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile, @RequestPart(name = "member", required = false) final MemberModifyRequest requestMember, final @AuthenticationPrincipal User user) throws IOException;
 }
