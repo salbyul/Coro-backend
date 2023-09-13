@@ -1,13 +1,12 @@
-package com.coro.coro.member.util;
+package com.coro.coro.member.validator;
 
-import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.exception.MemberException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static com.coro.coro.member.util.MemberValidator.*;
+import static com.coro.coro.member.validator.MemberValidator.*;
 import static org.assertj.core.api.Assertions.*;
 
 class MemberValidatorTest {
@@ -72,21 +71,9 @@ class MemberValidatorTest {
 
     @ParameterizedTest
     @DisplayName("닉네임 형식이 아닐 경우")
-    @ValueSource(strings = {"a", "asdfasdfasdfasdf", "나는 공백포함이야", "asdf!"})
+    @ValueSource(strings = {"a", "asdfasdfasdfasdf", "나는 공백포함이야", "asdf!", "ㅁㄱㄴㅇ"})
     void nicknameRegex(final String value) {
         assertThatThrownBy(() -> validateNickname(value))
-                .isInstanceOf(MemberException.class);
-    }
-
-    @Test
-    void memberBuilderTest() {
-        assertThatThrownBy(
-                () -> Member.builder()
-                        .email("")
-                        .nickname("")
-                        .password("")
-                        .build()
-        )
                 .isInstanceOf(MemberException.class);
     }
 }

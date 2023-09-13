@@ -1,4 +1,4 @@
-package com.coro.coro.member.util;
+package com.coro.coro.member.validator;
 
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.exception.MemberException;
@@ -16,10 +16,10 @@ public class MemberValidator {
 
     protected static void validateEmail(final String email) {
         if (isEmpty(email)) {
-            throw new MemberException(EMAIL_NULL);
+            throw new MemberException(MEMBER_EMAIL_NULL);
         }
         if (!isEmail(email)) {
-            throw new MemberException(EMAIL_NOT_VALID);
+            throw new MemberException(MEMBER_EMAIL_NOT_VALID);
         }
     }
 
@@ -33,10 +33,10 @@ public class MemberValidator {
 
     protected static void validatePassword(final String password) {
         if (isEmpty(password)) {
-            throw new MemberException(PASSWORD_NULL);
+            throw new MemberException(MEMBER_PASSWORD_NULL);
         }
         if (!passwordMatches(password)) {
-            throw new MemberException(PASSWORD_NOT_VALID);
+            throw new MemberException(MEMBER_PASSWORD_NOT_VALID);
         }
     }
 
@@ -46,14 +46,14 @@ public class MemberValidator {
 
     protected static void validateNickname(final String nickname) {
         if (isEmpty(nickname)) {
-            throw new MemberException(NICKNAME_NULL);
+            throw new MemberException(MEMBER_NICKNAME_NULL);
         }
         if (!nicknameMatches(nickname)) {
-            throw new MemberException(NICKNAME_NOT_VALID);
+            throw new MemberException(MEMBER_NICKNAME_NOT_VALID);
         }
     }
 
     private static boolean nicknameMatches(final String nickname) {
-        return nickname.matches("[\\wㄱ-ㅎ가-힣-]{2,15}");
+        return nickname.matches("[\\w가-힣-]{2,15}");
     }
 }

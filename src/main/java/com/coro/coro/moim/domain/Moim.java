@@ -1,11 +1,19 @@
-package com.coro.coro.group.domain;
+package com.coro.coro.moim.domain;
 
 import com.coro.coro.common.domain.BaseEntity;
 import com.coro.coro.member.domain.Member;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Moim extends BaseEntity {
 
     @Id
@@ -28,12 +36,28 @@ public class Moim extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MoimState state;
 
+    @OneToMany(mappedBy = "moim")
+    private List<MoimTag> tagList = new ArrayList<>();
+
+    @Builder
+    public Moim(final Member leader, final String name, final String introduction, final Boolean visible, final MoimType type) {
+        this.leader = leader;
+        this.name = name;
+        this.introduction = introduction;
+        this.visible = visible;
+        this.type = type;
+    }
+
     @Override
     public void prePersist() {
         super.prePersist();
-        if (this.introduction == null) {
+        if (isEmpty(this.introduction)) {
             this.introduction = "우리 모임을 소개해주세요.";
         }
         this.state = MoimState.ACTIVE;
+    }
+
+    private boolean isEmpty(final String value) {
+        return value == null || value.equals("");
     }
 }

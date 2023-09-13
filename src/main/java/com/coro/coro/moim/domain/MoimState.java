@@ -1,4 +1,4 @@
-package com.coro.coro.group.domain;
+package com.coro.coro.moim.domain;
 
 public enum MoimState {
     ACTIVE, SUSPENDED
