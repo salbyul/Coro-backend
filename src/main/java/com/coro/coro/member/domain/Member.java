@@ -1,16 +1,15 @@
 package com.coro.coro.member.domain;
 
 import com.coro.coro.common.domain.BaseEntity;
+import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.member.dto.request.MemberModifyRequest;
 import com.coro.coro.member.exception.MemberException;
-import com.coro.coro.member.util.MemberValidator;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.coro.coro.member.validator.MemberValidator;
+import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
@@ -28,6 +27,9 @@ public class Member extends BaseEntity {
     private String nickname;
     private String introduction;
 
+    @OneToMany(mappedBy = "leader")
+    private List<Moim> moimList = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     private MemberState state;
 
@@ -36,7 +38,6 @@ public class Member extends BaseEntity {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
-        MemberValidator.validateRegistration(this);
     }
 
     public void encryptPassword(final PasswordEncoder passwordEncoder) {
@@ -53,10 +54,10 @@ public class Member extends BaseEntity {
     public void verifyDuplication(final List<Member> foundMembers) {
         for (Member foundMember : foundMembers) {
             if (foundMember.getEmail().equals(this.email)) {
-                throw new MemberException(EMAIL_DUPLICATE);
+                throw new MemberException(MEMBER_EMAIL_DUPLICATE);
             }
             if (foundMember.getNickname().equals(this.nickname)) {
-                throw new MemberException(NICKNAME_DUPLICATE);
+                throw new MemberException(MEMBER_NICKNAME_DUPLICATE);
             }
         }
     }

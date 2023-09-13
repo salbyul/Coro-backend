@@ -8,6 +8,7 @@ import com.coro.coro.member.dto.request.MemberModifyRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.repository.MemberRepository;
+import com.coro.coro.member.validator.MemberValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +36,7 @@ public class MemberService {
                         .password(requestMember.getPassword())
                         .nickname(requestMember.getNickname())
                         .build();
+        MemberValidator.validateRegistration(member);
 
         List<Member> foundMembers = memberRepository.findByEmailOrNickname(member.getEmail(), member.getNickname());
         member.verifyDuplication(foundMembers);
