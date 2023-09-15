@@ -7,6 +7,7 @@ import com.coro.coro.member.repository.MemberRepository;
 import com.coro.coro.member.service.MemberService;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.domain.MoimType;
+import com.coro.coro.moim.dto.request.MoimModifyRequest;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
 import com.coro.coro.moim.dto.request.MoimTagRequest;
 import com.coro.coro.moim.exception.MoimException;
@@ -43,13 +44,14 @@ class MoimServiceTest {
     private MemberService memberService;
     private Member member;
     private MoimRegisterRequest requestMoim;
+    private Long savedMoimId;
 
     @BeforeEach
     void setUp() {
         memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         member = memberRepository.findByEmail("asdf@asdf.com")
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
-        moimService.register(
+        savedMoimId = moimService.register(
                 new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true),
                 new MoimTagRequest(List.of("tag1", "tag2", "tag3")),
                 member.getId());
@@ -103,5 +105,29 @@ class MoimServiceTest {
             assertThatThrownBy(() -> moimService.register(requestMoim, requestMoimTag, member.getId()))
                     .isInstanceOf(MoimException.class)
                     .hasMessage(MOIM_TAG_NOT_VALID.getMessage());
+    }
+
+    @Test
+    @DisplayName("[모임 수정] 정상적인 모임 수정")
+    void update() {
+        moimService.update(new MoimModifyRequest(savedMoimId, EXAMPLE_NAME, "수정되었습니다.", "mixed", true), null);
+    }
+
+    @Test
+    @DisplayName("[모임 수정] 존재하지 않는 모임")
+    void updateFailByNotExistId() {
+        assertThatThrownBy(() -> moimService.update(new MoimModifyRequest(0L, "수정", "소개 수정", "mixed", true), null))
+                .isInstanceOf(MoimException.class)
+                .hasMessage(MOIM_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("[모임 수정] 이름 중복의 경우")
+    void updateFailByDuplicateName() {
+        Long savedId = moimService.register(new MoimRegisterRequest("모임 예", "모임 소개", "mixed", true), null, member.getId());
+        Moim moim = moimRepository.findById(savedId).orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
+        assertThatThrownBy(() -> moimService.update(new MoimModifyRequest(moim.getId(), EXAMPLE_NAME, "모임 소개", "mixed", true), null))
+                .isInstanceOf(MoimException.class)
+                .hasMessage(MOIM_NAME_DUPLICATE.getMessage());
     }
 }

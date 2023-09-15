@@ -39,7 +39,9 @@ public enum ErrorType {
 
     MOIM_TAG_NULL("240", "Tag 값이 비어있습니다."),
     MOIM_TAG_DUPLICATE("241", "Tag 값이 중복됩니다."),
-    MOIM_TAG_NOT_VALID("242", "Tag 값의 형태가 올바르지 않습니다.");
+    MOIM_TAG_NOT_VALID("242", "Tag 값의 형태가 올바르지 않습니다."),
+
+    MOIM_TYPE_NULL("250", "Type 값이 비어있습니다.");
 
     private final String code;
     private final String message;

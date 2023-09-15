@@ -50,7 +50,7 @@ public class MemberController implements MemberControllerDocs {
     @ResponseStatus(HttpStatus.OK)
     @Override
     public APIResponse update(@RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile, @RequestPart(name = "member", required = false) final MemberModifyRequest requestMember, final @AuthenticationPrincipal User user) throws IOException {
-        if (requestMember != null && requestMember.isExist()) {
+        if (requestMember != null && requestMember.isExist()) { // TODO 수정
             memberService.update(user.getId(), requestMember);
         }
         if (multipartFile != null && !multipartFile.isEmpty()) {

@@ -2,6 +2,7 @@ package com.coro.coro.moim.domain;
 
 import com.coro.coro.common.domain.BaseEntity;
 import com.coro.coro.member.domain.Member;
+import com.coro.coro.moim.dto.request.MoimModifyRequest;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -59,5 +60,12 @@ public class Moim extends BaseEntity {
 
     private boolean isEmpty(final String value) {
         return value == null || value.equals("");
+    }
+
+    public void changeTo(final MoimModifyRequest requestMoim) {
+        this.name = requestMoim.getName();
+        this.introduction = requestMoim.getIntroduction();
+        this.type = MoimType.getType(requestMoim.getType());
+        this.visible = requestMoim.getVisible();
     }
 }

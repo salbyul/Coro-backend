@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MoimModifyRequest {
 
+    private Long id;
     private String name;
     private String introduction;
+    private String type;
     private Boolean visible;
 }

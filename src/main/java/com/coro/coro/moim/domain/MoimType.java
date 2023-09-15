@@ -1,5 +1,8 @@
 package com.coro.coro.moim.domain;
 
+import com.coro.coro.common.response.error.ErrorType;
+import com.coro.coro.moim.exception.MoimException;
+
 import java.util.Arrays;
 
 public enum MoimType {
@@ -14,6 +17,6 @@ public enum MoimType {
     public static MoimType getType(final String type) {
         return Arrays.stream(values()).filter(moimType -> moimType.type.equals(type))
                 .findAny()
-                .orElseThrow(RuntimeException::new); // 발생할 수 없는 예외
+                .orElseThrow(() -> new MoimException(ErrorType.MOIM_TYPE_NULL));
     }
 }

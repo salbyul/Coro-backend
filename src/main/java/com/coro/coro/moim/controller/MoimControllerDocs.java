@@ -15,8 +15,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @Tag(name = "Moim", description = "모임")
 public interface MoimControllerDocs {
 
@@ -35,5 +33,5 @@ public interface MoimControllerDocs {
     })
     APIResponse register(@RequestPart final MoimRegisterRequest requestMoim, @RequestPart final MoimTagRequest requestTag, @AuthenticationPrincipal final User user);
 
-    APIResponse update(@RequestPart final MoimModifyRequest requestMoim, @RequestPart final MoimTagRequest requestTag, @RequestPart List<MultipartFile> multipartFileList, @AuthenticationPrincipal final User user);
+    APIResponse update(@RequestPart final MoimModifyRequest requestMoim, @RequestPart final MoimTagRequest requestTag, @RequestPart MultipartFile multipartFile, @AuthenticationPrincipal final User user);
 }

@@ -12,8 +12,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -29,10 +27,16 @@ public class MoimController implements MoimControllerDocs {
         return APIResponse.create();
     }
 
-//    TODO: 미완
+    /*
+    모임과 태그, 이미지 따로 수정 가능
+     */
     @PutMapping
     @Override
-    public APIResponse update(@RequestPart(required = false) final MoimModifyRequest requestMoim, @RequestPart(required = false) final MoimTagRequest requestTag, @RequestPart(required = false) final List<MultipartFile> multipartFileList, @AuthenticationPrincipal final User user) {
+    public APIResponse update(@RequestPart(name = "moim", required = false) final MoimModifyRequest requestMoim, @RequestPart(name = "tagList", required = false) final MoimTagRequest requestTag, @RequestPart(name = "moimImage", required = false) final MultipartFile multipartFile, @AuthenticationPrincipal final User user) {
+        if (requestMoim != null && requestTag != null) {
+            moimService.update(requestMoim, requestTag);
+        }
+        log.info("file name: {}", multipartFile.getOriginalFilename());
         return APIResponse.create();
     }
 }
