@@ -2,6 +2,7 @@ package com.coro.coro.configuration;
 
 import com.coro.coro.common.domain.jwt.AuthenticationEntryPointImpl;
 import com.coro.coro.common.domain.jwt.JwtProvider;
+import com.coro.coro.common.filter.ExceptionHandlingFilter;
 import com.coro.coro.common.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +55,7 @@ public class SecurityConfig {
                 .exceptionHandling()
                 .authenticationEntryPoint(new AuthenticationEntryPointImpl())
                 .and()
+                .addFilterBefore(new ExceptionHandlingFilter(), JwtAuthenticationFilter.class)
                 .build();
     }
 

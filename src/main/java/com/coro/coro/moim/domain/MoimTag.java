@@ -6,6 +6,7 @@ import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 
+@Table(name = "moim_tag")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MoimTag implements Persistable<MoimTagId> {

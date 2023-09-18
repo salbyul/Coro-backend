@@ -27,9 +27,9 @@ public interface MemberControllerDocs {
             @ApiResponse(responseCode = "400", description = "회원가입 검증 실패")
     })
     @Parameters(value = {
-            @Parameter(name = "email", description = "이메일", example = "asdf@asdf.com"),
-            @Parameter(name = "password", description = "비밀번호", example = "asdf1234!@"),
-            @Parameter(name = "nickname", description = "닉네임", example = "코로")
+            @Parameter(name = "email", description = "이메일", example = "asdf@asdf.com", required = true),
+            @Parameter(name = "password", description = "비밀번호", example = "asdf1234!@", required = true),
+            @Parameter(name = "nickname", description = "닉네임", example = "코로", required = true)
     })
     APIResponse register(@RequestBody final MemberRegisterRequest requestMember);
 
@@ -39,11 +39,22 @@ public interface MemberControllerDocs {
             @ApiResponse(responseCode = "400", description = "회원 검증 실패")
     })
     @Parameters(value = {
-            @Parameter(name = "email", description = "이메일", example = "asdf@asdf.com"),
-            @Parameter(name = "password", description = "비밀번호", example = "asdf1234!@")
+            @Parameter(name = "email", description = "이메일", example = "asdf@asdf.com", required = true),
+            @Parameter(name = "password", description = "비밀번호", example = "asdf1234!@", required = true)
     })
     APIResponse login(@RequestBody final MemberLoginRequest requestMember);
 
     @Operation(summary = "유저 정보 변경")
-    APIResponse update(@RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile, @RequestPart(name = "member", required = false) final MemberModifyRequest requestMember, final @AuthenticationPrincipal User user) throws IOException;
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "정보 변경 성공"),
+            @ApiResponse(responseCode = "403", description = "회원 인증 실패"),
+            @ApiResponse(responseCode = "400", description = "수정 데이터 검증 실패")
+    })
+    @Parameters(value = {
+            @Parameter(name = "originalPassword", description = "기존 비밀번호"),
+            @Parameter(name = "newPassword", description = "새로운 비밀번호"),
+            @Parameter(name = "introduction", description = "회원 소개"),
+            @Parameter(name = "profileImage", description = "프로필 이미지")
+    })
+    APIResponse update(@RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile, @RequestPart(name = "member", required = false) final MemberModifyRequest requestMember, @AuthenticationPrincipal final User user) throws IOException;
 }

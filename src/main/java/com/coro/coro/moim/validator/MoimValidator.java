@@ -1,6 +1,7 @@
 package com.coro.coro.moim.validator;
 
 import com.coro.coro.moim.domain.Moim;
+import com.coro.coro.moim.domain.MoimType;
 import com.coro.coro.moim.exception.MoimException;
 import org.springframework.util.StringUtils;
 
@@ -11,6 +12,7 @@ public class MoimValidator {
     public static void validateMoim(final Moim moim) {
         validateName(moim.getName());
         validateIntroduction(moim.getIntroduction());
+        validateType(moim.getType());
         validateVisible(moim.getVisible());
     }
 
@@ -33,6 +35,12 @@ public class MoimValidator {
         }
         if (introduction.length() > 500) {
             throw new MoimException(MOIM_INTRODUCTION_NOT_VALID);
+        }
+    }
+
+    private static void validateType(final MoimType type) {
+        if (type == null) {
+            throw new MoimException(MOIM_TYPE_NULL);
         }
     }
 
