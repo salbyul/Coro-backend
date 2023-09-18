@@ -4,23 +4,31 @@ import com.coro.coro.auth.exception.AuthException;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.repository.MemberRepository;
 import com.coro.coro.moim.domain.Moim;
+import com.coro.coro.moim.domain.MoimPhoto;
 import com.coro.coro.moim.domain.MoimTag;
 import com.coro.coro.moim.domain.MoimType;
 import com.coro.coro.moim.dto.request.MoimModifyRequest;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
 import com.coro.coro.moim.dto.request.MoimTagRequest;
 import com.coro.coro.moim.exception.MoimException;
+import com.coro.coro.moim.repository.MoimPhotoRepository;
 import com.coro.coro.moim.repository.MoimRepository;
 import com.coro.coro.moim.repository.MoimTagRepository;
 import com.coro.coro.moim.validator.MoimTagValidator;
 import com.coro.coro.moim.validator.MoimValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
@@ -34,6 +42,10 @@ public class MoimService {
     private final MoimRepository moimRepository;
     private final MoimTagRepository moimTagRepository;
     private final MemberRepository memberRepository;
+    private final MoimPhotoRepository moimPhotoRepository;
+
+    @Value("${moim.image.dir}")
+    private String path;
 
     @Transactional
     public Long register(final MoimRegisterRequest requestMoim, final MoimTagRequest requestMoimTag, final Long memberId) {
@@ -82,9 +94,19 @@ public class MoimService {
     }
 
     @Transactional
-    public void update(final MoimModifyRequest requestMoim, final MoimTagRequest requestTag) {
-        Moim moim = moimRepository.findById(requestMoim.getId())
+    public void update(final Long moimId, final MoimModifyRequest requestMoim, final MoimTagRequest requestTag, final MultipartFile multipartFile) throws IOException {
+        Moim moim = moimRepository.findById(moimId)
                 .orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
+
+        if (requestMoim != null && requestTag != null) {
+            updateMoim(requestMoim, requestTag, moim);
+        }
+        if (multipartFile != null) {
+            updateImage(moim, multipartFile);
+        }
+    }
+
+    private void updateMoim(final MoimModifyRequest requestMoim, final MoimTagRequest requestTag, final Moim moim) {
         if (!requestMoim.getName().equals(moim.getName())) {
             validateDuplicateName(requestMoim);
         }
@@ -93,6 +115,8 @@ public class MoimService {
 
         moimTagRepository.deleteAllByMoim(moim);
         saveTag(requestTag, moim);
+
+        moim.preUpdate();
     }
 
     private void validateDuplicateName(final MoimModifyRequest requestMoim) {
@@ -100,5 +124,30 @@ public class MoimService {
         if (isDuplicate) {
             throw new MoimException(MOIM_NAME_DUPLICATE);
         }
+    }
+
+    @Transactional
+    public void updateImage(final Moim moim, final MultipartFile multipartFile) throws IOException {
+        moimPhotoRepository.deleteById(moim.getId());
+
+        String name = generateFileName(multipartFile);
+        transferFile(multipartFile, path, name);
+        moimPhotoRepository.save(new MoimPhoto(moim, multipartFile.getOriginalFilename(), name));
+    }
+
+    private String generateFileName(final MultipartFile multipartFile) {
+        String uuid = UUID.randomUUID().toString();
+        String now = LocalDateTime.now().toString();
+        String extra = extractExtra(multipartFile.getOriginalFilename());
+        return uuid + "[" + now + "]" + extra;
+    }
+
+    private String extractExtra(final String originalName) {
+        log.info("file name: {}", originalName);
+        return originalName.substring(originalName.indexOf("."));
+    }
+
+    private void transferFile(final MultipartFile multipartFile, final String path, final String name) throws IOException {
+        multipartFile.transferTo(new File(path, name));
     }
 }

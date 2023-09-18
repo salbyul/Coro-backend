@@ -12,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -23,20 +25,18 @@ public class MoimController implements MoimControllerDocs {
     @PostMapping
     @Override
     public APIResponse register(@RequestPart(name = "moim") final MoimRegisterRequest requestMoim, @RequestPart(required = false, name = "tagList") final MoimTagRequest requestTag, @AuthenticationPrincipal final User user) {
-        moimService.register(requestMoim, requestTag, user.getId());
-        return APIResponse.create();
+        Long savedId = moimService.register(requestMoim, requestTag, user.getId());
+        return APIResponse.create()
+                .addObject("moimId", savedId);
     }
 
     /*
     모임과 태그, 이미지 따로 수정 가능
      */
-    @PutMapping
+    @PutMapping("/{id}")
     @Override
-    public APIResponse update(@RequestPart(name = "moim", required = false) final MoimModifyRequest requestMoim, @RequestPart(name = "tagList", required = false) final MoimTagRequest requestTag, @RequestPart(name = "moimImage", required = false) final MultipartFile multipartFile, @AuthenticationPrincipal final User user) {
-        if (requestMoim != null && requestTag != null) {
-            moimService.update(requestMoim, requestTag);
-        }
-        log.info("file name: {}", multipartFile.getOriginalFilename());
+    public APIResponse update(@PathVariable("id") Long moimId, @RequestPart(name = "moim", required = false) final MoimModifyRequest requestMoim, @RequestPart(name = "tagList", required = false) final MoimTagRequest requestTag, @RequestPart(name = "moimImage", required = false) final MultipartFile multipartFile, @AuthenticationPrincipal final User user) throws IOException {
+        moimService.update(moimId, requestMoim, requestTag, multipartFile);
         return APIResponse.create();
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
@@ -109,14 +110,14 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("[모임 수정] 정상적인 모임 수정")
-    void update() {
-        moimService.update(new MoimModifyRequest(savedMoimId, EXAMPLE_NAME, "수정되었습니다.", "mixed", true), null);
+    void update() throws IOException {
+        moimService.update(savedMoimId, new MoimModifyRequest(EXAMPLE_NAME, "수정되었습니다.", "mixed", true), null, null);
     }
 
     @Test
     @DisplayName("[모임 수정] 존재하지 않는 모임")
     void updateFailByNotExistId() {
-        assertThatThrownBy(() -> moimService.update(new MoimModifyRequest(0L, "수정", "소개 수정", "mixed", true), null))
+        assertThatThrownBy(() -> moimService.update(0L, new MoimModifyRequest("수정", "소개 수정", "mixed", true), null, null))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NOT_FOUND.getMessage());
     }
@@ -126,7 +127,7 @@ class MoimServiceTest {
     void updateFailByDuplicateName() {
         Long savedId = moimService.register(new MoimRegisterRequest("모임 예", "모임 소개", "mixed", true), null, member.getId());
         Moim moim = moimRepository.findById(savedId).orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
-        assertThatThrownBy(() -> moimService.update(new MoimModifyRequest(moim.getId(), EXAMPLE_NAME, "모임 소개", "mixed", true), null))
+        assertThatThrownBy(() -> moimService.update(moim.getId(), new MoimModifyRequest(EXAMPLE_NAME, "모임 소개", "mixed", true), new MoimTagRequest(), null))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NAME_DUPLICATE.getMessage());
     }
