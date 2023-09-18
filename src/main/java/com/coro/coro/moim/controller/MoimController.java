@@ -35,7 +35,7 @@ public class MoimController implements MoimControllerDocs {
      */
     @PutMapping("/{id}")
     @Override
-    public APIResponse update(@PathVariable("id") Long moimId, @RequestPart(name = "moim", required = false) final MoimModifyRequest requestMoim, @RequestPart(name = "tagList", required = false) final MoimTagRequest requestTag, @RequestPart(name = "moimImage", required = false) final MultipartFile multipartFile, @AuthenticationPrincipal final User user) throws IOException {
+    public APIResponse update(@PathVariable("id") Long moimId, @RequestPart(name = "moim", required = false) final MoimModifyRequest requestMoim, @RequestPart(name = "tagList", required = false) final MoimTagRequest requestTag, @RequestPart(name = "moimImage", required = false) final MultipartFile multipartFile) throws IOException {
         moimService.update(moimId, requestMoim, requestTag, multipartFile);
         return APIResponse.create();
     }

@@ -9,5 +9,4 @@ public class CoroApplication {
     public static void main(String[] args) {
         SpringApplication.run(CoroApplication.class, args);
     }
-
 }

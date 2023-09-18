@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,10 +52,11 @@ public interface MemberControllerDocs {
             @ApiResponse(responseCode = "400", description = "수정 데이터 검증 실패")
     })
     @Parameters(value = {
+            @Parameter(name = "id", description = "회원 id", required = true),
             @Parameter(name = "originalPassword", description = "기존 비밀번호"),
             @Parameter(name = "newPassword", description = "새로운 비밀번호"),
             @Parameter(name = "introduction", description = "회원 소개"),
             @Parameter(name = "profileImage", description = "프로필 이미지")
     })
-    APIResponse update(@RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile, @RequestPart(name = "member", required = false) final MemberModifyRequest requestMember, @AuthenticationPrincipal final User user) throws IOException;
+    APIResponse update(@PathVariable("id") Long memberId, @RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile, @RequestPart(name = "member", required = false) final MemberModifyRequest requestMember) throws IOException;
 }

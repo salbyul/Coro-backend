@@ -43,6 +43,7 @@ public interface MoimControllerDocs {
             @ApiResponse(responseCode = "403", description = "유저 인증 실패")
     })
     @Parameters(value = {
+            @Parameter(name = "id", description = "모임 id값", required = true),
             @Parameter(name = "name", description = "모임명", example = "코로"),
             @Parameter(name = "introduction", description = "모임 설명", example = "모임 설명입니다."),
             @Parameter(name = "type", description = "모임 대면, 비대면 타입", example = "mixed faceToFace nonContact"),
@@ -50,5 +51,5 @@ public interface MoimControllerDocs {
             @Parameter(name = "tagList", description = "모임 태그들", example = "[\"tag1\", \"tag2\", \"tag3\"]"),
             @Parameter(name = "moimImage", description = "모임 이미지")
     })
-    APIResponse update(@PathVariable("id") Long moimId, @RequestPart(name = "moim", required = false) final MoimModifyRequest requestMoim, @RequestPart(name = "tagList", required = false) final MoimTagRequest requestTag, @RequestPart(name = "moimImage", required = false) final MultipartFile multipartFile, @AuthenticationPrincipal final User user) throws IOException;
+    APIResponse update(@PathVariable("id") Long moimId, @RequestPart(name = "moim", required = false) final MoimModifyRequest requestMoim, @RequestPart(name = "tagList", required = false) final MoimTagRequest requestTag, @RequestPart(name = "moimImage", required = false) final MultipartFile multipartFile) throws IOException;
 }

@@ -46,16 +46,16 @@ public class MemberController implements MemberControllerDocs {
     /*
     이미지, 회원정보 따로 수정 가능
      */
-    @PutMapping
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @Override
-    public APIResponse update(@RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile, @RequestPart(name = "member", required = false) final MemberModifyRequest requestMember, final @AuthenticationPrincipal User user) throws IOException {
+    public APIResponse update(@PathVariable("id") Long memberId, @RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile, @RequestPart(name = "member", required = false) final MemberModifyRequest requestMember) throws IOException {
 //        아래 합치기?
         if (requestMember != null) {
-            memberService.update(user.getId(), requestMember);
+            memberService.update(memberId, requestMember);
         }
         if (multipartFile != null) {
-            memberPhotoService.changeProfileImage(user.getId(), multipartFile);
+            memberPhotoService.changeProfileImage(memberId, multipartFile);
         }
         return APIResponse.create();
     }
