@@ -21,8 +21,8 @@ public class MoimControllerAdvice {
 
     /* Moim 도메인에서 확인되지 않은 예외 */
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(RuntimeException.class)
-    public GlobalErrorResponse unknownException(final RuntimeException e) {
+    @ExceptionHandler(Exception.class)
+    public GlobalErrorResponse unknownException(final Exception e) {
         log.error("", e);
         return GlobalErrorResponse.create();
     }

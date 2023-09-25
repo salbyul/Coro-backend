@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.coro.coro.application")
 public class ApplicationControllerAdvice {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -21,8 +21,8 @@ public class ApplicationControllerAdvice {
 
     /* Application 도메인에서 확인되지 않은 예외 */
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(RuntimeException.class)
-    public GlobalErrorResponse unknownException(final RuntimeException e) {
+    @ExceptionHandler(Exception.class)
+    public GlobalErrorResponse unknownException(final Exception e) {
         log.error("", e);
         return GlobalErrorResponse.create();
     }
