@@ -168,7 +168,7 @@ class MemberServiceTest {
     @Test
     @DisplayName("[회원수정] 틀린 비밀번호의 경우")
     void updateFailByPassword() {
-        MemberModifyRequest requestMember = new MemberModifyRequest("asdf1234!", "qwer1234!@", "바뀐 소개입니다.");
+        MemberModifyRequest requestMember = new MemberModifyRequest("1234", "qwer1234!@", "바뀐 소개입니다.");
         assertThatThrownBy(() -> memberService.update(1L, requestMember))
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_NOT_FOUND.getMessage());

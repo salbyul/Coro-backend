@@ -17,6 +17,7 @@ import java.util.List;
 import static com.coro.coro.common.response.error.ErrorType.*;
 import static org.assertj.core.api.Assertions.*;
 
+@Transactional
 @SpringBootTest
 class ApplicationQuestionServiceTest {
 
@@ -36,7 +37,6 @@ class ApplicationQuestionServiceTest {
 
     @Test
     @DisplayName("정상적인 지원 양식 작성")
-    @Transactional
     void register() {
         List<ApplicationQuestionRegisterRequest> requestQuestions = new ArrayList<>();
         for (int i = 1; i < 6; i++) {
@@ -47,7 +47,6 @@ class ApplicationQuestionServiceTest {
 
     @Test
     @DisplayName("[지원 양식 작성] 이름 초과")
-    @Transactional
     void registerFailByNameLength() {
         List<ApplicationQuestionRegisterRequest> requestQuestions = new ArrayList<>();
         String value = "글".repeat(201);
@@ -60,7 +59,6 @@ class ApplicationQuestionServiceTest {
 
     @Test
     @DisplayName("[지원 양식 작성] 순서 중복")
-    @Transactional
     void registerFailByDuplicateOrders() {
         List<ApplicationQuestionRegisterRequest> requestQuestions = new ArrayList<>();
         requestQuestions.add(new ApplicationQuestionRegisterRequest("질문ㅎㅎ", 1));
@@ -72,7 +70,6 @@ class ApplicationQuestionServiceTest {
 
     @Test
     @DisplayName("[지원 양식 작성] 유효하지 않은 순서")
-    @Transactional
     void registerFailByNotValidOrders() {
         List<ApplicationQuestionRegisterRequest> requestQuestions = new ArrayList<>();
         requestQuestions.add(new ApplicationQuestionRegisterRequest("질문ㅎㅎ", 3));
@@ -88,7 +85,6 @@ class ApplicationQuestionServiceTest {
 
     @Test
     @DisplayName("[지원 양식 작성] 10개 초과")
-    @Transactional
     void registerFailedByOrdersGreaterThanTen() {
         List<ApplicationQuestionRegisterRequest> requestQuestions = new ArrayList<>();
         for (int i = 1; i < 12; i++) {
