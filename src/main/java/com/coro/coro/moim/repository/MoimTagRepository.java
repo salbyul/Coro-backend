@@ -2,7 +2,7 @@ package com.coro.coro.moim.repository;
 
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.domain.MoimTag;
-import com.coro.coro.moim.domain.MoimTagId;
+import com.coro.coro.moim.domain.id.MoimTagId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
