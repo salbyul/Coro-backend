@@ -2,6 +2,7 @@ package com.coro.coro.application.validator;
 
 import com.coro.coro.application.domain.ApplicationQuestion;
 import com.coro.coro.application.exception.ApplicationException;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -20,10 +21,15 @@ public class ApplicationQuestionValidator {
     }
 
     private static void validateContent(final List<ApplicationQuestion> applicationQuestions) {
-        boolean isNotValid = applicationQuestions.stream().anyMatch(question -> question.getContent().length() > MAX_NAME_LENGTH);
-        if (isNotValid) {
+        boolean isGreaterThanMaxLength = applicationQuestions.stream().anyMatch(question -> question.getContent().length() > MAX_NAME_LENGTH);
+        boolean isEmpty = applicationQuestions.stream().anyMatch(question -> isEmpty(question.getContent()));
+        if (isGreaterThanMaxLength || isEmpty) {
             throw new ApplicationException(APPLICATION_CONTENT_VALID);
         }
+    }
+
+    private static boolean isEmpty(final String value) {
+        return !StringUtils.hasText(value);
     }
 
     private static void validateOrders(final List<ApplicationQuestion> applicationQuestions) {
