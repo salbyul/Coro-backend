@@ -65,9 +65,6 @@ public class MoimService {
         } else if (moimSearchRequest.getOption().equals(TAG)) {
             moimPage = moimRepository.findAllByTag(moimSearchRequest.getValue(), pageable);
         }
-        if (moimPage == null) {
-            return null;
-        }
         return moimPage;
     }
 
