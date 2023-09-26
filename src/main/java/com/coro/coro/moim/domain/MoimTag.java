@@ -1,5 +1,6 @@
 package com.coro.coro.moim.domain;
 
+import com.coro.coro.moim.domain.id.MoimTagId;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Persistable;
@@ -20,11 +21,11 @@ public class MoimTag implements Persistable<MoimTagId> {
     private Moim moim;
 
     public static MoimTag generateMoimTag(final String tagName, final Moim moim) {
-        return new MoimTag(tagName, moim.getId(), moim);
+        return new MoimTag(tagName, moim);
     }
 
-    private MoimTag(final String tagName, final Long moimId, final Moim moim) {
-        this.id = new MoimTagId(moimId, tagName);
+    private MoimTag(final String tagName, final Moim moim) {
+        this.id = new MoimTagId(tagName);
         this.moim = moim;
     }
 

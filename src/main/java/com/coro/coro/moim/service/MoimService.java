@@ -1,5 +1,9 @@
 package com.coro.coro.moim.service;
 
+import com.coro.coro.application.domain.ApplicationQuestion;
+import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
+import com.coro.coro.application.repository.ApplicationQuestionRepository;
+import com.coro.coro.application.validator.ApplicationQuestionValidator;
 import com.coro.coro.auth.exception.AuthException;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.repository.MemberRepository;
@@ -43,17 +47,19 @@ public class MoimService {
     private final MoimTagRepository moimTagRepository;
     private final MemberRepository memberRepository;
     private final MoimPhotoRepository moimPhotoRepository;
+    private final ApplicationQuestionRepository applicationQuestionRepository;
 
     @Value("${moim.image.dir}")
     private String path;
 
     @Transactional
-    public Long register(final MoimRegisterRequest requestMoim, final MoimTagRequest requestMoimTag, final Long memberId) {
+    public Long register(final MoimRegisterRequest requestMoim, final MoimTagRequest requestMoimTag, final List<ApplicationQuestionRegisterRequest> requestQuestions, final Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new AuthException(AUTH_ERROR));
 
         Moim moim = saveMoim(requestMoim, member);
         saveTag(requestMoimTag, moim);
+        saveQuestions(requestQuestions, moim);
         return moim.getId();
     }
 
@@ -91,6 +97,21 @@ public class MoimService {
 
         MoimTagValidator.validateTag(tagList);
         moimTagRepository.saveAll(tagList);
+    }
+
+    private void saveQuestions(final List<ApplicationQuestionRegisterRequest> requestQuestions, final Moim moim) {
+        if (requestQuestions == null || requestQuestions.size() == 0) {
+            return;
+        }
+
+        List<ApplicationQuestion> applicationQuestionList = requestQuestions.stream()
+                .map(requestQuestion -> ApplicationQuestion.generateApplicationQuestion(moim, requestQuestion))
+                .collect(Collectors.toList());
+
+        ApplicationQuestionValidator.validateApplicationQuestion(applicationQuestionList);
+
+        applicationQuestionRepository.deleteAllByMoimId(moim.getId());
+        applicationQuestionRepository.saveAll(applicationQuestionList);
     }
 
     @Transactional

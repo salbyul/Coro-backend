@@ -1,5 +1,6 @@
 package com.coro.coro.moim.domain;
 
+import com.coro.coro.application.domain.ApplicationQuestion;
 import com.coro.coro.common.domain.BaseEntity;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.moim.dto.request.MoimModifyRequest;
@@ -39,6 +40,9 @@ public class Moim extends BaseEntity {
 
     @OneToMany(mappedBy = "moim")
     private List<MoimTag> tagList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "moim")
+    private List<ApplicationQuestion> questionList = new ArrayList<>();
 
     @Builder
     public Moim(final Member leader, final String name, final String introduction, final Boolean visible, final MoimType type) {

@@ -15,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Slf4j
@@ -30,7 +29,7 @@ public class MemberService {
 
     /* 회원가입 */
     @Transactional
-    public void register(final MemberRegisterRequest requestMember) {
+    public Long register(final MemberRegisterRequest requestMember) {
         Member member =
                 Member.builder()
                         .email(requestMember.getEmail())
@@ -44,6 +43,7 @@ public class MemberService {
         member.encryptPassword(passwordEncoder);
 
         memberRepository.save(member);
+        return member.getId();
     }
 
     /* 로그인 */
