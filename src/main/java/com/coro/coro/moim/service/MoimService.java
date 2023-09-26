@@ -45,6 +45,9 @@ import static com.coro.coro.common.response.error.ErrorType.*;
 @Transactional(readOnly = true)
 @Service
 public class MoimService {
+
+    private static final String NAME = "name";
+    private static final String TAG = "tag";
     private final MoimRepository moimRepository;
 
     private final MoimTagRepository moimTagRepository;
@@ -57,9 +60,9 @@ public class MoimService {
 
     public Page<Moim> search(final MoimSearchRequest moimSearchRequest, final Pageable pageable) {
         Page<Moim> moimPage = null;
-        if (moimSearchRequest.getOption().equals("name")) {
+        if (moimSearchRequest.getOption().equals(NAME)) {
             moimPage = moimRepository.findAllByName(moimSearchRequest.getValue(), pageable);
-        } else if (moimSearchRequest.getOption().equals("tag")) { // TODO
+        } else if (moimSearchRequest.getOption().equals(TAG)) {
             moimPage = moimRepository.findAllByTag(moimSearchRequest.getValue(), pageable);
         }
         if (moimPage == null) {

@@ -41,7 +41,9 @@ public class MoimController implements MoimControllerDocs {
                 .addObject("list", moimList)
                 .addObject("totalPages", result.getTotalPages())
                 .addObject("hasNext", result.hasNext())
-                .addObject("hasPrevious", result.hasPrevious());
+                .addObject("hasPrevious", result.hasPrevious())
+                .addObject("isFirst", result.isFirst())
+                .addObject("isLast", result.isLast());
     }
 
     @PostMapping

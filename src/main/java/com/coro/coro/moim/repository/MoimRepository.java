@@ -16,6 +16,6 @@ public interface MoimRepository extends JpaRepository<Moim, Long> {
     @Query(value = "select m from Moim m where m.name like %:name% and m.visible = true")
     Page<Moim> findAllByName(@Param("name") final String name, Pageable pageable);
 
-    @Query(value = "select m from Moim m left join fetch MoimTag mt on mt.id.name like %:name%")
+    @Query(value = "select m from Moim m inner join fetch MoimTag mt on m.id = mt.moim.id and mt.name like %:name% where m.visible = true")
     Page<Moim> findAllByTag(@Param("name") final String name, Pageable pageable);
 }
