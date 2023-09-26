@@ -1,5 +1,6 @@
 package com.coro.coro.moim.controller;
 
+import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
 import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.domain.User;
 import com.coro.coro.moim.dto.request.MoimModifyRequest;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Tag(name = "Moim", description = "모임")
 public interface MoimControllerDocs {
@@ -34,7 +36,10 @@ public interface MoimControllerDocs {
             @Parameter(name = "visible", description = "공개 모임인지", example = "true", required = true),
             @Parameter(name = "tagList", description = "모임 태그들", example = "[\"tag1\", \"tag2\", \"tag3\"]")
     })
-    APIResponse register(@RequestPart final MoimRegisterRequest requestMoim, @RequestPart final MoimTagRequest requestTag, @AuthenticationPrincipal final User user);
+    APIResponse register(@RequestPart(name = "moim") final MoimRegisterRequest requestMoim,
+                         @RequestPart(required = false, name = "tagList") final MoimTagRequest requestTag,
+                         @RequestPart(required = false, name = "applicationQuestionList") final List<ApplicationQuestionRegisterRequest> requestQuestions,
+                         @AuthenticationPrincipal final User user);
 
     @Operation(summary = "모임 수정")
     @ApiResponses(value = {
@@ -51,5 +56,8 @@ public interface MoimControllerDocs {
             @Parameter(name = "tagList", description = "모임 태그들", example = "[\"tag1\", \"tag2\", \"tag3\"]"),
             @Parameter(name = "moimImage", description = "모임 이미지")
     })
-    APIResponse update(@PathVariable("id") Long moimId, @RequestPart(name = "moim", required = false) final MoimModifyRequest requestMoim, @RequestPart(name = "tagList", required = false) final MoimTagRequest requestTag, @RequestPart(name = "moimImage", required = false) final MultipartFile multipartFile) throws IOException;
+    APIResponse update(@PathVariable("id") Long moimId,
+                       @RequestPart(name = "moim", required = false) final MoimModifyRequest requestMoim,
+                       @RequestPart(name = "tagList", required = false) final MoimTagRequest requestTag,
+                       @RequestPart(name = "moimImage", required = false) final MultipartFile multipartFile) throws IOException;
 }

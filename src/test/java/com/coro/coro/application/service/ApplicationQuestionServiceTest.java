@@ -32,7 +32,7 @@ class ApplicationQuestionServiceTest {
     @BeforeEach
     void setUp() {
         Long savedId = memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        moimId = moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), null, savedId);
+        moimId = moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true),null, null, savedId);
     }
 
     @Test

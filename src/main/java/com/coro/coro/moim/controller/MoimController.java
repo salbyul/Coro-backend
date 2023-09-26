@@ -1,5 +1,6 @@
 package com.coro.coro.moim.controller;
 
+import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
 import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.domain.User;
 import com.coro.coro.moim.dto.request.MoimModifyRequest;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,8 +26,8 @@ public class MoimController implements MoimControllerDocs {
 
     @PostMapping
     @Override
-    public APIResponse register(@RequestPart(name = "moim") final MoimRegisterRequest requestMoim, @RequestPart(required = false, name = "tagList") final MoimTagRequest requestTag, @AuthenticationPrincipal final User user) {
-        Long savedId = moimService.register(requestMoim, requestTag, user.getId());
+    public APIResponse register(@RequestPart(name = "moim") final MoimRegisterRequest requestMoim, @RequestPart(required = false, name = "tagList") final MoimTagRequest requestTag, @RequestPart(required = false, name = "applicationQuestionList") final List<ApplicationQuestionRegisterRequest> requestQuestions, @AuthenticationPrincipal final User user) {
+        Long savedId = moimService.register(requestMoim, requestTag, requestQuestions, user.getId());
         return APIResponse.create()
                 .addObject("moimId", savedId);
     }
