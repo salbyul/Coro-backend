@@ -13,6 +13,7 @@ import com.coro.coro.moim.domain.MoimTag;
 import com.coro.coro.moim.domain.MoimType;
 import com.coro.coro.moim.dto.request.MoimModifyRequest;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
+import com.coro.coro.moim.dto.request.MoimSearchRequest;
 import com.coro.coro.moim.dto.request.MoimTagRequest;
 import com.coro.coro.moim.exception.MoimException;
 import com.coro.coro.moim.repository.MoimPhotoRepository;
@@ -23,6 +24,8 @@ import com.coro.coro.moim.validator.MoimValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,8 +45,8 @@ import static com.coro.coro.common.response.error.ErrorType.*;
 @Transactional(readOnly = true)
 @Service
 public class MoimService {
-
     private final MoimRepository moimRepository;
+
     private final MoimTagRepository moimTagRepository;
     private final MemberRepository memberRepository;
     private final MoimPhotoRepository moimPhotoRepository;
@@ -51,6 +54,19 @@ public class MoimService {
 
     @Value("${moim.image.dir}")
     private String path;
+
+    public Page<Moim> search(final MoimSearchRequest moimSearchRequest, final Pageable pageable) {
+        Page<Moim> moimPage = null;
+        if (moimSearchRequest.getOption().equals("name")) {
+            moimPage = moimRepository.findAllByName(moimSearchRequest.getValue(), pageable);
+        } else if (moimSearchRequest.getOption().equals("tag")) { // TODO
+            moimPage = moimRepository.findAllByTag(moimSearchRequest.getValue(), pageable);
+        }
+        if (moimPage == null) {
+            return null;
+        }
+        return moimPage;
+    }
 
     @Transactional
     public Long register(final MoimRegisterRequest requestMoim, final MoimTagRequest requestMoimTag, final List<ApplicationQuestionRegisterRequest> requestQuestions, final Long memberId) {
