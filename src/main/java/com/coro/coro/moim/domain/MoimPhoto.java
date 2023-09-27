@@ -1,10 +1,12 @@
 package com.coro.coro.moim.domain;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@Getter
 @Table(name = "moim_photo")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -12,7 +14,7 @@ public class MoimPhoto {
 
     @Id
     @Column(name = "moim_id")
-    private Long moimId;
+    private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId

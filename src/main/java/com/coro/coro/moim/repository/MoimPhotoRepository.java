@@ -6,9 +6,14 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface MoimPhotoRepository extends JpaRepository<MoimPhoto, Long> {
 
     @Modifying
-    @Query("delete from MoimPhoto mp where mp.moimId = :moimId")
+    @Query("delete from MoimPhoto mp where mp.id = :moimId")
     void deleteById(@Param("moimId") Long moimId);
+
+    @Query("select mp from MoimPhoto mp where mp.id in :moimIds")
+    List<MoimPhoto> findAllByIds(@Param("moimIds") List<Long> moimIds);
 }

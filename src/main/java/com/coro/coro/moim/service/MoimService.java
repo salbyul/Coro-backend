@@ -5,6 +5,7 @@ import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
 import com.coro.coro.application.repository.ApplicationQuestionRepository;
 import com.coro.coro.application.validator.ApplicationQuestionValidator;
 import com.coro.coro.auth.exception.AuthException;
+import com.coro.coro.common.utils.FileSaveUtils;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.repository.MemberRepository;
 import com.coro.coro.moim.domain.Moim;
@@ -15,6 +16,7 @@ import com.coro.coro.moim.dto.request.MoimModifyRequest;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
 import com.coro.coro.moim.dto.request.MoimSearchRequest;
 import com.coro.coro.moim.dto.request.MoimTagRequest;
+import com.coro.coro.moim.dto.response.MoimSearchResponse;
 import com.coro.coro.moim.exception.MoimException;
 import com.coro.coro.moim.repository.MoimPhotoRepository;
 import com.coro.coro.moim.repository.MoimRepository;
@@ -32,10 +34,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
@@ -48,8 +50,8 @@ public class MoimService {
 
     private static final String NAME = "name";
     private static final String TAG = "tag";
-    private final MoimRepository moimRepository;
 
+    private final MoimRepository moimRepository;
     private final MoimTagRepository moimTagRepository;
     private final MemberRepository memberRepository;
     private final MoimPhotoRepository moimPhotoRepository;
@@ -69,13 +71,16 @@ public class MoimService {
     }
 
     @Transactional
-    public Long register(final MoimRegisterRequest requestMoim, final MoimTagRequest requestMoimTag, final List<ApplicationQuestionRegisterRequest> requestQuestions, final Long memberId) {
+    public Long register(final MoimRegisterRequest requestMoim, final MoimTagRequest requestMoimTag, final List<ApplicationQuestionRegisterRequest> requestQuestions, final MultipartFile multipartFile, final Long memberId) throws IOException {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new AuthException(AUTH_ERROR));
 
         Moim moim = saveMoim(requestMoim, member);
         saveTag(requestMoimTag, moim);
         saveQuestions(requestQuestions, moim);
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            updateImage(moim, multipartFile);
+        }
         return moim.getId();
     }
 
@@ -167,24 +172,48 @@ public class MoimService {
     public void updateImage(final Moim moim, final MultipartFile multipartFile) throws IOException {
         moimPhotoRepository.deleteById(moim.getId());
 
-        String name = generateFileName(multipartFile);
-        transferFile(multipartFile, path, name);
+        String name = FileSaveUtils.generateFileName(multipartFile);
+        FileSaveUtils.transferFile(multipartFile, path, name);
         moimPhotoRepository.save(new MoimPhoto(moim, multipartFile.getOriginalFilename(), name));
     }
 
-    private String generateFileName(final MultipartFile multipartFile) {
-        String uuid = UUID.randomUUID().toString();
-        String now = LocalDateTime.now().toString();
-        String extra = extractExtra(multipartFile.getOriginalFilename());
-        return uuid + "[" + now + "]" + extra;
+    public List<MoimSearchResponse> getSummaryMoim(final List<Moim> moimList) throws IOException {
+        List<Long> moimIds = moimList.stream()
+                .map(Moim::getId)
+                .collect(Collectors.toList());
+
+        List<MoimPhoto> photos = moimPhotoRepository.findAllByIds(moimIds);
+
+        List<MoimSearchResponse> result = new ArrayList<>();
+
+        for (Moim moim : moimList) {
+            boolean isAdded = false;
+            for (MoimPhoto photo : photos) {
+                if (moim.getId().equals(photo.getId())) {
+                    byte[] photoBytes = getPhoto(photo.getName());
+                    result.add(new MoimSearchResponse(moim, photo.getOriginalName(), photoBytes));
+                    photos.remove(photo);
+                    isAdded =true;
+                    break;
+                }
+            }
+            if (!isAdded) {
+                result.add(new MoimSearchResponse(moim, null, null));
+            }
+        }
+        return result;
     }
 
-    private String extractExtra(final String originalName) {
-        log.info("file name: {}", originalName);
-        return originalName.substring(originalName.indexOf("."));
+    public MoimSearchResponse getSummaryMoim(final Moim moim) throws IOException {
+        Optional<MoimPhoto> optionalMoimPhoto = moimPhotoRepository.findById(moim.getId());
+        if (optionalMoimPhoto.isPresent()) {
+            MoimPhoto moimPhoto = optionalMoimPhoto.get();
+            return new MoimSearchResponse(moim, moimPhoto.getOriginalName(), getPhoto(moimPhoto.getName()));
+        }
+        return new MoimSearchResponse(moim, null, null);
     }
 
-    private void transferFile(final MultipartFile multipartFile, final String path, final String name) throws IOException {
-        multipartFile.transferTo(new File(path, name));
+    private byte[] getPhoto(final String name) throws IOException {
+        return Files.readAllBytes(new File(path + name).toPath());
     }
 }

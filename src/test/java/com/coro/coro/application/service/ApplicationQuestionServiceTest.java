@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,9 +31,9 @@ class ApplicationQuestionServiceTest {
     private Long moimId;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         Long savedId = memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        moimId = moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true),null, null, savedId);
+        moimId = moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true),null, null, null, savedId);
     }
 
     @Test

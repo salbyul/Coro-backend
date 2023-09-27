@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,10 +32,10 @@ public class MoimController implements MoimControllerDocs {
 
     @GetMapping
     @Override
-    public APIResponse search(@Search final MoimSearchRequest moimSearchRequest, final Pageable pageable) {
+    public APIResponse search(@Search final MoimSearchRequest moimSearchRequest, final Pageable pageable) throws IOException{
         Page<Moim> result = moimService.search(moimSearchRequest, pageable);
+        List<MoimSearchResponse> moimList = moimService.getSummaryMoim(result.getContent());
 
-        List<MoimSearchResponse> moimList = result.getContent().stream().map(MoimSearchResponse::new).collect(Collectors.toList());
         return APIResponse.create()
                 .addObject("list", moimList)
                 .addObject("totalPages", result.getTotalPages())
@@ -48,8 +47,12 @@ public class MoimController implements MoimControllerDocs {
 
     @PostMapping
     @Override
-    public APIResponse register(@RequestPart(name = "moim") final MoimRegisterRequest requestMoim, @RequestPart(required = false, name = "tagList") final MoimTagRequest requestTag, @RequestPart(required = false, name = "applicationQuestionList") final List<ApplicationQuestionRegisterRequest> requestQuestions, @AuthenticationPrincipal final User user) {
-        Long savedId = moimService.register(requestMoim, requestTag, requestQuestions, user.getId());
+    public APIResponse register(@RequestPart(name = "moim") final MoimRegisterRequest requestMoim,
+                                @RequestPart(required = false, name = "tagList") final MoimTagRequest requestTag,
+                                @RequestPart(required = false, name = "applicationQuestionList") final List<ApplicationQuestionRegisterRequest> requestQuestions,
+                                @RequestPart(name = "photo", required = false) final MultipartFile multipartFile,
+                                @AuthenticationPrincipal final User user) throws IOException {
+        Long savedId = moimService.register(requestMoim, requestTag, requestQuestions, multipartFile, user.getId());
         return APIResponse.create()
                 .addObject("moimId", savedId);
     }
@@ -59,7 +62,10 @@ public class MoimController implements MoimControllerDocs {
      */
     @PutMapping("/{id}")
     @Override
-    public APIResponse update(@PathVariable("id") Long moimId, @RequestPart(name = "moim", required = false) final MoimModifyRequest requestMoim, @RequestPart(name = "tagList", required = false) final MoimTagRequest requestTag, @RequestPart(name = "moimImage", required = false) final MultipartFile multipartFile) throws IOException {
+    public APIResponse update(@PathVariable("id") Long moimId,
+                              @RequestPart(name = "moim", required = false) final MoimModifyRequest requestMoim,
+                              @RequestPart(name = "tagList", required = false) final MoimTagRequest requestTag,
+                              @RequestPart(name = "moimImage", required = false) final MultipartFile multipartFile) throws IOException {
         moimService.update(moimId, requestMoim, requestTag, multipartFile);
         return APIResponse.create();
     }

@@ -37,7 +37,7 @@ public interface MoimControllerDocs {
             @Parameter(name = "option", description = "모임명으로 검색인지 태그로 검색인지"),
             @Parameter(name = "value", description = "검색 값")
     })
-    APIResponse search(@Search final MoimSearchRequest moimSearchRequest, final Pageable pageable);
+    APIResponse search(@Search final MoimSearchRequest moimSearchRequest, final Pageable pageable) throws IOException;
 
     @Operation(summary = "모임 등록")
     @ApiResponses(value = {
@@ -50,12 +50,13 @@ public interface MoimControllerDocs {
             @Parameter(name = "introduction", description = "모임 소개", example = "우리 모임을 소개합니다!"),
             @Parameter(name = "type", description = "모임 대면, 비대면 타입", example = "mixed faceToFace nonContact"),
             @Parameter(name = "visible", description = "공개 모임인지", example = "true", required = true),
-            @Parameter(name = "tagList", description = "모임 태그들", example = "[\"tag1\", \"tag2\", \"tag3\"]")
+            @Parameter(name = "tagList", description = "모임 태그들", example = "[\"tag1\", \"tag2\", \"tag3\"]"),
     })
     APIResponse register(@RequestPart(name = "moim") final MoimRegisterRequest requestMoim,
                          @RequestPart(required = false, name = "tagList") final MoimTagRequest requestTag,
                          @RequestPart(required = false, name = "applicationQuestionList") final List<ApplicationQuestionRegisterRequest> requestQuestions,
-                         @AuthenticationPrincipal final User user);
+                         @RequestPart(name = "photo", required = false) final MultipartFile multipartFile,
+                         @AuthenticationPrincipal final User user) throws IOException;
 
     @Operation(summary = "모임 수정")
     @ApiResponses(value = {
