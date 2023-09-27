@@ -3,8 +3,10 @@ package com.coro.coro.moim.controller;
 import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
 import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.domain.User;
+import com.coro.coro.moim.annotation.Search;
 import com.coro.coro.moim.dto.request.MoimModifyRequest;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
+import com.coro.coro.moim.dto.request.MoimSearchRequest;
 import com.coro.coro.moim.dto.request.MoimTagRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -22,6 +25,19 @@ import java.util.List;
 
 @Tag(name = "Moim", description = "모임")
 public interface MoimControllerDocs {
+
+    @Operation(summary = "모임 검색")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "검색 성공"),
+            @ApiResponse(responseCode = "403", description = "유저 인증 실패")
+    })
+    @Parameters(value = {
+            @Parameter(name = "size", description = "검색 사이즈"),
+            @Parameter(name = "page", description = "페이지"),
+            @Parameter(name = "option", description = "모임명으로 검색인지 태그로 검색인지"),
+            @Parameter(name = "value", description = "검색 값")
+    })
+    APIResponse search(@Search final MoimSearchRequest moimSearchRequest, final Pageable pageable);
 
     @Operation(summary = "모임 등록")
     @ApiResponses(value = {

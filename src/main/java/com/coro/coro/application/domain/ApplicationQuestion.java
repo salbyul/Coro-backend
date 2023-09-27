@@ -1,6 +1,5 @@
 package com.coro.coro.application.domain;
 
-import com.coro.coro.application.domain.id.ApplicationQuestionId;
 import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
 import com.coro.coro.common.domain.BaseEntity;
 import com.coro.coro.moim.domain.Moim;
@@ -15,12 +14,14 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "application_question")
-public class ApplicationQuestion extends BaseEntity implements Persistable<ApplicationQuestionId> {
+public class ApplicationQuestion extends BaseEntity implements Persistable<Long> {
 
-    @EmbeddedId
-    private ApplicationQuestionId id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @MapsId("moimId")
+    @Column(name = "orders", nullable = false)
+    private Integer order;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "moim_id")
     private Moim moim;
@@ -30,7 +31,7 @@ public class ApplicationQuestion extends BaseEntity implements Persistable<Appli
     public ApplicationQuestion(final Moim moim, final String content, final Integer order) {
         this.moim = moim;
         this.content = content;
-        this.id = new ApplicationQuestionId(order);
+        this.order = order;
     }
 
     public static ApplicationQuestion generateApplicationQuestion(final Moim moim, final ApplicationQuestionRegisterRequest requestQuestion) {
@@ -38,11 +39,11 @@ public class ApplicationQuestion extends BaseEntity implements Persistable<Appli
     }
 
     public int getOrder() {
-        return this.id.getOrder();
+        return this.order;
     }
 
     @Override
-    public ApplicationQuestionId getId() {
+    public Long getId() {
         return this.id;
     }
 
