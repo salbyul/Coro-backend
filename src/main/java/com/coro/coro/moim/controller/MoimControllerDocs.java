@@ -26,6 +26,16 @@ import java.util.List;
 @Tag(name = "Moim", description = "모임")
 public interface MoimControllerDocs {
 
+    @Operation(summary = "모임 디테일")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "모임 디테일 획득"),
+            @ApiResponse(responseCode = "403", description = "유저 인증 실패")
+    })
+    @Parameters(value = {
+            @Parameter(name = "id", description = "모임 Id 값")
+    })
+    APIResponse detail(@PathVariable("id") final Long moimId) throws IOException;
+
     @Operation(summary = "모임 검색")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "검색 성공"),

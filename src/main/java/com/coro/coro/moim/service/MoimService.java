@@ -16,6 +16,7 @@ import com.coro.coro.moim.dto.request.MoimModifyRequest;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
 import com.coro.coro.moim.dto.request.MoimSearchRequest;
 import com.coro.coro.moim.dto.request.MoimTagRequest;
+import com.coro.coro.moim.dto.response.MoimDetailResponse;
 import com.coro.coro.moim.dto.response.MoimSearchResponse;
 import com.coro.coro.moim.exception.MoimException;
 import com.coro.coro.moim.repository.MoimPhotoRepository;
@@ -215,5 +216,19 @@ public class MoimService {
 
     private byte[] getPhoto(final String name) throws IOException {
         return Files.readAllBytes(new File(path + name).toPath());
+    }
+
+    public MoimDetailResponse getDetail(final Long moimId) throws IOException {
+        Moim moim = moimRepository.findById(moimId)
+                .orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
+
+        MoimDetailResponse result = MoimDetailResponse.generateInstance(moim);
+
+        Optional<MoimPhoto> optionalMoimPhoto = moimPhotoRepository.findById(moimId);
+        if (optionalMoimPhoto.isPresent()) {
+            MoimPhoto moimPhoto = optionalMoimPhoto.get();
+            result.setPhoto(moimPhoto.getOriginalName(), getPhoto(moimPhoto.getName()));
+        }
+        return result;
     }
 }

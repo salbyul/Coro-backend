@@ -9,6 +9,7 @@ import com.coro.coro.moim.dto.request.MoimModifyRequest;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
 import com.coro.coro.moim.dto.request.MoimSearchRequest;
 import com.coro.coro.moim.dto.request.MoimTagRequest;
+import com.coro.coro.moim.dto.response.MoimDetailResponse;
 import com.coro.coro.moim.dto.response.MoimSearchResponse;
 import com.coro.coro.moim.service.MoimService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,15 @@ public class MoimController implements MoimControllerDocs {
 
     private final MoimService moimService;
 
-    @GetMapping
+    @GetMapping("/{id}")
+    @Override
+    public APIResponse detail(@PathVariable("id") final Long moimId) throws IOException {
+        MoimDetailResponse detail = moimService.getDetail(moimId);
+        return APIResponse.create()
+                .addObject("moim", detail);
+    }
+
+    @GetMapping("/search")
     @Override
     public APIResponse search(@Search final MoimSearchRequest moimSearchRequest, final Pageable pageable) throws IOException{
         Page<Moim> result = moimService.search(moimSearchRequest, pageable);
