@@ -2,6 +2,7 @@ package com.coro.coro.application.service;
 
 import com.coro.coro.application.domain.ApplicationQuestion;
 import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
+import com.coro.coro.application.dto.response.ApplicationQuestionResponse;
 import com.coro.coro.application.repository.ApplicationQuestionRepository;
 import com.coro.coro.application.validator.ApplicationQuestionValidator;
 import com.coro.coro.common.response.error.ErrorType;
@@ -39,5 +40,12 @@ public class ApplicationQuestionService {
 
             applicationQuestionRepository.deleteAllByMoimId(moim.getId());
             applicationQuestionRepository.saveAll(applicationQuestionList);
+    }
+
+    public List<ApplicationQuestionResponse> findQuestionList(final Long moimId) {
+        List<ApplicationQuestion> questionList = applicationQuestionRepository.findAllByMoimId(moimId);
+        return questionList.stream()
+                .map(ApplicationQuestionResponse::new)
+                .collect(Collectors.toList());
     }
 }

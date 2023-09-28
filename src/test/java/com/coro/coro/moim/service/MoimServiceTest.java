@@ -48,7 +48,7 @@ class MoimServiceTest {
     private Long savedMoimId;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         member = memberRepository.findByEmail("asdf@asdf.com")
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
@@ -56,15 +56,16 @@ class MoimServiceTest {
                 new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true),
                 new MoimTagRequest(List.of("tag1", "tag2", "tag3")),
                 null,
+                null,
                 member.getId());
         requestMoim = new MoimRegisterRequest("모임", "모임 소개", "mixed", true);
     }
 
     @Test
     @DisplayName("[모임 생성] 정상적인 모임 생성")
-    void register() {
+    void register() throws IOException {
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "", "mixed", true);
-        moimService.register(requestMoim, new MoimTagRequest(), null, member.getId());
+        moimService.register(requestMoim, new MoimTagRequest(), null, null, member.getId());
         Moim moim = moimRepository.findByName("모임")
                 .orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
         assertThat(moim.getIntroduction()).isEqualTo("우리 모임을 소개해주세요.");
@@ -76,7 +77,7 @@ class MoimServiceTest {
     @DisplayName("[모임 생성] 이름 중복의 경우")
     void registerFailByDuplicateName() {
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
-        assertThatThrownBy(() -> moimService.register(requestMoim, new MoimTagRequest(), null, member.getId()))
+        assertThatThrownBy(() -> moimService.register(requestMoim, new MoimTagRequest(), null, null, member.getId()))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NAME_DUPLICATE.getMessage());
     }
@@ -85,7 +86,7 @@ class MoimServiceTest {
     @DisplayName("[모임 생성] 태그 값이 비어있을 경우")
     void registerFailByEmptyTag() {
         MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag2", ""));
-        assertThatThrownBy(() -> moimService.register(requestMoim, requestMoimTag, null, member.getId()))
+        assertThatThrownBy(() -> moimService.register(requestMoim, requestMoimTag, null, null, member.getId()))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_TAG_NULL.getMessage());
     }
@@ -94,7 +95,7 @@ class MoimServiceTest {
     @DisplayName("[모임 생성] 태그 값이 중복될 경우")
     void registerFailByDuplicateTag() {
         MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag1"));
-        assertThatThrownBy(() -> moimService.register(requestMoim, requestMoimTag, null, member.getId()))
+        assertThatThrownBy(() -> moimService.register(requestMoim, requestMoimTag, null, null, member.getId()))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_TAG_DUPLICATE.getMessage());
     }
@@ -104,7 +105,7 @@ class MoimServiceTest {
     @ValueSource(strings = {"tag12345678", "!@#", "-_a"})
     void registerFailByNotValidTag(final String input) {
         MoimTagRequest requestMoimTag = new MoimTagRequest(List.of(input));
-        assertThatThrownBy(() -> moimService.register(requestMoim, requestMoimTag, null, member.getId()))
+        assertThatThrownBy(() -> moimService.register(requestMoim, requestMoimTag, null, null, member.getId()))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_TAG_NOT_VALID.getMessage());
     }
@@ -125,8 +126,8 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("[모임 수정] 이름 중복의 경우")
-    void updateFailByDuplicateName() {
-        Long savedId = moimService.register(new MoimRegisterRequest("모임 예", "모임 소개", "mixed", true), null, null, member.getId());
+    void updateFailByDuplicateName() throws IOException {
+        Long savedId = moimService.register(new MoimRegisterRequest("모임 예", "모임 소개", "mixed", true), null, null, null, member.getId());
         Moim moim = moimRepository.findById(savedId).orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
         assertThatThrownBy(() -> moimService.update(moim.getId(), new MoimModifyRequest(EXAMPLE_NAME, "모임 소개", "mixed", true), new MoimTagRequest(), null))
                 .isInstanceOf(MoimException.class)
