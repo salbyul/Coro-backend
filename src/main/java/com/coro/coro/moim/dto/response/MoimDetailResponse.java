@@ -14,19 +14,21 @@ public class MoimDetailResponse {
     private String name;
     private String introduction;
     private List<String> tagList;
+    private boolean isJoined;
     private String photoName;
     private byte[] photo;
 
-    private MoimDetailResponse(final Moim moim) {
+    private MoimDetailResponse(final Moim moim, final boolean isJoined) {
         this.name = moim.getName();
         this.introduction = moim.getIntroduction();
         this.tagList = moim.getTagList().stream()
                 .map(MoimTag::getName)
                 .collect(Collectors.toList());
+        this.isJoined = isJoined;
     }
 
-    public static MoimDetailResponse generateInstance(final Moim moim) {
-        return new MoimDetailResponse(moim);
+    public static MoimDetailResponse generateInstance(final Moim moim, final boolean isJoined) {
+        return new MoimDetailResponse(moim, isJoined);
     }
 
     public void setPhoto(final String photoName, final byte[] photo) {

@@ -33,8 +33,8 @@ public class MoimController implements MoimControllerDocs {
 
     @GetMapping("/{id}")
     @Override
-    public APIResponse detail(@PathVariable("id") final Long moimId) throws IOException {
-        MoimDetailResponse detail = moimService.getDetail(moimId);
+    public APIResponse detail(@PathVariable("id") final Long moimId, @AuthenticationPrincipal final User user) throws IOException {
+        MoimDetailResponse detail = moimService.getDetail(moimId, user.getId());
         return APIResponse.create()
                 .addObject("moim", detail);
     }

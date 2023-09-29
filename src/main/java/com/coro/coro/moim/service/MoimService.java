@@ -8,10 +8,7 @@ import com.coro.coro.auth.exception.AuthException;
 import com.coro.coro.common.utils.FileSaveUtils;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.repository.MemberRepository;
-import com.coro.coro.moim.domain.Moim;
-import com.coro.coro.moim.domain.MoimPhoto;
-import com.coro.coro.moim.domain.MoimTag;
-import com.coro.coro.moim.domain.MoimType;
+import com.coro.coro.moim.domain.*;
 import com.coro.coro.moim.dto.request.MoimModifyRequest;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
 import com.coro.coro.moim.dto.request.MoimSearchRequest;
@@ -19,6 +16,7 @@ import com.coro.coro.moim.dto.request.MoimTagRequest;
 import com.coro.coro.moim.dto.response.MoimDetailResponse;
 import com.coro.coro.moim.dto.response.MoimSearchResponse;
 import com.coro.coro.moim.exception.MoimException;
+import com.coro.coro.moim.repository.MoimMemberRepository;
 import com.coro.coro.moim.repository.MoimPhotoRepository;
 import com.coro.coro.moim.repository.MoimRepository;
 import com.coro.coro.moim.repository.MoimTagRepository;
@@ -57,6 +55,7 @@ public class MoimService {
     private final MemberRepository memberRepository;
     private final MoimPhotoRepository moimPhotoRepository;
     private final ApplicationQuestionRepository applicationQuestionRepository;
+    private final MoimMemberRepository moimMemberRepository;
 
     @Value("${moim.image.dir}")
     private String path;
@@ -82,6 +81,10 @@ public class MoimService {
         if (multipartFile != null && !multipartFile.isEmpty()) {
             updateImage(moim, multipartFile);
         }
+
+        MoimMember moimMember = MoimMember.generate(moim, member);
+        moimMemberRepository.save(moimMember);
+
         return moim.getId();
     }
 
@@ -218,11 +221,16 @@ public class MoimService {
         return Files.readAllBytes(new File(path + name).toPath());
     }
 
-    public MoimDetailResponse getDetail(final Long moimId) throws IOException {
+    public MoimDetailResponse getDetail(final Long moimId, final Long memberId) throws IOException {
         Moim moim = moimRepository.findById(moimId)
                 .orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
 
-        MoimDetailResponse result = MoimDetailResponse.generateInstance(moim);
+        MoimDetailResponse result;
+        if (moimMemberRepository.findByMoimIdAndMemberId(moimId, memberId).isPresent()) {
+            result = MoimDetailResponse.generateInstance(moim, true);
+        } else {
+            result = MoimDetailResponse.generateInstance(moim, false);
+        }
 
         Optional<MoimPhoto> optionalMoimPhoto = moimPhotoRepository.findById(moimId);
         if (optionalMoimPhoto.isPresent()) {

@@ -55,7 +55,7 @@ class ApplicationQuestionServiceTest {
         assertThat(value.length()).isEqualTo(201);
         assertThatThrownBy(() -> applicationQuestionService.register(moimId, requestQuestions))
                 .isInstanceOf(ApplicationException.class)
-                .hasMessage(APPLICATION_CONTENT_VALID.getMessage());
+                .hasMessage(APPLICATION_QUESTION_CONTENT_VALID.getMessage());
     }
 
     @Test
@@ -66,7 +66,7 @@ class ApplicationQuestionServiceTest {
         requestQuestions.add(new ApplicationQuestionRegisterRequest("질문", 1));
         assertThatThrownBy(() -> applicationQuestionService.register(moimId, requestQuestions))
                 .isInstanceOf(ApplicationException.class)
-                .hasMessage(APPLICATION_ORDERS_VALID.getMessage());
+                .hasMessage(APPLICATION_QUESTION_ORDERS_VALID.getMessage());
     }
 
     @Test
@@ -77,11 +77,11 @@ class ApplicationQuestionServiceTest {
         requestQuestions.add(new ApplicationQuestionRegisterRequest("질문", 2));
         assertThatThrownBy(() -> applicationQuestionService.register(moimId, requestQuestions))
                 .isInstanceOf(ApplicationException.class)
-                .hasMessage(APPLICATION_ORDERS_VALID.getMessage());
+                .hasMessage(APPLICATION_QUESTION_ORDERS_VALID.getMessage());
 
         assertThatThrownBy(() -> applicationQuestionService.register(moimId, List.of(new ApplicationQuestionRegisterRequest("질문", 0))))
                 .isInstanceOf(ApplicationException.class)
-                .hasMessage(APPLICATION_ORDERS_VALID.getMessage());
+                .hasMessage(APPLICATION_QUESTION_ORDERS_VALID.getMessage());
     }
 
     @Test
@@ -93,6 +93,6 @@ class ApplicationQuestionServiceTest {
         }
         assertThatThrownBy(() -> applicationQuestionService.register(moimId, requestQuestions))
                 .isInstanceOf(ApplicationException.class)
-                .hasMessage(APPLICATION_MAX.getMessage());
+                .hasMessage(APPLICATION_QUESTION_MAX.getMessage());
     }
 }
