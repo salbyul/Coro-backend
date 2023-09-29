@@ -2,6 +2,7 @@ package com.coro.coro.application.controller;
 
 import com.coro.coro.application.dto.request.ApplicationRequest;
 import com.coro.coro.application.dto.response.ApplicationQuestionResponse;
+import com.coro.coro.application.dto.response.ApplicationResponse;
 import com.coro.coro.application.service.ApplicationQuestionService;
 import com.coro.coro.application.service.ApplicationService;
 import com.coro.coro.common.response.APIResponse;
@@ -28,6 +29,13 @@ public class ApplicationController implements ApplicationControllerDocs {
         List<ApplicationQuestionResponse> questionList = applicationQuestionService.findQuestionList(moimId);
         return APIResponse.create()
                 .addObject("questionList", questionList);
+    }
+
+    @GetMapping("/{moimId}")
+    public APIResponse getApplication(@PathVariable("moimId") Long moimId, @AuthenticationPrincipal User user, String status) {
+        List<ApplicationResponse> applicationList = applicationService.getApplication(moimId, user.getId(), status);
+        return APIResponse.create()
+                .addObject("applicationList", applicationList);
     }
 
     @PostMapping("/{moimId}")

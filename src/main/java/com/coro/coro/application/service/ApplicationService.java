@@ -6,6 +6,7 @@ import com.coro.coro.application.domain.ApplicationQuestion;
 import com.coro.coro.application.domain.ApplicationStatus;
 import com.coro.coro.application.dto.request.ApplicationDTO;
 import com.coro.coro.application.dto.request.ApplicationRequest;
+import com.coro.coro.application.dto.response.ApplicationResponse;
 import com.coro.coro.application.exception.ApplicationException;
 import com.coro.coro.application.repository.ApplicationAnswerRepository;
 import com.coro.coro.application.repository.ApplicationQuestionRepository;
@@ -25,6 +26,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
 
@@ -34,6 +36,7 @@ import static com.coro.coro.common.response.error.ErrorType.*;
 @Service
 public class ApplicationService {
 
+    public static final String ALL = "all";
     private final ApplicationQuestionRepository applicationQuestionRepository;
     private final MemberRepository memberRepository;
     private final MoimRepository moimRepository;
@@ -100,5 +103,17 @@ public class ApplicationService {
             }
         }
         return result;
+    }
+
+    public List<ApplicationResponse> getApplication(final Long moimId, final Long memberId, final String status) {
+        List<Application> applicationList;
+        if (status.equals(ALL)) {
+            applicationList = applicationRepository.findByMemberAndMoim(memberId, moimId);
+        } else {
+            applicationList = applicationRepository.findByMemberAndMoimAndStatus(memberId, moimId, status);
+        }
+        return applicationList.stream()
+                .map(ApplicationResponse::new)
+                .collect(Collectors.toList());
     }
 }
