@@ -49,7 +49,9 @@ public class MemberController implements MemberControllerDocs {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @Override
-    public APIResponse update(@PathVariable("id") Long memberId, @RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile, @RequestPart(name = "member", required = false) final MemberModifyRequest requestMember) throws IOException {
+    public APIResponse update(@PathVariable("id") Long memberId,
+                              @RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile,
+                              @RequestPart(name = "member", required = false) final MemberModifyRequest requestMember) throws IOException {
 //        아래 합치기?
         if (requestMember != null) {
             memberService.update(memberId, requestMember);

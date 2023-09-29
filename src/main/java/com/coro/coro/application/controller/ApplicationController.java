@@ -1,14 +1,15 @@
 package com.coro.coro.application.controller;
 
+import com.coro.coro.application.dto.request.ApplicationRequest;
 import com.coro.coro.application.dto.response.ApplicationQuestionResponse;
 import com.coro.coro.application.service.ApplicationQuestionService;
+import com.coro.coro.application.service.ApplicationService;
 import com.coro.coro.common.response.APIResponse;
+import com.coro.coro.member.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ import java.util.List;
 public class ApplicationController implements ApplicationControllerDocs {
 
     private final ApplicationQuestionService applicationQuestionService;
+    private final ApplicationService applicationService;
 
     @GetMapping("/questions/{id}")
     @Override
@@ -26,5 +28,15 @@ public class ApplicationController implements ApplicationControllerDocs {
         List<ApplicationQuestionResponse> questionList = applicationQuestionService.findQuestionList(moimId);
         return APIResponse.create()
                 .addObject("questionList", questionList);
+    }
+
+    @PostMapping("/{moimId}")
+    @Override
+    public APIResponse submitApplication(@PathVariable("moimId") Long moimId,
+                                  @RequestBody final ApplicationRequest applicationRequest,
+                                  @AuthenticationPrincipal final User user){
+        log.info("application: {}", applicationRequest);
+        applicationService.register(moimId, applicationRequest, user.getId());
+        return APIResponse.create();
     }
 }

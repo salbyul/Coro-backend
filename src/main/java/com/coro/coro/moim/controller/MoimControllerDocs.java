@@ -34,7 +34,7 @@ public interface MoimControllerDocs {
     @Parameters(value = {
             @Parameter(name = "id", description = "모임 Id 값")
     })
-    APIResponse detail(@PathVariable("id") final Long moimId) throws IOException;
+    APIResponse detail(@PathVariable("id") final Long moimId, @AuthenticationPrincipal final User user) throws IOException;
 
     @Operation(summary = "모임 검색")
     @ApiResponses(value = {
