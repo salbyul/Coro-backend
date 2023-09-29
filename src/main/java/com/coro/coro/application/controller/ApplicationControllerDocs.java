@@ -25,6 +25,17 @@ public interface ApplicationControllerDocs {
     })
     APIResponse getQuestionList(@PathVariable("id") Long moimId);
 
+    @Operation(summary = "지원 리스트")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "지원 리스트 획득 성공"),
+            @ApiResponse(responseCode = "403", description = "유저 인증 실패")
+    })
+    @Parameters(value = {
+            @Parameter(name = "moimId", description = "모임 Id 값"),
+            @Parameter(name = "status", description = "획득할 지원 status 값", example = "all, wait accept, refuse")
+    })
+    APIResponse getApplication(@PathVariable("moimId") final Long moimId, @AuthenticationPrincipal final User user, final String status);
+
     @Operation(summary = "지원 제출")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "지원 제출 성공"),

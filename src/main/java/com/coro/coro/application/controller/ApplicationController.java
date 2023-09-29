@@ -32,7 +32,8 @@ public class ApplicationController implements ApplicationControllerDocs {
     }
 
     @GetMapping("/{moimId}")
-    public APIResponse getApplication(@PathVariable("moimId") Long moimId, @AuthenticationPrincipal User user, String status) {
+    @Override
+    public APIResponse getApplication(@PathVariable("moimId") final Long moimId, @AuthenticationPrincipal final User user, final String status) {
         List<ApplicationResponse> applicationList = applicationService.getApplication(moimId, user.getId(), status);
         return APIResponse.create()
                 .addObject("applicationList", applicationList);
@@ -41,8 +42,8 @@ public class ApplicationController implements ApplicationControllerDocs {
     @PostMapping("/{moimId}")
     @Override
     public APIResponse submitApplication(@PathVariable("moimId") Long moimId,
-                                  @RequestBody final ApplicationRequest applicationRequest,
-                                  @AuthenticationPrincipal final User user){
+                                         @RequestBody final ApplicationRequest applicationRequest,
+                                         @AuthenticationPrincipal final User user) {
         log.info("application: {}", applicationRequest);
         applicationService.register(moimId, applicationRequest, user.getId());
         return APIResponse.create();
