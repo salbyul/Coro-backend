@@ -28,6 +28,7 @@ public enum ErrorType {
 
     //    Moim
     MOIM_NOT_FOUND("200", "해당 Moim이 없습니다."),
+    MOIM_FORBIDDEN("201", "권한이 없습니다."),
 
     MOIM_NAME_NULL("210", "Name 값이 비어있습니다."),
     MOIM_NAME_DUPLICATE("211", "Name 값이 중복됩니다."),

@@ -61,5 +61,9 @@ public interface MemberControllerDocs {
     APIResponse update(@PathVariable("id") Long memberId, @RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile, @RequestPart(name = "member", required = false) final MemberModifyRequest requestMember) throws IOException;
 
     @Operation(summary = "내 모임")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "403", description = "회원 인증 실패")
+    })
     APIResponse getMoim(@AuthenticationPrincipal final User user) throws IOException;
 }

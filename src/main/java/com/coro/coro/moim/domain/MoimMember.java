@@ -45,4 +45,8 @@ public class MoimMember extends BaseEntity {
     public static MoimMember generate(final Moim moim, final Member member) {
         return new MoimMember(moim, member, MoimRole.LEADER);
     }
+
+    public boolean canManage() {
+        return !this.role.equals(MoimRole.USER);
+    }
 }

@@ -5,11 +5,12 @@ import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.domain.User;
 import com.coro.coro.moim.annotation.Search;
 import com.coro.coro.moim.domain.Moim;
-import com.coro.coro.moim.dto.request.MoimModifyRequest;
+import com.coro.coro.moim.dto.request.MoimModificationRequest;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
 import com.coro.coro.moim.dto.request.MoimSearchRequest;
 import com.coro.coro.moim.dto.request.MoimTagRequest;
 import com.coro.coro.moim.dto.response.MoimDetailResponse;
+import com.coro.coro.moim.dto.response.MoimModificationResponse;
 import com.coro.coro.moim.dto.response.MoimSearchResponse;
 import com.coro.coro.moim.service.MoimService;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class MoimController implements MoimControllerDocs {
 
     @GetMapping("/search")
     @Override
-    public APIResponse search(@Search final MoimSearchRequest moimSearchRequest, final Pageable pageable) throws IOException{
+    public APIResponse search(@Search final MoimSearchRequest moimSearchRequest, final Pageable pageable) throws IOException {
         Page<Moim> result = moimService.search(moimSearchRequest, pageable);
         List<MoimSearchResponse> moimList = moimService.getSummaryMoim(result.getContent());
 
@@ -66,16 +67,22 @@ public class MoimController implements MoimControllerDocs {
                 .addObject("moimId", savedId);
     }
 
-    /*
-    모임과 태그, 이미지 따로 수정 가능
-     */
     @PutMapping("/{id}")
     @Override
     public APIResponse update(@PathVariable("id") Long moimId,
-                              @RequestPart(name = "moim", required = false) final MoimModifyRequest requestMoim,
-                              @RequestPart(name = "tagList", required = false) final MoimTagRequest requestTag,
-                              @RequestPart(name = "moimImage", required = false) final MultipartFile multipartFile) throws IOException {
-        moimService.update(moimId, requestMoim, requestTag, multipartFile);
+                              @RequestPart(name = "moim") final MoimModificationRequest requestMoim,
+                              @RequestPart(name = "tagList") final MoimTagRequest requestTag,
+                              @RequestPart(name = "applicationQuestionList") final List<ApplicationQuestionRegisterRequest> requestQuestions,
+                              @RequestPart(name = "photo", required = false) final MultipartFile multipartFile,
+                              @AuthenticationPrincipal final User user) throws IOException {
+        moimService.update(moimId, requestMoim, requestTag, multipartFile, requestQuestions, user.getId());
         return APIResponse.create();
+    }
+
+    @GetMapping("/modification/{id}")
+    public APIResponse getMoimForModification(@PathVariable("id") final Long moimId, @AuthenticationPrincipal User user) throws IOException {
+        MoimModificationResponse detail = moimService.getDetailForModification(moimId, user.getId());
+        return APIResponse.create()
+                .addObject("detail", detail);
     }
 }

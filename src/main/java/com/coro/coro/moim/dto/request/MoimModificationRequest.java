@@ -7,10 +7,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MoimModifyRequest {
+public class MoimModificationRequest {
 
     private String name;
     private String introduction;
     private String type;
     private Boolean visible;
+    private Boolean isDeletedPhoto;
 }
