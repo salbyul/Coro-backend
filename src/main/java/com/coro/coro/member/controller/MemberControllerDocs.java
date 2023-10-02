@@ -59,4 +59,7 @@ public interface MemberControllerDocs {
             @Parameter(name = "profileImage", description = "프로필 이미지")
     })
     APIResponse update(@PathVariable("id") Long memberId, @RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile, @RequestPart(name = "member", required = false) final MemberModifyRequest requestMember) throws IOException;
+
+    @Operation(summary = "내 모임")
+    APIResponse getMoim(@AuthenticationPrincipal final User user) throws IOException;
 }
