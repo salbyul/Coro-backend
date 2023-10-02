@@ -7,6 +7,9 @@ import com.coro.coro.member.dto.request.MemberModifyRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.service.MemberPhotoService;
 import com.coro.coro.member.service.MemberService;
+import com.coro.coro.moim.domain.Moim;
+import com.coro.coro.moim.dto.response.MoimSearchResponse;
+import com.coro.coro.moim.service.MoimService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -24,6 +28,7 @@ public class MemberController implements MemberControllerDocs {
 
     private final MemberService memberService;
     private final MemberPhotoService memberPhotoService;
+    private final MoimService moimService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -60,5 +65,16 @@ public class MemberController implements MemberControllerDocs {
             memberPhotoService.changeProfileImage(memberId, multipartFile);
         }
         return APIResponse.create();
+    }
+
+    @GetMapping("/moims")
+    @ResponseStatus(HttpStatus.OK)
+    @Override
+    public APIResponse getMoim(@AuthenticationPrincipal final User user) throws IOException{
+        List<Moim> moimList = moimService.getMoimListByMemberId(user.getId());
+        List<MoimSearchResponse> summaryMoims = moimService.getSummaryMoim(moimList);
+
+        return APIResponse.create()
+                .addObject("list", summaryMoims);
     }
 }

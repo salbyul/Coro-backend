@@ -239,4 +239,8 @@ public class MoimService {
         }
         return result;
     }
+
+    public List<Moim> getMoimListByMemberId(final Long memberId) {
+        return moimRepository.findAllByMemberId(memberId);
+    }
 }
