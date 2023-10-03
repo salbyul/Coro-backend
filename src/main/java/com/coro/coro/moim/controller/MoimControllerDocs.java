@@ -4,10 +4,7 @@ import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
 import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.domain.User;
 import com.coro.coro.moim.annotation.Search;
-import com.coro.coro.moim.dto.request.MoimModificationRequest;
-import com.coro.coro.moim.dto.request.MoimRegisterRequest;
-import com.coro.coro.moim.dto.request.MoimSearchRequest;
-import com.coro.coro.moim.dto.request.MoimTagRequest;
+import com.coro.coro.moim.dto.request.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -85,11 +82,11 @@ public interface MoimControllerDocs {
             @Parameter(name = "moimImage", description = "모임 이미지")
     })
     APIResponse update(@PathVariable("id") Long moimId,
-                              @RequestPart(name = "moim") final MoimModificationRequest requestMoim,
-                              @RequestPart(name = "tagList") final MoimTagRequest requestTag,
-                              @RequestPart(name = "applicationQuestionList") final List<ApplicationQuestionRegisterRequest> requestQuestions,
-                              @RequestPart(name = "photo", required = false) final MultipartFile multipartFile,
-                              @AuthenticationPrincipal final User user) throws IOException;
+                       @RequestPart(name = "moim") final MoimModificationRequest requestMoim,
+                       @RequestPart(name = "tagList") final MoimTagRequest requestTag,
+                       @RequestPart(name = "applicationQuestionList") final List<ApplicationQuestionRegisterRequest> requestQuestions,
+                       @RequestPart(name = "photo", required = false) final MultipartFile multipartFile,
+                       @AuthenticationPrincipal final User user) throws IOException;
 
     @Operation(summary = "모임 수정 위한 정보 획득")
     @ApiResponses(value = {
@@ -99,4 +96,26 @@ public interface MoimControllerDocs {
     @Parameter(name = "id", description = "모임 Id 값")
     APIResponse getMoimForModification(@PathVariable("id") final Long moimId,
                                        @AuthenticationPrincipal User user) throws IOException;
+
+    @Operation(summary = "모임 회원 목록")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "403", description = "유저 인증 실패")
+    })
+    @Parameters(value = {
+            @Parameter(name = "moimId", description = "모임 Id 값")
+    })
+    APIResponse getMoimMember(@PathVariable("moimId") final Long moimId);
+
+    @Operation(summary = "모임 회원 역할 수정")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "403", description = "유저 인증 실패"),
+            @ApiResponse(responseCode = "400", description = "리더가 여럿 있을 경우")
+    })
+    @Parameters(value = {
+            @Parameter(name = "moimId", description = "모임 Id 값"),
+            @Parameter(name = "requestMoimMember", description = "수정된 회원들의 목록")
+    })
+    APIResponse changeMoimMember(@PathVariable("moimId") final Long moimId, final List<MoimMemberModificationRequest> requestMoimMember, @AuthenticationPrincipal final User user);
 }

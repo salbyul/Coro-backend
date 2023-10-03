@@ -50,7 +50,11 @@ public enum ErrorType {
     APPLICATION_NOT_COMPLETE("308", "답변이 불완전합니다."),
     APPLICATION_QUESTION_MAX("309", "Application Question은 총 10개까지만 생성이 가능합니다."),
     APPLICATION_QUESTION_CONTENT_VALID("312", "Content 값의 형태가 올바르지 않습니다."),
-    APPLICATION_QUESTION_ORDERS_VALID("321", "Orders 값이 올바르지 않습니다.");
+    APPLICATION_QUESTION_ORDERS_VALID("321", "Orders 값이 올바르지 않습니다."),
+
+//    MoimMember
+    MOIM_MEMBER_NOT_VALID("401", "MoimMember가 유효하지 않습니다.");
+
 
     private final String code;
     private final String message;

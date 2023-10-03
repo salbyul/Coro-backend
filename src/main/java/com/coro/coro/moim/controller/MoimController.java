@@ -5,11 +5,9 @@ import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.domain.User;
 import com.coro.coro.moim.annotation.Search;
 import com.coro.coro.moim.domain.Moim;
-import com.coro.coro.moim.dto.request.MoimModificationRequest;
-import com.coro.coro.moim.dto.request.MoimRegisterRequest;
-import com.coro.coro.moim.dto.request.MoimSearchRequest;
-import com.coro.coro.moim.dto.request.MoimTagRequest;
+import com.coro.coro.moim.dto.request.*;
 import com.coro.coro.moim.dto.response.MoimDetailResponse;
+import com.coro.coro.moim.dto.response.MoimMemberResponse;
 import com.coro.coro.moim.dto.response.MoimModificationResponse;
 import com.coro.coro.moim.dto.response.MoimSearchResponse;
 import com.coro.coro.moim.service.MoimService;
@@ -80,9 +78,27 @@ public class MoimController implements MoimControllerDocs {
     }
 
     @GetMapping("/modification/{id}")
+    @Override
     public APIResponse getMoimForModification(@PathVariable("id") final Long moimId, @AuthenticationPrincipal User user) throws IOException {
         MoimModificationResponse detail = moimService.getDetailForModification(moimId, user.getId());
         return APIResponse.create()
                 .addObject("detail", detail);
+    }
+
+    @GetMapping("/{moimId}/moim-members")
+    @Override
+    public APIResponse getMoimMember(@PathVariable("moimId") final Long moimId) {
+        List<MoimMemberResponse> moimMemberResponseList = moimService.getMoimMemberList(moimId);
+        return APIResponse.create()
+                .addObject("moimMemberList", moimMemberResponseList);
+    }
+
+    @PutMapping("/{moimId}/moim-members")
+    @Override
+    public APIResponse changeMoimMember(@PathVariable("moimId") final Long moimId,
+                                        @RequestBody final List<MoimMemberModificationRequest> requestMoimMember,
+                                        @AuthenticationPrincipal final User user) {
+        moimService.modifyMoimMember(moimId, requestMoimMember, user.getId());
+        return APIResponse.create();
     }
 }

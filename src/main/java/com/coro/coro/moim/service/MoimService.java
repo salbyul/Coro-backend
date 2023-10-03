@@ -9,11 +9,9 @@ import com.coro.coro.common.utils.FileSaveUtils;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.repository.MemberRepository;
 import com.coro.coro.moim.domain.*;
-import com.coro.coro.moim.dto.request.MoimModificationRequest;
-import com.coro.coro.moim.dto.request.MoimRegisterRequest;
-import com.coro.coro.moim.dto.request.MoimSearchRequest;
-import com.coro.coro.moim.dto.request.MoimTagRequest;
+import com.coro.coro.moim.dto.request.*;
 import com.coro.coro.moim.dto.response.MoimDetailResponse;
+import com.coro.coro.moim.dto.response.MoimMemberResponse;
 import com.coro.coro.moim.dto.response.MoimModificationResponse;
 import com.coro.coro.moim.dto.response.MoimSearchResponse;
 import com.coro.coro.moim.exception.MoimException;
@@ -271,5 +269,33 @@ public class MoimService {
 
     public List<Moim> getMoimListByMemberId(final Long memberId) {
         return moimRepository.findAllByMemberId(memberId);
+    }
+
+    public List<MoimMemberResponse> getMoimMemberList(final Long moimId) {
+        List<MoimMember> moimMemberList = moimMemberRepository.findAllByMoimId(moimId);
+        return moimMemberList.stream()
+                .map(MoimMemberResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void modifyMoimMember(final Long moimId, final List<MoimMemberModificationRequest> requestMoimMember, final Long memberId) {
+        moimMemberRepository.findByMoimIdAndMemberId(moimId, memberId)
+                .map(MoimMember::canManage)
+                .orElseThrow(() -> new MoimException(MOIM_FORBIDDEN));
+
+        List<MoimMember> moimMemberList = moimMemberRepository.findAllByMoimId(moimId);
+        updateMoimMember(moimMemberList, requestMoimMember);
+    }
+
+    private void updateMoimMember(final List<MoimMember> moimMemberList, final List<MoimMemberModificationRequest> requestMoimMemberList) {
+        for (MoimMember moimMember : moimMemberList) {
+            for (MoimMemberModificationRequest moimMemberRequest : requestMoimMemberList) {
+                if (moimMember.getId().equals(moimMemberRequest.getId())) {
+                    moimMember.update(moimMemberRequest);
+                    break;
+                }
+            }
+        }
     }
 }
