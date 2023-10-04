@@ -7,14 +7,17 @@ import com.coro.coro.application.domain.ApplicationStatus;
 import com.coro.coro.application.dto.request.ApplicationDTO;
 import com.coro.coro.application.dto.request.ApplicationRequest;
 import com.coro.coro.application.dto.response.ApplicationResponse;
+import com.coro.coro.application.dto.response.DetailedApplicationResponse;
 import com.coro.coro.application.exception.ApplicationException;
 import com.coro.coro.application.repository.ApplicationAnswerRepository;
 import com.coro.coro.application.repository.ApplicationQuestionRepository;
 import com.coro.coro.application.repository.ApplicationRepository;
 import com.coro.coro.member.domain.Member;
+import com.coro.coro.member.domain.MemberRole;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.repository.MemberRepository;
 import com.coro.coro.moim.domain.Moim;
+import com.coro.coro.moim.domain.MoimMember;
 import com.coro.coro.moim.exception.MoimException;
 import com.coro.coro.moim.repository.MoimMemberRepository;
 import com.coro.coro.moim.repository.MoimRepository;
@@ -115,5 +118,46 @@ public class ApplicationService {
         return applicationList.stream()
                 .map(ApplicationResponse::new)
                 .collect(Collectors.toList());
+    }
+
+    public List<ApplicationResponse> getApplication(final Long moimId, final String status) {
+        List<Application> applicationList;
+        if (status.equals(ALL)) {
+            applicationList = applicationRepository.findAllByMoimId(moimId);
+        } else {
+            applicationList = applicationRepository.findAllByMoimIdAndStatus(moimId, status);
+        }
+        return applicationList.stream()
+                .map(ApplicationResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    public DetailedApplicationResponse getDetailedApplication(final Long applicationId) {
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new ApplicationException(APPLICATION_NOT_FOUND));
+
+        List<ApplicationAnswer> applicationAnswerList = applicationAnswerRepository.findAllByApplicationId(applicationId);
+        return DetailedApplicationResponse.generate(application, applicationAnswerList);
+    }
+
+    @Transactional
+    public void decideApplication(final Long memberId, final Long applicationId, final ApplicationStatus status) {
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new ApplicationException(APPLICATION_NOT_FOUND));
+
+        if (!application.isWait()) {
+            throw new ApplicationException(APPLICATION_STATUS_ALREADY);
+        }
+
+        Long moimId = application.getMoim().getId();
+        moimMemberRepository.findByMoimIdAndMemberId(moimId, memberId)
+                .filter(MoimMember::canManage)
+                .orElseThrow(() -> new ApplicationException(APPLICATION_FORBIDDEN));
+        application.updateStatusTo(status);
+
+        if (status.equals(ApplicationStatus.ACCEPT)) {
+            MoimMember moimMember = MoimMember.generate(application.getMoim(), application.getMember(), MemberRole.USER);
+            moimMemberRepository.save(moimMember);
+        }
     }
 }

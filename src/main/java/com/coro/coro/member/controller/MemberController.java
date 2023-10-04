@@ -1,5 +1,7 @@
 package com.coro.coro.member.controller;
 
+import com.coro.coro.application.dto.response.ApplicationResponse;
+import com.coro.coro.application.service.ApplicationService;
 import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.domain.User;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
@@ -29,6 +31,7 @@ public class MemberController implements MemberControllerDocs {
     private final MemberService memberService;
     private final MemberPhotoService memberPhotoService;
     private final MoimService moimService;
+    private final ApplicationService applicationService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -76,5 +79,15 @@ public class MemberController implements MemberControllerDocs {
 
         return APIResponse.create()
                 .addObject("list", summaryMoims);
+    }
+
+    @GetMapping("/applications")
+    @Override
+    public APIResponse getApplication(@ModelAttribute(name = "moim") final Long moimId,
+                                      @AuthenticationPrincipal final User user,
+                                      final String status) {
+        List<ApplicationResponse> applicationList = applicationService.getApplication(moimId, user.getId(), status);
+        return APIResponse.create()
+                .addObject("applicationList", applicationList);
     }
 }

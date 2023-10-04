@@ -19,4 +19,9 @@ public enum MoimType {
                 .findAny()
                 .orElseThrow(() -> new MoimException(ErrorType.MOIM_TYPE_NULL));
     }
+
+    @Override
+    public String toString() {
+        return this.type;
+    }
 }

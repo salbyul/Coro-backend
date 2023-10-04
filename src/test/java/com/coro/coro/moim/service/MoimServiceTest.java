@@ -7,7 +7,7 @@ import com.coro.coro.member.repository.MemberRepository;
 import com.coro.coro.member.service.MemberService;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.domain.MoimType;
-import com.coro.coro.moim.dto.request.MoimModifyRequest;
+import com.coro.coro.moim.dto.request.MoimModificationRequest;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
 import com.coro.coro.moim.dto.request.MoimTagRequest;
 import com.coro.coro.moim.exception.MoimException;
@@ -113,13 +113,13 @@ class MoimServiceTest {
     @Test
     @DisplayName("[모임 수정] 정상적인 모임 수정")
     void update() throws IOException {
-        moimService.update(savedMoimId, new MoimModifyRequest(EXAMPLE_NAME, "수정되었습니다.", "mixed", true), null, null);
+        moimService.update(savedMoimId, new MoimModificationRequest(EXAMPLE_NAME, "수정되었습니다.", "mixed", true, false), null, null, null, member.getId());
     }
 
     @Test
     @DisplayName("[모임 수정] 존재하지 않는 모임")
     void updateFailByNotExistId() {
-        assertThatThrownBy(() -> moimService.update(0L, new MoimModifyRequest("수정", "소개 수정", "mixed", true), null, null))
+        assertThatThrownBy(() -> moimService.update(0L, new MoimModificationRequest("수정", "소개 수정", "mixed", true, false), null, null, null, member.getId()))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NOT_FOUND.getMessage());
     }
@@ -129,7 +129,7 @@ class MoimServiceTest {
     void updateFailByDuplicateName() throws IOException {
         Long savedId = moimService.register(new MoimRegisterRequest("모임 예", "모임 소개", "mixed", true), null, null, null, member.getId());
         Moim moim = moimRepository.findById(savedId).orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
-        assertThatThrownBy(() -> moimService.update(moim.getId(), new MoimModifyRequest(EXAMPLE_NAME, "모임 소개", "mixed", true), new MoimTagRequest(), null))
+        assertThatThrownBy(() -> moimService.update(moim.getId(), new MoimModificationRequest(EXAMPLE_NAME, "모임 소개", "mixed", true, false), new MoimTagRequest(), null, null, member.getId()))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NAME_DUPLICATE.getMessage());
     }

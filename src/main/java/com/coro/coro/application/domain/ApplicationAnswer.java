@@ -20,9 +20,7 @@ public class ApplicationAnswer implements Persistable<Long> {
     @JoinColumn(name = "application_id")
     private Application application;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "application_question_id")
-    private ApplicationQuestion applicationQuestion;
+    private String question;
 
     private String content;
 
@@ -38,7 +36,7 @@ public class ApplicationAnswer implements Persistable<Long> {
 
     private ApplicationAnswer(final Application application, final ApplicationQuestion applicationQuestion, final String content) {
         this.application = application;
-        this.applicationQuestion = applicationQuestion;
+        this.question = applicationQuestion.getContent();
         this.content = content;
     };
 

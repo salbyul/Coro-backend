@@ -3,7 +3,7 @@ package com.coro.coro.moim.domain;
 import com.coro.coro.application.domain.ApplicationQuestion;
 import com.coro.coro.common.domain.BaseEntity;
 import com.coro.coro.member.domain.Member;
-import com.coro.coro.moim.dto.request.MoimModifyRequest;
+import com.coro.coro.moim.dto.request.MoimModificationRequest;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,8 +32,6 @@ public class Moim extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private MoimType type;
-
-    private String address;
 
     @Enumerated(EnumType.STRING)
     private MoimState state;
@@ -66,10 +64,13 @@ public class Moim extends BaseEntity {
         return value == null || value.equals("");
     }
 
-    public void changeTo(final MoimModifyRequest requestMoim) {
-        this.name = requestMoim.getName();
+    public void changeTo(final MoimModificationRequest requestMoim) {
         this.introduction = requestMoim.getIntroduction();
         this.type = MoimType.getType(requestMoim.getType());
         this.visible = requestMoim.getVisible();
+    }
+
+    public void changeLeader(final Member newLeader) {
+        this.leader = newLeader;
     }
 }
