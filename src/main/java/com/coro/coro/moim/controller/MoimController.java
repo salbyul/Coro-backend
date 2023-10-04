@@ -104,4 +104,11 @@ public class MoimController implements MoimControllerDocs {
         moimService.modifyMoimMember(moimId, requestMoimMember, user.getId());
         return APIResponse.create();
     }
+
+    @DeleteMapping("/{moimId}/members")
+    @Override
+    public APIResponse deportMember(@PathVariable(name = "moimId") final Long moimId, @ModelAttribute(name = "moimMember") final Long moimMemberId, @AuthenticationPrincipal final User user) {
+        moimService.deport(moimId, moimMemberId, user.getId());
+        return APIResponse.create();
+    }
 }

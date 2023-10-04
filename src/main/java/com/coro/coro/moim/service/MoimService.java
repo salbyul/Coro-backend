@@ -8,7 +8,6 @@ import com.coro.coro.auth.exception.AuthException;
 import com.coro.coro.common.utils.FileSaveUtils;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.domain.MemberRole;
-import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.repository.MemberRepository;
 import com.coro.coro.moim.domain.*;
 import com.coro.coro.moim.dto.request.*;
@@ -308,5 +307,22 @@ public class MoimService {
         return moimMemberRepository.findByMoimIdAndMemberId(moimId, memberId)
                 .map(MoimMember::getRole)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
+    }
+
+    @Transactional
+    public void deport(final Long moimId, final Long moimMemberId, final Long memberId) {
+        moimMemberRepository.findByMoimIdAndMemberId(moimId, memberId)
+                .filter(MoimMember::canManage)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_FORBIDDN));
+        moimRepository.findById(moimId)
+                .orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
+        MoimMember moimMember = moimMemberRepository.findById(moimMemberId)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
+
+        if (moimMember.getRole().isLeader()) {
+            throw new MoimException(MOIM_FORBIDDEN);
+        }
+
+        moimMemberRepository.delete(moimMember);
     }
 }

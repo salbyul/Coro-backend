@@ -58,7 +58,8 @@ public enum ErrorType {
 
     //    MoimMember
     MOIM_MEMBER_NOT_FOUND("400", "해당 MoimMember가 없습니다."),
-    MOIM_MEMBER_NOT_VALID("401", "MoimMember가 유효하지 않습니다.");
+    MOIM_MEMBER_NOT_VALID("401", "MoimMember가 유효하지 않습니다."),
+    MOIM_MEMBER_FORBIDDN("403", "권한이 없습니다.");
 
 
     private final String code;

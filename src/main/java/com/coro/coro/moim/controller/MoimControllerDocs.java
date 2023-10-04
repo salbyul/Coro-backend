@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
@@ -118,4 +119,16 @@ public interface MoimControllerDocs {
             @Parameter(name = "requestMoimMember", description = "수정된 회원들의 목록")
     })
     APIResponse changeMoimMember(@PathVariable("moimId") final Long moimId, final List<MoimMemberModificationRequest> requestMoimMember, @AuthenticationPrincipal final User user);
+
+    @Operation(summary = "회원 추방")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "403", description = "유저 인증 실패"),
+            @ApiResponse(responseCode = "400", description = "인가 실패")
+    })
+    @Parameters(value = {
+            @Parameter(name = "moimId", description = "모임 Id 값"),
+            @Parameter(name = "moimMember", description = "moimMember Id 값")
+    })
+    APIResponse deportMember(@PathVariable(name = "moimId") final Long moimId, @ModelAttribute(name = "moimMember") final Long moimMemberId, @AuthenticationPrincipal final User user);
 }
