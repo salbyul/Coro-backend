@@ -42,4 +42,12 @@ public class Application extends BaseEntity {
     public static Application generate(final Member member, final Moim moim) {
         return new Application(member, moim);
     }
+
+    public void updateStatusTo(final ApplicationStatus status) {
+        this.status = status;
+    }
+
+    public boolean isWait() {
+        return this.status.equals(ApplicationStatus.WAIT);
+    }
 }

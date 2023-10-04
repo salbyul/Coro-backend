@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -66,4 +67,15 @@ public interface MemberControllerDocs {
             @ApiResponse(responseCode = "403", description = "회원 인증 실패")
     })
     APIResponse getMoim(@AuthenticationPrincipal final User user) throws IOException;
+
+    @Operation(summary = "지원 리스트")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "지원 리스트 획득 성공"),
+            @ApiResponse(responseCode = "403", description = "유저 인증 실패")
+    })
+    @Parameters(value = {
+            @Parameter(name = "moim", description = "모임 Id 값", required = true),
+            @Parameter(name = "status", description = "획득할 지원 status 값", example = "all, wait accept, refuse")
+    })
+    APIResponse getApplication(@ModelAttribute(name = "moim") final Long moimId, @AuthenticationPrincipal final User user, final String status);
 }

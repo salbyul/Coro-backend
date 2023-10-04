@@ -7,6 +7,8 @@ import com.coro.coro.application.validator.ApplicationQuestionValidator;
 import com.coro.coro.auth.exception.AuthException;
 import com.coro.coro.common.utils.FileSaveUtils;
 import com.coro.coro.member.domain.Member;
+import com.coro.coro.member.domain.MemberRole;
+import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.repository.MemberRepository;
 import com.coro.coro.moim.domain.*;
 import com.coro.coro.moim.dto.request.*;
@@ -85,7 +87,7 @@ public class MoimService {
             updateImage(moim, multipartFile);
         }
 
-        MoimMember moimMember = MoimMember.generate(moim, member);
+        MoimMember moimMember = MoimMember.generate(moim, member, MemberRole.LEADER);
         moimMemberRepository.save(moimMember);
 
         return moim.getId();
@@ -280,22 +282,31 @@ public class MoimService {
 
     @Transactional
     public void modifyMoimMember(final Long moimId, final List<MoimMemberModificationRequest> requestMoimMember, final Long memberId) {
-        moimMemberRepository.findByMoimIdAndMemberId(moimId, memberId)
-                .map(MoimMember::canManage)
+        MoimMember moimMember = moimMemberRepository.findByMoimIdAndMemberId(moimId, memberId)
+                .filter(MoimMember::canManage)
                 .orElseThrow(() -> new MoimException(MOIM_FORBIDDEN));
 
         List<MoimMember> moimMemberList = moimMemberRepository.findAllByMoimId(moimId);
-        updateMoimMember(moimMemberList, requestMoimMember);
+        updateMoimMember(moimMemberList, requestMoimMember, moimMember.getRole());
     }
 
-    private void updateMoimMember(final List<MoimMember> moimMemberList, final List<MoimMemberModificationRequest> requestMoimMemberList) {
+    private void updateMoimMember(final List<MoimMember> moimMemberList, final List<MoimMemberModificationRequest> requestMoimMemberList, final MemberRole role) {
         for (MoimMember moimMember : moimMemberList) {
             for (MoimMemberModificationRequest moimMemberRequest : requestMoimMemberList) {
                 if (moimMember.getId().equals(moimMemberRequest.getId())) {
+                    if (moimMember.getRole().equals(MemberRole.LEADER) && !moimMemberRequest.getRole().equals(MemberRole.LEADER) && role.isNotLeader()) {
+                        throw new MoimException(MOIM_FORBIDDEN);
+                    }
                     moimMember.update(moimMemberRequest);
                     break;
                 }
             }
         }
+    }
+
+    public MemberRole getMoimMemberFromMoim(final Long memberId, final Long moimId) {
+        return moimMemberRepository.findByMoimIdAndMemberId(moimId, memberId)
+                .map(MoimMember::getRole)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
     }
 }

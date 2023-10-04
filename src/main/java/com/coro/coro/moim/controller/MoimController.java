@@ -2,6 +2,7 @@ package com.coro.coro.moim.controller;
 
 import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
 import com.coro.coro.common.response.APIResponse;
+import com.coro.coro.member.domain.MemberRole;
 import com.coro.coro.member.domain.User;
 import com.coro.coro.moim.annotation.Search;
 import com.coro.coro.moim.domain.Moim;
@@ -85,15 +86,17 @@ public class MoimController implements MoimControllerDocs {
                 .addObject("detail", detail);
     }
 
-    @GetMapping("/{moimId}/moim-members")
+    @GetMapping("/{moimId}/members")
     @Override
-    public APIResponse getMoimMember(@PathVariable("moimId") final Long moimId) {
+    public APIResponse getMoimMember(@PathVariable("moimId") final Long moimId, @AuthenticationPrincipal final User user) {
         List<MoimMemberResponse> moimMemberResponseList = moimService.getMoimMemberList(moimId);
+        MemberRole memberRole = moimService.getMoimMemberFromMoim(user.getId(), moimId);
         return APIResponse.create()
-                .addObject("moimMemberList", moimMemberResponseList);
+                .addObject("moimMemberList", moimMemberResponseList)
+                .addObject("role", memberRole);
     }
 
-    @PutMapping("/{moimId}/moim-members")
+    @PutMapping("/{moimId}/members")
     @Override
     public APIResponse changeMoimMember(@PathVariable("moimId") final Long moimId,
                                         @RequestBody final List<MoimMemberModificationRequest> requestMoimMember,

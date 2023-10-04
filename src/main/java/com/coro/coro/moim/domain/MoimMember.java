@@ -5,7 +5,6 @@ import com.coro.coro.common.response.error.ErrorType;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.domain.MemberRole;
 import com.coro.coro.moim.dto.request.MoimMemberModificationRequest;
-import com.coro.coro.moim.dto.request.MoimMemberRequest;
 import com.coro.coro.moim.exception.MoimException;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -47,8 +46,8 @@ public class MoimMember extends BaseEntity {
         this.role = role;
     }
 
-    public static MoimMember generate(final Moim moim, final Member member) {
-        return new MoimMember(moim, member, MemberRole.LEADER);
+    public static MoimMember generate(final Moim moim, final Member member, final MemberRole role) {
+        return new MoimMember(moim, member, role);
     }
 
     public boolean canManage() {
@@ -60,6 +59,9 @@ public class MoimMember extends BaseEntity {
             throw new MoimException(ErrorType.MOIM_MEMBER_NOT_VALID);
         }
         this.role = moimMemberRequest.getRole();
+        if (moimMemberRequest.getRole().isLeader()) {
+            moim.changeLeader(member);
+        }
     }
 
     private boolean notEqualsMemberName(final MoimMemberModificationRequest moimMemberRequest) {

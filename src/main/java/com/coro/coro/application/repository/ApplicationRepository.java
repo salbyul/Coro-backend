@@ -10,8 +10,14 @@ import java.util.List;
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
 
     @Query("select a from Application a where a.moim.id = :moimId and a.member.id = :memberId")
-    List<Application> findByMemberAndMoim(@Param("memberId") Long memberId, @Param("moimId") Long moimId);
+    List<Application> findByMemberAndMoim(@Param("memberId") final Long memberId, @Param("moimId") final Long moimId);
 
     @Query("select a from Application a where a.moim.id = :moimId and a.member.id = :memberId and a.status = UPPER( :status)")
-    List<Application> findByMemberAndMoimAndStatus(@Param("memberId") Long memberId, @Param("moimId") Long moimId, @Param("status") String status);
+    List<Application> findByMemberAndMoimAndStatus(@Param("memberId") final Long memberId, @Param("moimId") final Long moimId, @Param("status") final String status);
+
+    @Query("select a from Application a where a.moim.id = :moimId and a.status = UPPER(:status)")
+    List<Application> findAllByMoimIdAndStatus(@Param("moimId") final Long moimId, @Param("status") final String status);
+
+    @Query("select a from Application a where a.moim.id = :moimId")
+    List<Application> findAllByMoimId(@Param("moimId") final Long moimId);
 }

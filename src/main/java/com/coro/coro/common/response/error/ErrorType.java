@@ -45,14 +45,19 @@ public enum ErrorType {
     MOIM_TYPE_NULL("250", "Type 값이 비어있습니다."),
 
 //    Application
+    APPLICATION_NOT_FOUND("300", "해당 Application이 없습니다."),
+    APPLICATION_FORBIDDEN("303", "권한이 없습니다."),
     APPLICATION_EXIST("306", "이미 지원한 모임입니다."),
     APPLICATION_EXIST_MEMBER("307", "이미 가입한 모임입니다."),
     APPLICATION_NOT_COMPLETE("308", "답변이 불완전합니다."),
     APPLICATION_QUESTION_MAX("309", "Application Question은 총 10개까지만 생성이 가능합니다."),
     APPLICATION_QUESTION_CONTENT_VALID("312", "Content 값의 형태가 올바르지 않습니다."),
     APPLICATION_QUESTION_ORDERS_VALID("321", "Orders 값이 올바르지 않습니다."),
+    APPLICATION_STATUS_NOT_VALID("332", "Status 값이 올바르지 않습니다."),
+    APPLICATION_STATUS_ALREADY("339", "이미 처리된 Application 입니다."),
 
-//    MoimMember
+    //    MoimMember
+    MOIM_MEMBER_NOT_FOUND("400", "해당 MoimMember가 없습니다."),
     MOIM_MEMBER_NOT_VALID("401", "MoimMember가 유효하지 않습니다.");
 
 

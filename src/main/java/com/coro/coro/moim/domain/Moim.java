@@ -69,4 +69,8 @@ public class Moim extends BaseEntity {
         this.type = MoimType.getType(requestMoim.getType());
         this.visible = requestMoim.getVisible();
     }
+
+    public void changeLeader(final Member newLeader) {
+        this.leader = newLeader;
+    }
 }

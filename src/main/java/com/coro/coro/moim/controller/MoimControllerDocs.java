@@ -105,7 +105,7 @@ public interface MoimControllerDocs {
     @Parameters(value = {
             @Parameter(name = "moimId", description = "모임 Id 값")
     })
-    APIResponse getMoimMember(@PathVariable("moimId") final Long moimId);
+    APIResponse getMoimMember(@PathVariable("moimId") final Long moimId, @AuthenticationPrincipal final User user);
 
     @Operation(summary = "모임 회원 역할 수정")
     @ApiResponses(value = {
