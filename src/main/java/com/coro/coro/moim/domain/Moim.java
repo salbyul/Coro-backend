@@ -54,13 +54,13 @@ public class Moim extends BaseEntity {
     @Override
     public void prePersist() {
         super.prePersist();
-        if (isEmpty(this.introduction)) {
+        if (isEmptyString(this.introduction)) {
             this.introduction = "우리 모임을 소개해주세요.";
         }
         this.state = MoimState.ACTIVE;
     }
 
-    private boolean isEmpty(final String value) {
+    private boolean isEmptyString(final String value) {
         return value == null || value.equals("");
     }
 

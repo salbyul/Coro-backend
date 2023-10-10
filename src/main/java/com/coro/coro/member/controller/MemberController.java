@@ -5,7 +5,7 @@ import com.coro.coro.application.service.ApplicationService;
 import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.domain.User;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
-import com.coro.coro.member.dto.request.MemberModifyRequest;
+import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.service.MemberPhotoService;
 import com.coro.coro.member.service.MemberService;
@@ -59,7 +59,7 @@ public class MemberController implements MemberControllerDocs {
     @Override
     public APIResponse update(@PathVariable("id") Long memberId,
                               @RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile,
-                              @RequestPart(name = "member", required = false) final MemberModifyRequest requestMember) throws IOException {
+                              @RequestPart(name = "member", required = false) final MemberModificationRequest requestMember) throws IOException {
 //        아래 합치기?
         if (requestMember != null) {
             memberService.update(memberId, requestMember);

@@ -17,7 +17,7 @@ public enum MoimType {
     public static MoimType getType(final String type) {
         return Arrays.stream(values()).filter(moimType -> moimType.type.equals(type))
                 .findAny()
-                .orElseThrow(() -> new MoimException(ErrorType.MOIM_TYPE_NULL));
+                .orElseThrow(() -> new MoimException(ErrorType.MOIM_TYPE_NOT_VALID));
     }
 
     @Override
