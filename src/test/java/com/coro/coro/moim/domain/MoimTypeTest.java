@@ -6,15 +6,18 @@ import org.junit.jupiter.api.Test;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class MoimTypeTest {
 
     @Test
     @DisplayName("올바른 타입을 찾는 경우")
     void validGetTypeMethod() {
-        assertThat(MoimType.getType("faceToFace")).isEqualTo(MoimType.FACE_TO_FACE);
-        assertThat(MoimType.getType("mixed")).isEqualTo(MoimType.MIXED);
-        assertThat(MoimType.getType("nonContact")).isEqualTo(MoimType.NON_CONTACT);
+        assertAll(
+                () -> assertThat(MoimType.getType("faceToFace")).isEqualTo(MoimType.FACE_TO_FACE),
+                () -> assertThat(MoimType.getType("mixed")).isEqualTo(MoimType.MIXED),
+                () -> assertThat(MoimType.getType("nonContact")).isEqualTo(MoimType.NON_CONTACT)
+        );
     }
 
     @Test
