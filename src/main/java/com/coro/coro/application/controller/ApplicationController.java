@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -54,7 +55,10 @@ public class ApplicationController implements ApplicationControllerDocs {
     @GetMapping("/questions/{id}")
     @Override
     public APIResponse getQuestionList(@PathVariable("id") final Long moimId) {
-        List<ApplicationQuestionResponse> questionList = applicationQuestionService.findQuestionList(moimId);
+        List<ApplicationQuestionResponse> questionList = applicationQuestionService.findQuestionList(moimId)
+                .stream()
+                .map(ApplicationQuestionResponse::new)
+                .collect(Collectors.toList());
         return APIResponse.create()
                 .addObject("questionList", questionList);
     }

@@ -48,12 +48,12 @@ public class ApplicationService {
     private final MoimMemberRepository moimMemberRepository;
 
     @Transactional
-    public void register(final Long moimId, final ApplicationRequest applicationRequest, final Long memberId) {
+    public Long register(final Long moimId, final ApplicationRequest applicationRequest, final Long memberId) {
         List<ApplicationQuestion> applicationQuestionList = applicationQuestionRepository.findAllByMoimId(moimId);
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new ApplicationException(MEMBER_NOT_FOUND));
         Moim moim = moimRepository.findById(moimId)
-                .orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
+                .orElseThrow(() -> new ApplicationException(MOIM_NOT_FOUND));
 
         List<ApplicationDTO> applicationList = applicationRequest.getApplicationList();
 
@@ -66,6 +66,7 @@ public class ApplicationService {
 
         List<ApplicationAnswer> applicationAnswerList = applicationRequestToEntity(application, applicationQuestionList, applicationList);
         applicationAnswerRepository.saveAll(applicationAnswerList);
+        return application.getId();
     }
 
     private void validateHasWaitApplication(final Long moimId, final Long memberId) {
@@ -141,7 +142,7 @@ public class ApplicationService {
     }
 
     @Transactional
-    public void decideApplication(final Long memberId, final Long applicationId, final ApplicationStatus status) {
+    public void decideApplication(final Long loggedInMemberId, final Long applicationId, final ApplicationStatus status) {
         Application application = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new ApplicationException(APPLICATION_NOT_FOUND));
 
@@ -150,7 +151,7 @@ public class ApplicationService {
         }
 
         Long moimId = application.getMoim().getId();
-        moimMemberRepository.findByMoimIdAndMemberId(moimId, memberId)
+        moimMemberRepository.findByMoimIdAndMemberId(moimId, loggedInMemberId)
                 .filter(MoimMember::canManage)
                 .orElseThrow(() -> new ApplicationException(APPLICATION_FORBIDDEN));
         application.updateStatusTo(status);

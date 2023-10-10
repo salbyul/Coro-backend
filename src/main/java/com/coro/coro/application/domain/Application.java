@@ -28,15 +28,10 @@ public class Application extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private ApplicationStatus status;
 
-    @Override
-    public void prePersist() {
-        super.prePersist();
-        this.status = ApplicationStatus.WAIT;
-    }
-
     private Application(final Member member, final Moim moim) {
         this.member = member;
         this.moim = moim;
+        this.status = ApplicationStatus.WAIT;
     }
 
     public static Application generate(final Member member, final Moim moim) {

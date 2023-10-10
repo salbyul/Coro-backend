@@ -23,8 +23,10 @@ class MoimTagTest {
                 .visible(true)
                 .type(MoimType.FACE_TO_FACE)
                 .build();
+
         MoimTag moimTag = MoimTag.generateMoimTag("중복태그", moim);
         MoimTag duplicatedTag = MoimTag.generateMoimTag("중복태그", moim);
+
         assertThat(moimTag.getName()).isEqualTo("중복태그");
         assertThat(moimTag.isDuplicateName(duplicatedTag)).isTrue();
     }

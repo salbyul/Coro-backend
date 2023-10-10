@@ -2,7 +2,6 @@ package com.coro.coro.application.service;
 
 import com.coro.coro.application.domain.ApplicationQuestion;
 import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
-import com.coro.coro.application.dto.response.ApplicationQuestionResponse;
 import com.coro.coro.application.repository.ApplicationQuestionRepository;
 import com.coro.coro.application.validator.ApplicationQuestionValidator;
 import com.coro.coro.common.response.error.ErrorType;
@@ -33,7 +32,7 @@ public class ApplicationQuestionService {
                     .orElseThrow(() -> new MoimException(ErrorType.MOIM_NOT_FOUND));
 
             List<ApplicationQuestion> applicationQuestionList = requestQuestions.stream()
-                    .map(requestQuestion -> ApplicationQuestion.generateApplicationQuestion(moim, requestQuestion))
+                    .map(requestQuestion -> ApplicationQuestion.generate(moim, requestQuestion))
                     .collect(Collectors.toList());
 
             ApplicationQuestionValidator.validateApplicationQuestion(applicationQuestionList);
@@ -42,10 +41,7 @@ public class ApplicationQuestionService {
             applicationQuestionRepository.saveAll(applicationQuestionList);
     }
 
-    public List<ApplicationQuestionResponse> findQuestionList(final Long moimId) {
-        List<ApplicationQuestion> questionList = applicationQuestionRepository.findAllByMoimId(moimId);
-        return questionList.stream()
-                .map(ApplicationQuestionResponse::new)
-                .collect(Collectors.toList());
+    public List<ApplicationQuestion> findQuestionList(final Long moimId) {
+        return  applicationQuestionRepository.findAllByMoimId(moimId);
     }
 }

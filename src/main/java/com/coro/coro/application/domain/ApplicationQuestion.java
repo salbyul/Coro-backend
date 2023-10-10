@@ -34,7 +34,7 @@ public class ApplicationQuestion extends BaseEntity implements Persistable<Long>
         this.order = order;
     }
 
-    public static ApplicationQuestion generateApplicationQuestion(final Moim moim, final ApplicationQuestionRegisterRequest requestQuestion) {
+    public static ApplicationQuestion generate(final Moim moim, final ApplicationQuestionRegisterRequest requestQuestion) {
         return new ApplicationQuestion(moim, requestQuestion.getContent(), requestQuestion.getOrder());
     }
 

@@ -28,7 +28,9 @@ class MoimTest {
                 .password("asdf1234!@")
                 .email("a@a.com")
                 .build();
+
         moim.changeLeader(newLeader);
+
         assertThat(moim.getLeader()).isEqualTo(newLeader);
     }
 }
