@@ -42,10 +42,7 @@ public class ApplicationQuestionService {
             applicationQuestionRepository.saveAll(applicationQuestionList);
     }
 
-    public List<ApplicationQuestionResponse> findQuestionList(final Long moimId) {
-        List<ApplicationQuestion> questionList = applicationQuestionRepository.findAllByMoimId(moimId);
-        return questionList.stream()
-                .map(ApplicationQuestionResponse::new)
-                .collect(Collectors.toList());
+    public List<ApplicationQuestion> findQuestionList(final Long moimId) {
+        return  applicationQuestionRepository.findAllByMoimId(moimId);
     }
 }
