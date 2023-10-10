@@ -128,21 +128,6 @@ public class MoimService {
         moimTagRepository.saveAll(tagList);
     }
 
-    private void saveQuestions(final List<ApplicationQuestionRegisterRequest> requestQuestions, final Moim moim) {
-        if (requestQuestions == null || requestQuestions.size() == 0) {
-            return;
-        }
-
-        List<ApplicationQuestion> applicationQuestionList = requestQuestions.stream()
-                .map(requestQuestion -> ApplicationQuestion.generateApplicationQuestion(moim, requestQuestion))
-                .collect(Collectors.toList());
-
-        ApplicationQuestionValidator.validateApplicationQuestion(applicationQuestionList);
-
-        applicationQuestionRepository.deleteAllByMoimId(moim.getId());
-        applicationQuestionRepository.saveAll(applicationQuestionList);
-    }
-
     @Transactional
     public void update(final Long moimId,
                        final MoimModificationRequest requestMoim,
@@ -165,6 +150,21 @@ public class MoimService {
         if (requestMoim.getIsDeletedPhoto()) {
             moimPhotoRepository.deleteById(moim.getId());
         }
+    }
+
+    private void saveQuestions(final List<ApplicationQuestionRegisterRequest> requestQuestions, final Moim moim) {
+        if (requestQuestions == null || requestQuestions.size() == 0) {
+            return;
+        }
+
+        List<ApplicationQuestion> applicationQuestionList = requestQuestions.stream()
+                .map(requestQuestion -> ApplicationQuestion.generateApplicationQuestion(moim, requestQuestion))
+                .collect(Collectors.toList());
+
+        ApplicationQuestionValidator.validateApplicationQuestion(applicationQuestionList);
+
+        applicationQuestionRepository.deleteAllByMoimId(moim.getId());
+        applicationQuestionRepository.saveAll(applicationQuestionList);
     }
 
     private void updateMoim(final MoimModificationRequest requestMoim, final MoimTagRequest requestTag, final Moim moim) {
@@ -203,7 +203,7 @@ public class MoimService {
                     byte[] photoBytes = getPhoto(photo.getName());
                     result.add(new MoimSearchResponse(moim, photo.getOriginalName(), photoBytes));
                     photos.remove(photo);
-                    isAdded =true;
+                    isAdded = true;
                     break;
                 }
             }
@@ -212,15 +212,6 @@ public class MoimService {
             }
         }
         return result;
-    }
-
-    public MoimSearchResponse getSummaryMoim(final Moim moim) throws IOException {
-        Optional<MoimPhoto> optionalMoimPhoto = moimPhotoRepository.findById(moim.getId());
-        if (optionalMoimPhoto.isPresent()) {
-            MoimPhoto moimPhoto = optionalMoimPhoto.get();
-            return new MoimSearchResponse(moim, moimPhoto.getOriginalName(), getPhoto(moimPhoto.getName()));
-        }
-        return new MoimSearchResponse(moim, null, null);
     }
 
     private byte[] getPhoto(final String name) throws IOException {
@@ -283,42 +274,57 @@ public class MoimService {
     }
 
     @Transactional
-    public void modifyMoimMember(final Long moimId, final List<MoimMemberModificationRequest> requestMoimMember, final Long memberId) {
-        MoimMember moimMember = moimMemberRepository.findByMoimIdAndMemberId(moimId, memberId)
+    public void modifyMoimMember(final Long moimId, final List<MoimMemberModificationRequest> requestMoimMember, final Long loggedInMember) {
+        moimMemberRepository.findByMoimIdAndMemberId(moimId, loggedInMember)
                 .filter(MoimMember::canManage)
                 .orElseThrow(() -> new MoimException(MOIM_FORBIDDEN));
 
         List<MoimMember> moimMemberList = moimMemberRepository.findAllByMoimId(moimId);
-        updateMoimMember(moimMemberList, requestMoimMember, moimMember.getRole());
+        validateModificationMoimMember(requestMoimMember);
+        updateMoimMember(moimMemberList, requestMoimMember);
     }
 
-    private void updateMoimMember(final List<MoimMember> moimMemberList, final List<MoimMemberModificationRequest> requestMoimMemberList, final MemberRole role) {
+    private void validateModificationMoimMember(final List<MoimMemberModificationRequest> requestMoimMember) {
+        long leaderCounts = requestMoimMember.stream()
+                .filter(moimMember -> moimMember.getRole().isLeader())
+                .count();
+        if (leaderCounts != 1) {
+            throw new MoimException(MOIM_MEMBER_NOT_VALID);
+        }
+    }
+
+    private void updateMoimMember(final List<MoimMember> moimMemberList, final List<MoimMemberModificationRequest> requestMoimMemberList) {
+        if (moimMemberList.size() != requestMoimMemberList.size()) {
+            throw new MoimException(MOIM_MEMBER_NOT_VALID);
+        }
+        List<MoimMember> requests = new ArrayList<>(List.copyOf(moimMemberList));
         for (MoimMember moimMember : moimMemberList) {
             for (MoimMemberModificationRequest moimMemberRequest : requestMoimMemberList) {
                 if (moimMember.getId().equals(moimMemberRequest.getId())) {
-                    if (moimMember.getRole().equals(MemberRole.LEADER) && !moimMemberRequest.getRole().equals(MemberRole.LEADER) && role.isNotLeader()) {
-                        throw new MoimException(MOIM_FORBIDDEN);
-                    }
                     moimMember.update(moimMemberRequest);
+                    requests.remove(moimMember);
                     break;
                 }
             }
         }
+        if (!requests.isEmpty()) {
+            throw new MoimException(MOIM_MEMBER_NOT_VALID);
+        }
     }
 
-    public MemberRole getMoimMemberFromMoim(final Long memberId, final Long moimId) {
+    public MemberRole getMemberRole(final Long memberId, final Long moimId) {
         return moimMemberRepository.findByMoimIdAndMemberId(moimId, memberId)
                 .map(MoimMember::getRole)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
     }
 
     @Transactional
-    public void deport(final Long moimId, final Long moimMemberId, final Long memberId) {
-        moimMemberRepository.findByMoimIdAndMemberId(moimId, memberId)
-                .filter(MoimMember::canManage)
-                .orElseThrow(() -> new MoimException(MOIM_MEMBER_FORBIDDN));
+    public void deport(final Long moimId, final Long moimMemberId, final Long loggedInMemberId) {
         moimRepository.findById(moimId)
                 .orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
+        moimMemberRepository.findByMoimIdAndMemberId(moimId, loggedInMemberId)
+                .filter(MoimMember::canManage)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_FORBIDDN));
         MoimMember moimMember = moimMemberRepository.findById(moimMemberId)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 

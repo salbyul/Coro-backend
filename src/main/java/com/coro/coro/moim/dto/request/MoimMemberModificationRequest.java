@@ -1,15 +1,13 @@
 package com.coro.coro.moim.dto.request;
 
 import com.coro.coro.member.domain.MemberRole;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode
 public class MoimMemberModificationRequest {
 
     private Long id;
