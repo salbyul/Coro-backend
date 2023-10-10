@@ -40,7 +40,7 @@ public class MoimValidator {
 
     private static void validateType(final MoimType type) {
         if (type == null) {
-            throw new MoimException(MOIM_TYPE_NULL);
+            throw new MoimException(MOIM_TYPE_NOT_VALID);
         }
     }
 
