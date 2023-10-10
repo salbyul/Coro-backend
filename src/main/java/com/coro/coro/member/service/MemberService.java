@@ -1,7 +1,6 @@
 package com.coro.coro.member.service;
 
 import com.coro.coro.common.domain.jwt.JwtProvider;
-import com.coro.coro.common.response.error.ErrorType;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
 import com.coro.coro.member.dto.request.MemberModificationRequest;
@@ -16,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.coro.coro.common.response.error.ErrorType.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -49,7 +50,7 @@ public class MemberService {
     /* 로그인 */
     public String login(final MemberLoginRequest requestMember) {
         Member member = memberRepository.findByEmail(requestMember.getEmail())
-                .orElseThrow(() -> new MemberException(ErrorType.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
         comparePassword(requestMember.getPassword(), member.getPassword());
 
         return tokenProvider.generateAccessToken(member.getNickname());
@@ -57,7 +58,7 @@ public class MemberService {
 
     private void comparePassword(final String password, final String target) {
         if (!passwordEncoder.matches(password, target)) {
-            throw new MemberException(ErrorType.MEMBER_NOT_FOUND);
+            throw new MemberException(MEMBER_PASSWORD_NOT_VALID);
         }
     }
 
@@ -65,7 +66,7 @@ public class MemberService {
     @Transactional
     public void update(final Long id, final MemberModificationRequest requestMember) {
         Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new MemberException(ErrorType.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
         comparePassword(requestMember.getOriginalPassword(), member.getPassword());
 
         member.changeTo(requestMember);

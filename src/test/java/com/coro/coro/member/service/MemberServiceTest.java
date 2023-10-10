@@ -145,14 +145,16 @@ class MemberServiceTest {
     @DisplayName("[로그인] 틀린 이메일의 경우")
     void loginFailByEmail() {
         assertThatThrownBy(() -> memberService.login(new MemberLoginRequest("12@2.com", EXAMPLE_PASSWORD)))
-                .isInstanceOf(MemberException.class);
+                .isInstanceOf(MemberException.class)
+                .hasMessage(MEMBER_NOT_FOUND.getMessage());
     }
 
     @Test
     @DisplayName("[로그인] 틀린 비밀번호의 경우")
     void loginFailByPassword() {
-        assertThatThrownBy(() -> memberService.login(new MemberLoginRequest("asdf@asdf.com", "asdf1234!#")))
-                .isInstanceOf(MemberException.class);
+        assertThatThrownBy(() -> memberService.login(new MemberLoginRequest(EXAMPLE_EMAIL, "asdf1234!#")))
+                .isInstanceOf(MemberException.class)
+                .hasMessage(MEMBER_PASSWORD_NOT_VALID.getMessage());
     }
 
     @Test
