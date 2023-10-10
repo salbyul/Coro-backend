@@ -168,6 +168,9 @@ public class MoimService {
     }
 
     private void updateMoim(final MoimModificationRequest requestMoim, final MoimTagRequest requestTag, final Moim moim) {
+        if (!requestMoim.getName().equals(moim.getName())) {
+            validateDuplicateName(moim);
+        }
         moim.changeTo(requestMoim);
         MoimValidator.validateMoim(moim);
 

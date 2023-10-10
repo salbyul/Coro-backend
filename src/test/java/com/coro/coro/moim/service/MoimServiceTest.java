@@ -127,9 +127,8 @@ class MoimServiceTest {
     @Test
     @DisplayName("[모임 수정] 이름 중복의 경우")
     void updateFailByDuplicateName() throws IOException {
-        Long savedId = moimService.register(new MoimRegisterRequest("모임 예", "모임 소개", "mixed", true), null, null, null, member.getId());
-        Moim moim = moimRepository.findById(savedId).orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
-        assertThatThrownBy(() -> moimService.update(moim.getId(), new MoimModificationRequest(EXAMPLE_NAME, "모임 소개", "mixed", true, false), new MoimTagRequest(), null, null, member.getId()))
+        Long moimId = moimService.register(new MoimRegisterRequest("모임 예", "모임 소개", "mixed", true), null, null, null, member.getId());
+        assertThatThrownBy(() -> moimService.update(moimId, new MoimModificationRequest(EXAMPLE_NAME, "모임 소개", "mixed", true, false), new MoimTagRequest(), null, null, member.getId()))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NAME_DUPLICATE.getMessage());
     }
