@@ -158,7 +158,7 @@ public class MoimService {
         }
 
         List<ApplicationQuestion> applicationQuestionList = requestQuestions.stream()
-                .map(requestQuestion -> ApplicationQuestion.generateApplicationQuestion(moim, requestQuestion))
+                .map(requestQuestion -> ApplicationQuestion.generate(moim, requestQuestion))
                 .collect(Collectors.toList());
 
         ApplicationQuestionValidator.validateApplicationQuestion(applicationQuestionList);

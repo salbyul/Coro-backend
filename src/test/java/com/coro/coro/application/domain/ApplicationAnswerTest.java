@@ -28,7 +28,9 @@ class ApplicationAnswerTest {
                 .type(MoimType.FACE_TO_FACE)
                 .build();
         Application application = Application.generate(member, moim);
-        ApplicationQuestion applicationQuestion = ApplicationQuestion.generateApplicationQuestion(moim, new ApplicationQuestionRegisterRequest("질문", 1));
+        ApplicationQuestion applicationQuestion =
+                ApplicationQuestion.generate(moim, new ApplicationQuestionRegisterRequest("질문", 1));
+
         ApplicationAnswer applicationAnswer = ApplicationAnswer.generate(application, applicationQuestion, "답변입니다.");
 
         assertAll(
