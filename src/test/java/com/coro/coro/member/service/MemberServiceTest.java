@@ -48,7 +48,9 @@ class MemberServiceTest {
     @Test
     @DisplayName("[회원가입] 이메일 NULL의 경우")
     void registerFailByEmailNull() {
-        assertThatThrownBy(() -> memberService.register(new MemberRegisterRequest(null, EXAMPLE_PASSWORD, "이메일널")))
+        assertThatThrownBy(() ->
+                memberService.register(new MemberRegisterRequest(null, EXAMPLE_PASSWORD, "이메일널"))
+        )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_EMAIL_NULL.getMessage());
     }
@@ -56,7 +58,9 @@ class MemberServiceTest {
     @Test
     @DisplayName("[회원가입] 이메일 빈 문자열의 경우")
     void registerFailByEmailBlank() {
-        assertThatThrownBy(() -> memberService.register(new MemberRegisterRequest("", EXAMPLE_PASSWORD, "이메일빈문자열")))
+        assertThatThrownBy(() ->
+                memberService.register(new MemberRegisterRequest("", EXAMPLE_PASSWORD, "이메일빈문자열"))
+        )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_EMAIL_NULL.getMessage());
     }
@@ -64,7 +68,9 @@ class MemberServiceTest {
     @Test
     @DisplayName("[회원가입] 이메일 중복")
     void registerFailByEmailDuplication() {
-        assertThatThrownBy(() -> memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, "닉네임입니다")))
+        assertThatThrownBy(() ->
+                memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, "닉네임입니다"))
+        )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_EMAIL_DUPLICATE.getMessage());
     }
@@ -73,7 +79,9 @@ class MemberServiceTest {
     @DisplayName("[회원가입] 이메일 형식이 옳지 않은 경우")
     @ValueSource(strings = {"asdf", "asdf@asdf", "asdf.com"})
     void registerFailByEmailRegex(final String value) {
-        assertThatThrownBy(() -> memberService.register(new MemberRegisterRequest(value, EXAMPLE_PASSWORD, "ㅎㅎ")))
+        assertThatThrownBy(() ->
+                memberService.register(new MemberRegisterRequest(value, EXAMPLE_PASSWORD, "ㅎㅎ"))
+        )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_EMAIL_NOT_VALID.getMessage());
     }
@@ -81,7 +89,9 @@ class MemberServiceTest {
     @Test
     @DisplayName("[회원가입] 비밀번호 NULL의 경우")
     void registerFailByPasswordNull() {
-        assertThatThrownBy(() -> memberService.register(new MemberRegisterRequest("password@null.com", null, "PSnull")))
+        assertThatThrownBy(() ->
+                memberService.register(new MemberRegisterRequest("password@null.com", null, "PSnull"))
+        )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_PASSWORD_NULL.getMessage());
     }
@@ -89,7 +99,9 @@ class MemberServiceTest {
     @Test
     @DisplayName("[회원가입] 비밀번호 빈 문자열의 경우")
     void registerFailByPasswordBlank() {
-        assertThatThrownBy(() -> memberService.register(new MemberRegisterRequest("password@null.com", "", "PSnull")))
+        assertThatThrownBy(() ->
+                memberService.register(new MemberRegisterRequest("password@null.com", "", "PSnull"))
+        )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_PASSWORD_NULL.getMessage());
     }
@@ -98,7 +110,9 @@ class MemberServiceTest {
     @DisplayName("[회원가입] 비밀번호 형식이 옳지 않은 경우")
     @ValueSource(strings = {"asdfasdfas", "asdfasdf12", "asdfasdfas 1 @", "asdfasdfasdfasdfasdfasdfasdfas"})
     void registerFailByPasswordRegex(final String value) {
-        assertThatThrownBy(() -> memberService.register(new MemberRegisterRequest("good@good.com", value, "nickname")))
+        assertThatThrownBy(() ->
+                memberService.register(new MemberRegisterRequest("good@good.com", value, "nickname"))
+        )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_PASSWORD_NOT_VALID.getMessage());
     }
@@ -106,7 +120,9 @@ class MemberServiceTest {
     @Test
     @DisplayName("[회원가입] 닉네임 NULL의 경우")
     void registerFailByNicknameNull() {
-        assertThatThrownBy(() -> memberService.register(new MemberRegisterRequest("nickname@null.com", EXAMPLE_PASSWORD, null)))
+        assertThatThrownBy(() ->
+                memberService.register(new MemberRegisterRequest("nickname@null.com", EXAMPLE_PASSWORD, null))
+        )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_NICKNAME_NULL.getMessage());
     }
@@ -114,7 +130,9 @@ class MemberServiceTest {
     @Test
     @DisplayName("[회원가입] 닉네임 빈 문자열의 경우")
     void registerFailByNicknameBlank() {
-        assertThatThrownBy(() -> memberService.register(new MemberRegisterRequest("nickname@null.com", EXAMPLE_PASSWORD, "")))
+        assertThatThrownBy(() ->
+                memberService.register(new MemberRegisterRequest("nickname@null.com", EXAMPLE_PASSWORD, ""))
+        )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_NICKNAME_NULL.getMessage());
     }
@@ -122,15 +140,20 @@ class MemberServiceTest {
     @Test
     @DisplayName("[회원가입] 닉네임 중복")
     void registerFailByNicknameDuplication() {
-        assertThatThrownBy(() -> memberService.register(new MemberRegisterRequest("2@2.com", EXAMPLE_PASSWORD, EXAMPLE_NICKNAME)))
+        assertThatThrownBy(() ->
+                memberService.register(new MemberRegisterRequest("2@2.com", EXAMPLE_PASSWORD, EXAMPLE_NICKNAME))
+        )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_NICKNAME_DUPLICATE.getMessage());
     }
+
     @ParameterizedTest
     @DisplayName("[회원가입] 닉네임 형식이 옳지 않은 경우")
     @ValueSource(strings = {"a", "asdfasdfasdfasdf", "닉 네 임"})
     void registerFailByNicknameRegex(final String value) {
-        assertThatThrownBy(() -> memberService.register(new MemberRegisterRequest("abc@abc.com", EXAMPLE_PASSWORD, value)))
+        assertThatThrownBy(() ->
+                memberService.register(new MemberRegisterRequest("abc@abc.com", EXAMPLE_PASSWORD, value))
+        )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_NICKNAME_NOT_VALID.getMessage());
     }
@@ -144,7 +167,9 @@ class MemberServiceTest {
     @Test
     @DisplayName("[로그인] 틀린 이메일의 경우")
     void loginFailByEmail() {
-        assertThatThrownBy(() -> memberService.login(new MemberLoginRequest("12@2.com", EXAMPLE_PASSWORD)))
+        assertThatThrownBy(() ->
+                memberService.login(new MemberLoginRequest("12@2.com", EXAMPLE_PASSWORD))
+        )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_NOT_FOUND.getMessage());
     }
@@ -152,7 +177,9 @@ class MemberServiceTest {
     @Test
     @DisplayName("[로그인] 틀린 비밀번호의 경우")
     void loginFailByPassword() {
-        assertThatThrownBy(() -> memberService.login(new MemberLoginRequest(EXAMPLE_EMAIL, "asdf1234!#")))
+        assertThatThrownBy(() ->
+                memberService.login(new MemberLoginRequest(EXAMPLE_EMAIL, "asdf1234!#"))
+        )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_PASSWORD_NOT_VALID.getMessage());
     }
@@ -160,7 +187,8 @@ class MemberServiceTest {
     @Test
     @DisplayName("[회원수정] 정상적인 회원 수정")
     void updateMember() {
-        MemberModificationRequest requestMember = new MemberModificationRequest(EXAMPLE_PASSWORD, "qwer1234!@", "바뀐 소개입니다.");
+        MemberModificationRequest requestMember =
+                new MemberModificationRequest(EXAMPLE_PASSWORD, "qwer1234!@", "바뀐 소개입니다.");
         memberService.update(member.getId(), requestMember);
 
         assertThat(passwordEncoder.matches(requestMember.getNewPassword(), member.getPassword())).isTrue();
@@ -171,7 +199,10 @@ class MemberServiceTest {
     @DisplayName("[회원수정] 틀린 비밀번호의 경우")
     void updateFailByPassword() {
         MemberModificationRequest requestMember = new MemberModificationRequest("1234", "qwer1234!@", "바뀐 소개입니다.");
-        assertThatThrownBy(() -> memberService.update(1L, requestMember))
+
+        assertThatThrownBy(() ->
+                memberService.update(1L, requestMember)
+        )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_NOT_FOUND.getMessage());
     }
