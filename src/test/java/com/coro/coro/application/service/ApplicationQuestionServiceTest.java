@@ -3,9 +3,8 @@ package com.coro.coro.application.service;
 import com.coro.coro.application.domain.ApplicationQuestion;
 import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
 import com.coro.coro.application.exception.ApplicationException;
-import com.coro.coro.member.domain.Member;
+import com.coro.coro.application.repository.ApplicationQuestionRepository;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
-import com.coro.coro.member.repository.MemberRepository;
 import com.coro.coro.member.service.MemberService;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
@@ -23,7 +22,6 @@ import java.util.List;
 import static com.coro.coro.common.response.error.ErrorType.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Transactional
 @SpringBootTest
@@ -36,29 +34,38 @@ class ApplicationQuestionServiceTest {
     @Autowired
     private ApplicationQuestionService applicationQuestionService;
     @Autowired
-    private MemberRepository memberRepository;
+    private ApplicationQuestionRepository applicationQuestionRepository;
     @Autowired
     private MoimRepository moimRepository;
-    private Member member;
     private Moim moim;
 
 
     @BeforeEach
     void setUp() throws IOException {
         Long memberId = memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long moimId = moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), null, null, null, memberId);
-        member = memberRepository.findById(memberId).get();
+        Long moimId = moimService.register(
+                new MoimRegisterRequest("모임", "모임설명", "mixed", true),
+                null,
+                null,
+                null,
+                memberId
+        );
         moim = moimRepository.findById(moimId).get();
     }
 
     @Test
     @DisplayName("정상적인 지원 양식 작성")
     void register() {
-        List<ApplicationQuestionRegisterRequest> requestQuestions = new ArrayList<>();
-        for (int i = 1; i < 6; i++) {
-            requestQuestions.add(new ApplicationQuestionRegisterRequest("질문" + i, i));
-        }
+        List<ApplicationQuestionRegisterRequest> requestQuestions = generateRequestQuestions("질문", 3);
         applicationQuestionService.register(moim.getId(), requestQuestions);
+
+        List<ApplicationQuestion> questionList = applicationQuestionRepository.findAllByMoimId(moim.getId());
+
+        assertAll(
+                () -> assertThat(questionList).extracting(ApplicationQuestion::getContent).containsExactlyInAnyOrder("질문1", "질문2", "질문3"),
+                () -> assertThat(questionList).extracting(ApplicationQuestion::getOrder).containsExactlyInAnyOrder(1, 2, 3),
+                () -> assertThat(questionList).extracting(ApplicationQuestion::getMoim).containsExactlyInAnyOrder(moim, moim, moim)
+        );
     }
 
     @Test
@@ -68,7 +75,10 @@ class ApplicationQuestionServiceTest {
         String value = "글".repeat(201);
         requestQuestions.add(new ApplicationQuestionRegisterRequest(value, 1));
         assertThat(value.length()).isEqualTo(201);
-        assertThatThrownBy(() -> applicationQuestionService.register(moim.getId(), requestQuestions))
+
+        assertThatThrownBy(() ->
+                applicationQuestionService.register(moim.getId(), requestQuestions)
+        )
                 .isInstanceOf(ApplicationException.class)
                 .hasMessage(APPLICATION_QUESTION_CONTENT_VALID.getMessage());
     }
@@ -79,7 +89,10 @@ class ApplicationQuestionServiceTest {
         List<ApplicationQuestionRegisterRequest> requestQuestions = new ArrayList<>();
         requestQuestions.add(new ApplicationQuestionRegisterRequest("질문ㅎㅎ", 1));
         requestQuestions.add(new ApplicationQuestionRegisterRequest("질문", 1));
-        assertThatThrownBy(() -> applicationQuestionService.register(moim.getId(), requestQuestions))
+
+        assertThatThrownBy(() ->
+                applicationQuestionService.register(moim.getId(), requestQuestions)
+        )
                 .isInstanceOf(ApplicationException.class)
                 .hasMessage(APPLICATION_QUESTION_ORDERS_VALID.getMessage());
     }
@@ -90,11 +103,16 @@ class ApplicationQuestionServiceTest {
         List<ApplicationQuestionRegisterRequest> requestQuestions = new ArrayList<>();
         requestQuestions.add(new ApplicationQuestionRegisterRequest("질문ㅎㅎ", 3));
         requestQuestions.add(new ApplicationQuestionRegisterRequest("질문", 2));
-        assertThatThrownBy(() -> applicationQuestionService.register(moim.getId(), requestQuestions))
+
+        assertThatThrownBy(() ->
+                applicationQuestionService.register(moim.getId(), requestQuestions)
+        )
                 .isInstanceOf(ApplicationException.class)
                 .hasMessage(APPLICATION_QUESTION_ORDERS_VALID.getMessage());
 
-        assertThatThrownBy(() -> applicationQuestionService.register(moim.getId(), List.of(new ApplicationQuestionRegisterRequest("질문", 0))))
+        assertThatThrownBy(() ->
+                applicationQuestionService.register(moim.getId(), List.of(new ApplicationQuestionRegisterRequest("질문", 0)))
+        )
                 .isInstanceOf(ApplicationException.class)
                 .hasMessage(APPLICATION_QUESTION_ORDERS_VALID.getMessage());
     }
@@ -102,13 +120,21 @@ class ApplicationQuestionServiceTest {
     @Test
     @DisplayName("[지원 양식 작성] 10개 초과")
     void registerFailedByOrdersGreaterThanTen() {
-        List<ApplicationQuestionRegisterRequest> requestQuestions = new ArrayList<>();
-        for (int i = 1; i < 12; i++) {
-            requestQuestions.add(new ApplicationQuestionRegisterRequest("질문" + i, i));
-        }
-        assertThatThrownBy(() -> applicationQuestionService.register(moim.getId(), requestQuestions))
+        List<ApplicationQuestionRegisterRequest> requestQuestions = generateRequestQuestions("질문", 15);
+
+        assertThatThrownBy(() ->
+                applicationQuestionService.register(moim.getId(), requestQuestions)
+        )
                 .isInstanceOf(ApplicationException.class)
                 .hasMessage(APPLICATION_QUESTION_MAX.getMessage());
+    }
+
+    private List<ApplicationQuestionRegisterRequest> generateRequestQuestions(final String content, final int counts) {
+        List<ApplicationQuestionRegisterRequest> requestQuestions = new ArrayList<>();
+        for (int i = 1; i <= counts; i++) {
+            requestQuestions.add(new ApplicationQuestionRegisterRequest(content + i, i));
+        }
+        return requestQuestions;
     }
 
     @Test
@@ -116,9 +142,7 @@ class ApplicationQuestionServiceTest {
     void findQuestionList() {
         applicationQuestionService.register(
                 moim.getId(),
-                List.of(
-                        new ApplicationQuestionRegisterRequest("질문1", 1),
-                        new ApplicationQuestionRegisterRequest("질문2", 2))
+                generateRequestQuestions("질문", 2)
         );
         List<ApplicationQuestion> questionList = applicationQuestionService.findQuestionList(moim.getId());
 
