@@ -3,7 +3,7 @@ package com.coro.coro.member.controller;
 import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.domain.User;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
-import com.coro.coro.member.dto.request.MemberModifyRequest;
+import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -59,7 +59,7 @@ public interface MemberControllerDocs {
             @Parameter(name = "introduction", description = "회원 소개"),
             @Parameter(name = "profileImage", description = "프로필 이미지")
     })
-    APIResponse update(@PathVariable("id") Long memberId, @RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile, @RequestPart(name = "member", required = false) final MemberModifyRequest requestMember) throws IOException;
+    APIResponse update(@PathVariable("id") Long memberId, @RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile, @RequestPart(name = "member", required = false) final MemberModificationRequest requestMember) throws IOException;
 
     @Operation(summary = "내 모임")
     @ApiResponses(value = {

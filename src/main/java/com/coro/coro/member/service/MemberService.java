@@ -4,7 +4,7 @@ import com.coro.coro.common.domain.jwt.JwtProvider;
 import com.coro.coro.common.response.error.ErrorType;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
-import com.coro.coro.member.dto.request.MemberModifyRequest;
+import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.repository.MemberRepository;
@@ -63,7 +63,7 @@ public class MemberService {
 
     /* 회원 수정 */
     @Transactional
-    public void update(final Long id, final MemberModifyRequest requestMember) {
+    public void update(final Long id, final MemberModificationRequest requestMember) {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new MemberException(ErrorType.MEMBER_NOT_FOUND));
         comparePassword(requestMember.getOriginalPassword(), member.getPassword());

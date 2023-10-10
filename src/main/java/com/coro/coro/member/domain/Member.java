@@ -2,7 +2,7 @@ package com.coro.coro.member.domain;
 
 import com.coro.coro.common.domain.BaseEntity;
 import com.coro.coro.moim.domain.Moim;
-import com.coro.coro.member.dto.request.MemberModifyRequest;
+import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.validator.MemberValidator;
 import lombok.*;
@@ -62,7 +62,7 @@ public class Member extends BaseEntity {
         }
     }
 
-    public void changeTo(final MemberModifyRequest requestMember) {
+    public void changeTo(final MemberModificationRequest requestMember) {
         this.introduction = requestMember.getIntroduction();
         this.password = requestMember.getNewPassword();
         MemberValidator.validateRegistration(this);

@@ -2,7 +2,7 @@ package com.coro.coro.member.service;
 
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
-import com.coro.coro.member.dto.request.MemberModifyRequest;
+import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.repository.MemberRepository;
@@ -158,7 +158,7 @@ class MemberServiceTest {
     @Test
     @DisplayName("[회원수정] 정상적인 회원 수정")
     void updateMember() {
-        MemberModifyRequest requestMember = new MemberModifyRequest(EXAMPLE_PASSWORD, "qwer1234!@", "바뀐 소개입니다.");
+        MemberModificationRequest requestMember = new MemberModificationRequest(EXAMPLE_PASSWORD, "qwer1234!@", "바뀐 소개입니다.");
         memberService.update(member.getId(), requestMember);
 
         assertThat(passwordEncoder.matches(requestMember.getNewPassword(), member.getPassword())).isTrue();
@@ -168,7 +168,7 @@ class MemberServiceTest {
     @Test
     @DisplayName("[회원수정] 틀린 비밀번호의 경우")
     void updateFailByPassword() {
-        MemberModifyRequest requestMember = new MemberModifyRequest("1234", "qwer1234!@", "바뀐 소개입니다.");
+        MemberModificationRequest requestMember = new MemberModificationRequest("1234", "qwer1234!@", "바뀐 소개입니다.");
         assertThatThrownBy(() -> memberService.update(1L, requestMember))
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_NOT_FOUND.getMessage());
