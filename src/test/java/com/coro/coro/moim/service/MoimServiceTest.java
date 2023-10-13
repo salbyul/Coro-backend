@@ -1,6 +1,5 @@
 package com.coro.coro.moim.service;
 
-import com.coro.coro.application.domain.Application;
 import com.coro.coro.application.domain.ApplicationQuestion;
 import com.coro.coro.application.domain.ApplicationStatus;
 import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
@@ -46,7 +45,7 @@ class MoimServiceTest {
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "", "mixed", true);
         Long moimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
-        Moim moim = container.moimRepository.findById(moimId).get();
+        Moim moim = container.moimRepository.findById(moimId).orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
 
         assertAll(
                 () -> assertThat(moim.getIntroduction()).isEqualTo("우리 모임을 소개해주세요."),
@@ -150,7 +149,7 @@ class MoimServiceTest {
                 savedMemberId
         );
 
-        Moim moim = container.moimRepository.findById(savedMoimId).get();
+        Moim moim = container.moimRepository.findById(savedMoimId).orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
 
         assertAll(
                 () -> assertThat(moim.getName()).isEqualTo(EXAMPLE_NAME),
@@ -481,7 +480,7 @@ class MoimServiceTest {
 
         MoimMember moimMember1 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
-        MoimMember moimMember2 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+        container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 
         assertThatThrownBy(() ->
