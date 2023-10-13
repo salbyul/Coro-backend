@@ -1,8 +1,6 @@
 package com.coro.coro.application.domain;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
@@ -11,9 +9,12 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "application_answer")
+@AllArgsConstructor
+@Builder
 public class ApplicationAnswer implements Persistable<Long> {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,15 +33,5 @@ public class ApplicationAnswer implements Persistable<Long> {
     @Override
     public boolean isNew() { // 제출한 답변은 수정 불가
         return true;
-    }
-
-    private ApplicationAnswer(final Application application, final ApplicationQuestion applicationQuestion, final String content) {
-        this.application = application;
-        this.question = applicationQuestion.getContent();
-        this.content = content;
-    };
-
-    public static ApplicationAnswer generate(final Application application, final ApplicationQuestion applicationQuestion, final String content) {
-        return new ApplicationAnswer(application, applicationQuestion, content);
     }
 }

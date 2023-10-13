@@ -1,11 +1,8 @@
 package com.coro.coro.application.domain;
 
-import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
 import com.coro.coro.common.domain.BaseEntity;
 import com.coro.coro.moim.domain.Moim;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
@@ -14,6 +11,8 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "application_question")
+@AllArgsConstructor
+@Builder
 public class ApplicationQuestion extends BaseEntity implements Persistable<Long> {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,20 +26,6 @@ public class ApplicationQuestion extends BaseEntity implements Persistable<Long>
     private Moim moim;
 
     private String content;
-
-    public ApplicationQuestion(final Moim moim, final String content, final Integer order) {
-        this.moim = moim;
-        this.content = content;
-        this.order = order;
-    }
-
-    public static ApplicationQuestion generate(final Moim moim, final ApplicationQuestionRegisterRequest requestQuestion) {
-        return new ApplicationQuestion(moim, requestQuestion.getContent(), requestQuestion.getOrder());
-    }
-
-    public int getOrder() {
-        return this.order;
-    }
 
     @Override
     public Long getId() {

@@ -8,11 +8,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface MoimMemberRepository extends JpaRepository<MoimMember, Long> {
+public interface MoimMemberJpaRepository extends JpaRepository<MoimMember, Long> {
 
     @Query("select mm from MoimMember mm where mm.moim.id = :moimId")
-    List<MoimMember> findAllByMoimId(@Param("moimId") Long moimId);
+    List<MoimMember> findAllByMoimId(@Param("moimId") final Long moimId);
 
     @Query("select mm from MoimMember mm where mm.moim.id = :moimId and mm.member.id = :memberId")
-    Optional<MoimMember> findByMoimIdAndMemberId(@Param("moimId") Long moimId, @Param("memberId") Long memberId);
+    Optional<MoimMember> findByMoimIdAndMemberId(@Param("moimId") final Long moimId, @Param("memberId") final Long memberId);
 }

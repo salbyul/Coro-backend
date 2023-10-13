@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface MoimPhotoRepository extends JpaRepository<MoimPhoto, Long> {
+public interface MoimPhotoJpaRepository extends JpaRepository<MoimPhoto, Long> {
 
     @Modifying
     @Query("delete from MoimPhoto mp where mp.id = :moimId")

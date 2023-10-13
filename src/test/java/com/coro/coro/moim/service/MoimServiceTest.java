@@ -5,8 +5,7 @@ import com.coro.coro.application.dto.response.ApplicationQuestionResponse;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.domain.MemberRole;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
-import com.coro.coro.member.exception.MemberException;
-import com.coro.coro.member.repository.MemberRepository;
+import com.coro.coro.member.repository.port.MemberRepository;
 import com.coro.coro.member.service.MemberService;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.domain.MoimMember;
@@ -20,8 +19,8 @@ import com.coro.coro.moim.dto.response.MoimDetailResponse;
 import com.coro.coro.moim.dto.response.MoimMemberResponse;
 import com.coro.coro.moim.dto.response.MoimModificationResponse;
 import com.coro.coro.moim.exception.MoimException;
-import com.coro.coro.moim.repository.MoimMemberRepository;
-import com.coro.coro.moim.repository.MoimRepository;
+import com.coro.coro.moim.repository.port.MoimMemberRepository;
+import com.coro.coro.moim.repository.port.MoimRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -68,8 +67,7 @@ class MoimServiceTest {
     @BeforeEach
     void setUp() throws IOException {
         memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        member = memberRepository.findByEmail("asdf@asdf.com")
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+        member = memberRepository.findByEmail("asdf@asdf.com").get();
         MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag2", "tag3"));
         List<ApplicationQuestionRegisterRequest> questionRequests = List.of(
                 new ApplicationQuestionRegisterRequest("질문1", 1),
@@ -82,8 +80,7 @@ class MoimServiceTest {
                 null,
                 member.getId());
         requestMoim = new MoimRegisterRequest("모임", "모임 소개", "mixed", true);
-        moimMember = moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, member.getId())
-                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
+        moimMember = moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, member.getId()).get();
         em.clear();
     }
 
@@ -92,8 +89,7 @@ class MoimServiceTest {
     void register() throws IOException {
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "", "mixed", true);
         Long moimId = moimService.register(requestMoim, new MoimTagRequest(), null, null, member.getId());
-        Moim moim = moimRepository.findById(moimId)
-                .orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
+        Moim moim = moimRepository.findById(moimId).get();
 
         assertAll(
                 () -> assertThat(moim.getIntroduction()).isEqualTo("우리 모임을 소개해주세요."),
@@ -161,8 +157,7 @@ class MoimServiceTest {
                 member.getId()
         );
 
-        Moim moim = moimRepository.findById(savedMoimId)
-                .orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
+        Moim moim = moimRepository.findById(savedMoimId).get();
 
         assertAll(
                 () -> assertThat(moim.getName()).isEqualTo(EXAMPLE_NAME),
@@ -292,11 +287,17 @@ class MoimServiceTest {
     void modifyMoimMember() {
         Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
         Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = moimMemberRepository.save(MoimMember.generate(moimRepository.findById(savedMoimId).get(), newMember, MemberRole.USER));
+        MoimMember moimMember = MoimMember.builder()
+                .moim(moimRepository.findById(savedMoimId).get())
+                .member(newMember)
+                .role(MemberRole.USER)
+                .build();
+        Long savedId = moimMemberRepository.save(moimMember);
+        MoimMember newMoimMember = moimMemberRepository.findById(savedId).get();
         moimService.modifyMoimMember(
                 savedMoimId,
                 List.of(
-                        new MoimMemberModificationRequest(moimMember.getId(), "닉네임", MemberRole.LEADER),
+                        new MoimMemberModificationRequest(this.moimMember.getId(), "닉네임", MemberRole.LEADER),
                         new MoimMemberModificationRequest(newMoimMember.getId(), "회원2", MemberRole.MANAGER)),
                 member.getId()
         );
@@ -313,7 +314,11 @@ class MoimServiceTest {
     void modifyMoimMemberFailByDuplicateLeader() {
         Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
         Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = moimMemberRepository.save(MoimMember.generate(moimRepository.findById(savedMoimId).get(), newMember, MemberRole.USER));
+        MoimMember newMoimMember = MoimMember.builder()
+                .moim(moimRepository.findById(savedMoimId).get())
+                .member(newMember)
+                .role(MemberRole.USER)
+                .build();
 
         assertThatThrownBy(() ->
                 moimService.modifyMoimMember(savedMoimId,
@@ -334,7 +339,11 @@ class MoimServiceTest {
     void modifyMoimMemberFailByNoLeader() {
         Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
         Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = moimMemberRepository.save(MoimMember.generate(moimRepository.findById(savedMoimId).get(), newMember, MemberRole.USER));
+        MoimMember newMoimMember = MoimMember.builder()
+                .moim(moimRepository.findById(savedMoimId).get())
+                .member(newMember)
+                .role(MemberRole.USER)
+                .build();
 
         assertThatThrownBy(() ->
                 moimService.modifyMoimMember(
@@ -353,7 +362,11 @@ class MoimServiceTest {
     void modifyMoimMemberFailByNotAllMoimMember() {
         Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
         Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = moimMemberRepository.save(MoimMember.generate(moimRepository.findById(savedMoimId).get(), newMember, MemberRole.USER));
+        MoimMember newMoimMember = MoimMember.builder()
+                .moim(moimRepository.findById(savedMoimId).get())
+                .member(newMember)
+                .role(MemberRole.USER)
+                .build();
 
         assertThatThrownBy(() ->
                 moimService.modifyMoimMember(savedMoimId,
@@ -368,8 +381,13 @@ class MoimServiceTest {
     @DisplayName("모임 멤버 수정 실패 - 올바르지 않은 모임 멤버의 경우")
     void modifyMoimMemberFailByNotValidMoimMember() {
         Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
+
         Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = moimMemberRepository.save(MoimMember.generate(moimRepository.findById(savedMoimId).get(), newMember, MemberRole.USER));
+        MoimMember newMoimMember = MoimMember.builder()
+                .moim(moimRepository.findById(savedMoimId).get())
+                .member(newMember)
+                .role(MemberRole.USER)
+                .build();
 
         assertThatThrownBy(() ->
                 moimService.modifyMoimMember(savedMoimId,
@@ -416,8 +434,15 @@ class MoimServiceTest {
     @DisplayName("정상적인 회원 추방")
     void deport() {
         Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
+
         Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = moimMemberRepository.save(MoimMember.generate(moimRepository.findById(savedMoimId).get(), newMember, MemberRole.USER));
+        MoimMember newMoimMember = MoimMember.builder()
+                .moim(moimRepository.findById(savedMoimId).get())
+                .member(newMember)
+                .role(MemberRole.USER)
+                .build();
+        moimMemberRepository.save(newMoimMember);
+
         moimService.deport(savedMoimId, newMoimMember.getId(), member.getId());
         List<MoimMember> moimMemberList = moimMemberRepository.findAllByMoimId(savedMoimId);
 
@@ -432,8 +457,14 @@ class MoimServiceTest {
     @DisplayName("회원 추방 실패 - 올바르지 않은 모임 Id")
     void deportFailByNotValidMoimId() {
         Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
+
         Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = moimMemberRepository.save(MoimMember.generate(moimRepository.findById(savedMoimId).get(), newMember, MemberRole.USER));
+        MoimMember newMoimMember = MoimMember.builder()
+                .moim(moimRepository.findById(savedMoimId).get())
+                .member(newMember)
+                .role(MemberRole.USER)
+                .build();
+        moimMemberRepository.save(newMoimMember);
 
         assertThatThrownBy(() ->
                 moimService.deport(999999L, newMoimMember.getId(), member.getId())
@@ -446,8 +477,14 @@ class MoimServiceTest {
     @DisplayName("회원 추방 실패 - 권한이 없을 경우")
     void deportFailByForbidden() {
         Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
+
         Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = moimMemberRepository.save(MoimMember.generate(moimRepository.findById(savedMoimId).get(), newMember, MemberRole.USER));
+        MoimMember newMoimMember = MoimMember.builder()
+                .moim(moimRepository.findById(savedMoimId).get())
+                .member(newMember)
+                .role(MemberRole.USER)
+                .build();
+        moimMemberRepository.save(newMoimMember);
 
         assertThatThrownBy(() ->
                 moimService.deport(savedMoimId, newMoimMember.getId(), newMemberId)
@@ -461,7 +498,13 @@ class MoimServiceTest {
     void deportFailByDeportLeader() {
         Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
         Member newMember = memberRepository.findById(newMemberId).get();
-        moimMemberRepository.save(MoimMember.generate(moimRepository.findById(savedMoimId).get(), newMember, MemberRole.MANAGER));
+        MoimMember newMoimMember = MoimMember.builder()
+                .moim(moimRepository.findById(savedMoimId).get())
+                .member(newMember)
+                .role(MemberRole.MANAGER)
+                .build();
+
+        moimMemberRepository.save(newMoimMember);
 
         assertThatThrownBy(() ->
                 moimService.deport(savedMoimId, moimMember.getId(), newMemberId)

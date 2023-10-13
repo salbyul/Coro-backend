@@ -27,7 +27,13 @@ class ApplicationTest {
                 .visible(true)
                 .type(MoimType.FACE_TO_FACE)
                 .build();
-        Application application = Application.generate(member, moim);
+
+        Application application = Application.builder()
+                .member(member)
+                .moim(moim)
+                .status(ApplicationStatus.WAIT)
+                .build();
+
 
         assertAll(
                 () -> assertThat(application.getMember()).isEqualTo(member),
@@ -52,7 +58,11 @@ class ApplicationTest {
                 .visible(true)
                 .type(MoimType.FACE_TO_FACE)
                 .build();
-        Application application = Application.generate(member, moim);
+        Application application = Application.builder()
+                .member(member)
+                .moim(moim)
+                .status(ApplicationStatus.WAIT)
+                .build();
         application.updateStatusTo(ApplicationStatus.ACCEPT);
 
         assertThat(application.getStatus()).isEqualTo(ApplicationStatus.ACCEPT);

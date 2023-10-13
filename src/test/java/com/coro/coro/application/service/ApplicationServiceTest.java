@@ -9,15 +9,15 @@ import com.coro.coro.application.dto.response.ApplicationAnswerDTO;
 import com.coro.coro.application.dto.response.ApplicationResponse;
 import com.coro.coro.application.dto.response.DetailedApplicationResponse;
 import com.coro.coro.application.exception.ApplicationException;
-import com.coro.coro.application.repository.ApplicationRepository;
+import com.coro.coro.application.repository.port.ApplicationRepository;
 import com.coro.coro.member.domain.MemberRole;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
-import com.coro.coro.member.repository.MemberRepository;
+import com.coro.coro.member.repository.port.MemberRepository;
 import com.coro.coro.member.service.MemberService;
 import com.coro.coro.moim.domain.MoimMember;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
-import com.coro.coro.moim.repository.MoimMemberRepository;
-import com.coro.coro.moim.repository.MoimRepository;
+import com.coro.coro.moim.repository.port.MoimMemberRepository;
+import com.coro.coro.moim.repository.port.MoimRepository;
 import com.coro.coro.moim.service.MoimService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @SpringBootTest
 class ApplicationServiceTest {
 
-    public static final String WILL_JOINED_MEMBER_NICKNAME = "가입할회원";
+    public static final String MEMBER_NICKNAME_TO_BE_JOIN = "가입할회원";
     @Autowired
     private MemberService memberService;
     @Autowired
@@ -55,7 +55,7 @@ class ApplicationServiceTest {
 
     private Long memberId;
     private Long moimId;
-    private Long willJoinedMemberId;
+    private Long memberIdToBeJoin;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -70,7 +70,7 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
-        willJoinedMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", WILL_JOINED_MEMBER_NICKNAME));
+        memberIdToBeJoin = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOIN));
     }
 
     @Test
@@ -79,12 +79,12 @@ class ApplicationServiceTest {
         Long applicationId = applicationService.register(
                 moimId,
                 new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
-                willJoinedMemberId
+                memberIdToBeJoin
         );
         Application application = applicationRepository.findById(applicationId).get();
 
         assertAll(
-                () -> assertThat(application.getMember()).isEqualTo(memberRepository.findById(willJoinedMemberId).get()),
+                () -> assertThat(application.getMember()).isEqualTo(memberRepository.findById(memberIdToBeJoin).get()),
                 () -> assertThat(application.getMoim()).isEqualTo(moimRepository.findById(moimId).get()),
                 () -> assertThat(application.getStatus()).isEqualTo(ApplicationStatus.WAIT)
         );
@@ -97,7 +97,7 @@ class ApplicationServiceTest {
                 applicationService.register(
                         99999L,
                         new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
-                        willJoinedMemberId
+                        memberIdToBeJoin
                 )
         )
                 .isInstanceOf(ApplicationException.class)
@@ -121,20 +121,24 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 등록 성공 - 거절된 지원서가 있을 경우")
     void registerSuccessButExistRefuseApplication() {
-        Application acceptedApplication = Application.generate(memberRepository.findById(memberId).get(), moimRepository.findById(moimId).get());
+        Application acceptedApplication = Application.builder()
+                .member(memberRepository.findById(memberId).get())
+                .moim(moimRepository.findById(moimId).get())
+                .status(ApplicationStatus.WAIT)
+                .build();
         acceptedApplication.updateStatusTo(ApplicationStatus.REFUSE);
         applicationRepository.save(acceptedApplication);
 
         Long applicationId = applicationService.register(
                 moimId,
                 new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
-                willJoinedMemberId
+                memberIdToBeJoin
         );
 
         Application application = applicationRepository.findById(applicationId).get();
 
         assertAll(
-                () -> assertThat(application.getMember()).isEqualTo(memberRepository.findById(willJoinedMemberId).get()),
+                () -> assertThat(application.getMember()).isEqualTo(memberRepository.findById(memberIdToBeJoin).get()),
                 () -> assertThat(application.getMoim()).isEqualTo(moimRepository.findById(moimId).get()),
                 () -> assertThat(application.getStatus()).isEqualTo(ApplicationStatus.WAIT)
         );
@@ -144,14 +148,18 @@ class ApplicationServiceTest {
     @DisplayName("지원서 등록 실패 - 이미 가입한 모임의 경우")
     void registerSuccessByNotWaitApplication() {
         moimMemberRepository.save(
-                MoimMember.generate(moimRepository.findById(moimId).get(), memberRepository.findById(willJoinedMemberId).get(), MemberRole.USER)
+                MoimMember.builder()
+                        .moim(moimRepository.findById(moimId).get())
+                        .member(memberRepository.findById(memberIdToBeJoin).get())
+                        .role(MemberRole.USER)
+                        .build()
         );
 
         assertThatThrownBy(() ->
                 applicationService.register(
                         moimId,
                         new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
-                        willJoinedMemberId
+                        memberIdToBeJoin
                 )
         )
                 .isInstanceOf(ApplicationException.class)
@@ -164,18 +172,18 @@ class ApplicationServiceTest {
         applicationService.register(
                 moimId,
                 new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
-                willJoinedMemberId
+                memberIdToBeJoin
         );
 
         assertThatThrownBy(() ->
                 applicationService.register(
                         moimId,
                         new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
-                        willJoinedMemberId
+                        memberIdToBeJoin
                 )
         )
                 .isInstanceOf(ApplicationException.class)
-                .hasMessage(APPLICATION_EXIST.getMessage());
+                .hasMessage(APPLICATION_ALREADY_EXIST.getMessage());
     }
 
     @Test
@@ -185,7 +193,7 @@ class ApplicationServiceTest {
                 applicationService.register(
                         moimId,
                         new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1))),
-                        willJoinedMemberId
+                        memberIdToBeJoin
                 )
         )
                 .isInstanceOf(ApplicationException.class)
@@ -199,7 +207,7 @@ class ApplicationServiceTest {
                 applicationService.register(
                         moimId,
                         new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("", 2))),
-                        willJoinedMemberId
+                        memberIdToBeJoin
                 )
         )
                 .isInstanceOf(ApplicationException.class)
@@ -212,14 +220,14 @@ class ApplicationServiceTest {
         applicationService.register(
                 moimId,
                 new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
-                willJoinedMemberId
+                memberIdToBeJoin
         );
-        List<ApplicationResponse> applicationList = applicationService.getApplication(moimId, willJoinedMemberId, "all");
+        List<ApplicationResponse> applicationList = applicationService.getApplication(moimId, memberIdToBeJoin, "all");
 
         assertAll(
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getApplicantName)
-                        .containsExactlyInAnyOrder(WILL_JOINED_MEMBER_NICKNAME),
+                        .containsExactlyInAnyOrder(MEMBER_NICKNAME_TO_BE_JOIN),
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getStatus)
                         .containsExactlyInAnyOrder(ApplicationStatus.WAIT)
@@ -229,16 +237,20 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("특정 회원의 합격한 지원서 찾기")
     void getApplicationAccept() {
-        Application application = Application.generate(memberRepository.findById(willJoinedMemberId).get(), moimRepository.findById(moimId).get());
+        Application application = Application.builder()
+                .member(memberRepository.findById(memberIdToBeJoin).get())
+                .moim(moimRepository.findById(moimId).get())
+                .status(ApplicationStatus.WAIT)
+                .build();
         application.updateStatusTo(ApplicationStatus.ACCEPT);
         applicationRepository.save(application);
 
-        List<ApplicationResponse> applicationList = applicationService.getApplication(moimId, willJoinedMemberId, "accept");
+        List<ApplicationResponse> applicationList = applicationService.getApplication(moimId, memberIdToBeJoin, "accept");
 
         assertAll(
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getApplicantName)
-                        .containsExactlyInAnyOrder(WILL_JOINED_MEMBER_NICKNAME),
+                        .containsExactlyInAnyOrder(MEMBER_NICKNAME_TO_BE_JOIN),
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getStatus)
                         .containsExactlyInAnyOrder(ApplicationStatus.ACCEPT)
@@ -248,16 +260,20 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("특정 회원의 거절된 지원서 찾기")
     void getApplicationRefuse() {
-        Application application = Application.generate(memberRepository.findById(willJoinedMemberId).get(), moimRepository.findById(moimId).get());
+        Application application = Application.builder()
+                .member(memberRepository.findById(memberIdToBeJoin).get())
+                .moim(moimRepository.findById(moimId).get())
+                .status(ApplicationStatus.WAIT)
+                .build();
         application.updateStatusTo(ApplicationStatus.REFUSE);
         applicationRepository.save(application);
 
-        List<ApplicationResponse> applicationList = applicationService.getApplication(moimId, willJoinedMemberId, "refuse");
+        List<ApplicationResponse> applicationList = applicationService.getApplication(moimId, memberIdToBeJoin, "refuse");
 
         assertAll(
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getApplicantName)
-                        .containsExactlyInAnyOrder(WILL_JOINED_MEMBER_NICKNAME),
+                        .containsExactlyInAnyOrder(MEMBER_NICKNAME_TO_BE_JOIN),
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getStatus)
                         .containsExactlyInAnyOrder(ApplicationStatus.REFUSE)
@@ -270,7 +286,7 @@ class ApplicationServiceTest {
         applicationService.register(
                 moimId,
                 new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
-                willJoinedMemberId
+                memberIdToBeJoin
         );
 
         List<ApplicationResponse> applicationList = applicationService.getApplication(moimId, "all");
@@ -278,7 +294,7 @@ class ApplicationServiceTest {
         assertAll(
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getApplicantName)
-                        .containsExactlyInAnyOrder(WILL_JOINED_MEMBER_NICKNAME),
+                        .containsExactlyInAnyOrder(MEMBER_NICKNAME_TO_BE_JOIN),
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getStatus)
                         .containsExactlyInAnyOrder(ApplicationStatus.WAIT)
@@ -288,7 +304,11 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("모든 거절된 지원서 찾기")
     void getAllApplicationRefuse() {
-        Application application = Application.generate(memberRepository.findById(willJoinedMemberId).get(), moimRepository.findById(moimId).get());
+        Application application = Application.builder()
+                .member(memberRepository.findById(memberIdToBeJoin).get())
+                .moim(moimRepository.findById(moimId).get())
+                .status(ApplicationStatus.WAIT)
+                .build();
         application.updateStatusTo(ApplicationStatus.REFUSE);
         applicationRepository.save(application);
 
@@ -297,7 +317,7 @@ class ApplicationServiceTest {
         assertAll(
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getApplicantName)
-                        .containsExactlyInAnyOrder(WILL_JOINED_MEMBER_NICKNAME),
+                        .containsExactlyInAnyOrder(MEMBER_NICKNAME_TO_BE_JOIN),
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getStatus)
                         .containsExactlyInAnyOrder(ApplicationStatus.REFUSE)
@@ -307,7 +327,11 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("모든 승인된 지원서 찾기")
     void getAllApplicationAccept() {
-        Application application = Application.generate(memberRepository.findById(willJoinedMemberId).get(), moimRepository.findById(moimId).get());
+        Application application = Application.builder()
+                .member(memberRepository.findById(memberIdToBeJoin).get())
+                .moim(moimRepository.findById(moimId).get())
+                .status(ApplicationStatus.WAIT)
+                .build();
         application.updateStatusTo(ApplicationStatus.ACCEPT);
         applicationRepository.save(application);
 
@@ -316,7 +340,7 @@ class ApplicationServiceTest {
         assertAll(
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getApplicantName)
-                        .containsExactlyInAnyOrder(WILL_JOINED_MEMBER_NICKNAME),
+                        .containsExactlyInAnyOrder(MEMBER_NICKNAME_TO_BE_JOIN),
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getStatus)
                         .containsExactlyInAnyOrder(ApplicationStatus.ACCEPT)
@@ -329,7 +353,7 @@ class ApplicationServiceTest {
         Long applicationId = applicationService.register(
                 moimId,
                 new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
-                willJoinedMemberId
+                memberIdToBeJoin
         );
 
         DetailedApplicationResponse detailedApplication = applicationService.getDetailedApplication(applicationId);
@@ -351,7 +375,7 @@ class ApplicationServiceTest {
         applicationService.register(
                 moimId,
                 new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
-                willJoinedMemberId
+                memberIdToBeJoin
         );
 
         assertThatThrownBy(() ->
@@ -367,7 +391,7 @@ class ApplicationServiceTest {
         Long applicationId = applicationService.register(
                 moimId,
                 new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
-                willJoinedMemberId
+                memberIdToBeJoin
         );
         applicationService.decideApplication(memberId, applicationId, ApplicationStatus.REFUSE);
 
@@ -382,17 +406,17 @@ class ApplicationServiceTest {
         Long applicationId = applicationService.register(
                 moimId,
                 new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
-                willJoinedMemberId
+                memberIdToBeJoin
         );
         applicationService.decideApplication(memberId, applicationId, ApplicationStatus.ACCEPT);
 
         Application application = applicationRepository.findById(applicationId).get();
-        MoimMember moimMember = moimMemberRepository.findByMoimIdAndMemberId(moimId, willJoinedMemberId).get();
+        MoimMember moimMember = moimMemberRepository.findByMoimIdAndMemberId(moimId, memberIdToBeJoin).get();
 
         assertAll(
                 () -> assertThat(application.getStatus()).isEqualTo(ApplicationStatus.ACCEPT),
                 () -> assertThat(moimMember.getMoim().getId()).isEqualTo(moimId),
-                () -> assertThat(moimMember.getMember().getId()).isEqualTo(willJoinedMemberId),
+                () -> assertThat(moimMember.getMember().getId()).isEqualTo(memberIdToBeJoin),
                 () -> assertThat(moimMember.getRole()).isEqualTo(MemberRole.USER)
         );
     }
@@ -403,7 +427,7 @@ class ApplicationServiceTest {
         applicationService.register(
                 moimId,
                 new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
-                willJoinedMemberId);
+                memberIdToBeJoin);
 
         assertThatThrownBy(() ->
                 applicationService.decideApplication(memberId, 99999L, ApplicationStatus.ACCEPT)
@@ -416,12 +440,17 @@ class ApplicationServiceTest {
     @DisplayName("지원서 상태 변경 실패 - 권한이 없는 회원이 변경하려는 경우")
     void decideApplicationFailByForbidden() {
         Long joinedMember = memberService.register(new MemberRegisterRequest("b@b.com", "asdf1234!@", "기존회원"));
-        moimMemberRepository.save(MoimMember.generate(moimRepository.findById(moimId).get(), memberRepository.findById(joinedMember).get(), MemberRole.USER));
+        MoimMember moimMember = MoimMember.builder()
+                .moim(moimRepository.findById(moimId).get())
+                .member(memberRepository.findById(joinedMember).get())
+                .role(MemberRole.USER)
+                .build();
+        moimMemberRepository.save(moimMember);
 
         Long applicationId = applicationService.register(
                 moimId,
                 new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
-                willJoinedMemberId
+                memberIdToBeJoin
         );
 
         assertThatThrownBy(() ->
@@ -437,7 +466,7 @@ class ApplicationServiceTest {
         Long applicationId = applicationService.register(
                 moimId,
                 new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
-                willJoinedMemberId
+                memberIdToBeJoin
         );
 
         applicationService.decideApplication(memberId, applicationId, ApplicationStatus.ACCEPT);

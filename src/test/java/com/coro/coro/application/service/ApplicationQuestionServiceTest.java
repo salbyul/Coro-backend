@@ -3,12 +3,12 @@ package com.coro.coro.application.service;
 import com.coro.coro.application.domain.ApplicationQuestion;
 import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
 import com.coro.coro.application.exception.ApplicationException;
-import com.coro.coro.application.repository.ApplicationQuestionRepository;
+import com.coro.coro.application.repository.port.ApplicationQuestionRepository;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.service.MemberService;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
-import com.coro.coro.moim.repository.MoimRepository;
+import com.coro.coro.moim.repository.port.MoimRepository;
 import com.coro.coro.moim.service.MoimService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +23,8 @@ import static com.coro.coro.common.response.error.ErrorType.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@Transactional
 @SpringBootTest
+@Transactional
 class ApplicationQuestionServiceTest {
 
     @Autowired
@@ -38,7 +38,6 @@ class ApplicationQuestionServiceTest {
     @Autowired
     private MoimRepository moimRepository;
     private Moim moim;
-
 
     @BeforeEach
     void setUp() throws IOException {
@@ -144,12 +143,12 @@ class ApplicationQuestionServiceTest {
                 moim.getId(),
                 generateRequestQuestions("질문", 2)
         );
-        List<ApplicationQuestion> questionList = applicationQuestionService.findQuestionList(moim.getId());
+        List<com.coro.coro.application.domain.ApplicationQuestion> questionList = applicationQuestionService.findQuestionList(moim.getId());
 
         assertAll(
-                () -> assertThat(questionList).extracting(ApplicationQuestion::getContent).containsExactlyInAnyOrder("질문1", "질문2"),
-                () -> assertThat(questionList).extracting(ApplicationQuestion::getOrder).containsExactlyInAnyOrder(1, 2),
-                () -> assertThat(questionList).extracting(ApplicationQuestion::getMoim).containsExactlyInAnyOrder(moim, moim)
+                () -> assertThat(questionList).extracting(com.coro.coro.application.domain.ApplicationQuestion::getContent).containsExactlyInAnyOrder("질문1", "질문2"),
+                () -> assertThat(questionList).extracting(com.coro.coro.application.domain.ApplicationQuestion::getOrder).containsExactlyInAnyOrder(1, 2),
+                () -> assertThat(questionList).extracting(com.coro.coro.application.domain.ApplicationQuestion::getMoim).containsExactlyInAnyOrder(moim, moim)
         );
     }
 }

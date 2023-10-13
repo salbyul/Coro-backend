@@ -4,7 +4,7 @@ import com.coro.coro.application.annotation.StatusValue;
 import com.coro.coro.application.domain.ApplicationStatus;
 import com.coro.coro.application.dto.request.ApplicationRequest;
 import com.coro.coro.common.response.APIResponse;
-import com.coro.coro.member.domain.User;
+import com.coro.coro.member.service.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;

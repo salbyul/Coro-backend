@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface MoimRepository extends JpaRepository<Moim, Long> {
+public interface MoimJpaRepository extends JpaRepository<Moim, Long> {
 
     Optional<Moim> findByName(final String name);
 

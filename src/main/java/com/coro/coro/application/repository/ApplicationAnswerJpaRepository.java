@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ApplicationAnswerRepository extends JpaRepository<ApplicationAnswer, Long> {
+public interface ApplicationAnswerJpaRepository extends JpaRepository<ApplicationAnswer, Long> {
 
     @Query("select aa from ApplicationAnswer aa where aa.application.id = :applicationId")
     List<ApplicationAnswer> findAllByApplicationId(@Param("applicationId") final Long applicationId);

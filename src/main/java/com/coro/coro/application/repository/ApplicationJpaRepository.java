@@ -7,13 +7,13 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ApplicationRepository extends JpaRepository<Application, Long> {
+public interface ApplicationJpaRepository extends JpaRepository<Application, Long> {
 
     @Query("select a from Application a where a.moim.id = :moimId and a.member.id = :memberId")
-    List<Application> findByMemberAndMoim(@Param("memberId") final Long memberId, @Param("moimId") final Long moimId);
+    List<Application> findByMemberIdAndMoimId(@Param("memberId") final Long memberId, @Param("moimId") final Long moimId);
 
     @Query("select a from Application a where a.moim.id = :moimId and a.member.id = :memberId and a.status = UPPER( :status)")
-    List<Application> findByMemberAndMoimAndStatus(@Param("memberId") final Long memberId, @Param("moimId") final Long moimId, @Param("status") final String status);
+    List<Application> findByMemberIdAndMoimIdAndStatus(@Param("memberId") final Long memberId, @Param("moimId") final Long moimId, @Param("status") final String status);
 
     @Query("select a from Application a where a.moim.id = :moimId and a.status = UPPER(:status)")
     List<Application> findAllByMoimIdAndStatus(@Param("moimId") final Long moimId, @Param("status") final String status);

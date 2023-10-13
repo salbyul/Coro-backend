@@ -1,7 +1,7 @@
 package com.coro.coro.member.controller;
 
 import com.coro.coro.common.response.APIResponse;
-import com.coro.coro.member.domain.User;
+import com.coro.coro.member.service.User;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
 import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;

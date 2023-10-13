@@ -5,7 +5,7 @@ import com.coro.coro.member.dto.request.MemberLoginRequest;
 import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.exception.MemberException;
-import com.coro.coro.member.repository.MemberRepository;
+import com.coro.coro.member.repository.port.MemberRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -35,8 +35,7 @@ class MemberServiceTest {
     @BeforeEach
     void setUp() {
         memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
-        member = memberRepository.findByEmail(EXAMPLE_EMAIL)
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+        member = memberRepository.findByEmail(EXAMPLE_EMAIL).get();
     }
 
     @Test
@@ -190,9 +189,10 @@ class MemberServiceTest {
         MemberModificationRequest requestMember =
                 new MemberModificationRequest(EXAMPLE_PASSWORD, "qwer1234!@", "바뀐 소개입니다.");
         memberService.update(member.getId(), requestMember);
+        Member updatedMember = memberRepository.findById(member.getId()).get();
 
-        assertThat(passwordEncoder.matches(requestMember.getNewPassword(), member.getPassword())).isTrue();
-        assertThat(member.getIntroduction()).isEqualTo(requestMember.getIntroduction());
+        assertThat(passwordEncoder.matches(requestMember.getNewPassword(), updatedMember.getPassword())).isTrue();
+        assertThat(updatedMember.getIntroduction()).isEqualTo(requestMember.getIntroduction());
     }
 
     @Test

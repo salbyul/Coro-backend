@@ -3,7 +3,7 @@ package com.coro.coro.moim.controller;
 import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
 import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.domain.MemberRole;
-import com.coro.coro.member.domain.User;
+import com.coro.coro.member.service.User;
 import com.coro.coro.moim.annotation.Search;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.dto.request.*;

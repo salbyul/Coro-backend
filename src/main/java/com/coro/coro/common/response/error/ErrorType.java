@@ -26,6 +26,8 @@ public enum ErrorType {
     MEMBER_NICKNAME_DUPLICATE("131", "Nickname 값이 중복됩니다."),
     MEMBER_NICKNAME_NOT_VALID("132", "Nickname 값의 형태가 올바르지 않습니다."),
 
+    MEMBER_PHOTO_NOT_FOUND("140", "해당 MemberPhoto가 없습니다."),
+
     //    Moim
     MOIM_NOT_FOUND("200", "해당 Moim이 없습니다."),
     MOIM_FORBIDDEN("201", "권한이 없습니다."),
@@ -44,10 +46,12 @@ public enum ErrorType {
 
     MOIM_TYPE_NOT_VALID("252", "Type 값이 올바르지 않습니다."),
 
+    MOIM_PHOTO_NOT_FOUND("260", "해당 MoimPhoto가 없습니다."),
+
 //    Application
     APPLICATION_NOT_FOUND("300", "해당 Application이 없습니다."),
     APPLICATION_FORBIDDEN("303", "권한이 없습니다."),
-    APPLICATION_EXIST("306", "이미 지원한 모임입니다."),
+    APPLICATION_ALREADY_EXIST("306", "이미 지원한 모임입니다."),
     APPLICATION_EXIST_MEMBER("307", "이미 가입한 모임입니다."),
     APPLICATION_NOT_COMPLETE("308", "답변이 불완전합니다."),
     APPLICATION_QUESTION_MAX("309", "Application Question은 총 10개까지만 생성이 가능합니다."),

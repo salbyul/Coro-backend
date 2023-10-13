@@ -1,14 +1,14 @@
 package com.coro.coro.member.domain;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 @Table(name = "member_photo")
 public class MemberPhoto {
 
@@ -25,10 +25,4 @@ public class MemberPhoto {
     private String originalName;
 
     private String name;
-
-    public MemberPhoto(final Member member, final String originalName, final String name) {
-        this.member = member;
-        this.originalName = originalName;
-        this.name = name;
-    }
 }

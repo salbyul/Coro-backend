@@ -1,7 +1,6 @@
 package com.coro.coro.moim.domain;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
@@ -9,6 +8,9 @@ import javax.persistence.*;
 @Table(name = "moim_tag")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+@Getter
 public class MoimTag implements Persistable<Long> {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,15 +22,6 @@ public class MoimTag implements Persistable<Long> {
     @JoinColumn(name = "moim_id")
     private Moim moim;
 
-    public static MoimTag generateMoimTag(final String tagName, final Moim moim) {
-        return new MoimTag(tagName, moim);
-    }
-
-    private MoimTag(final String tagName, final Moim moim) {
-        this.name = tagName;
-        this.moim = moim;
-    }
-
     @Override
     public Long getId() {
         return id;
@@ -37,10 +30,6 @@ public class MoimTag implements Persistable<Long> {
     @Override
     public boolean isNew() {
         return true; // 태그 변경 시 모든 태그 제거 후 추가이기 때문
-    }
-
-    public String getName() {
-        return this.name;
     }
 
     public boolean isDuplicateName(final MoimTag moimTag) {

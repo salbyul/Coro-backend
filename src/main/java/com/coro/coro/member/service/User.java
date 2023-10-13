@@ -1,5 +1,7 @@
-package com.coro.coro.member.domain;
+package com.coro.coro.member.service;
 
+import com.coro.coro.member.domain.Member;
+import com.coro.coro.member.domain.MemberState;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

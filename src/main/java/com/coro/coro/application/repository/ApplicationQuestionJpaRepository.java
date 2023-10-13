@@ -8,12 +8,12 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ApplicationQuestionRepository extends JpaRepository<ApplicationQuestion, Long> {
+public interface ApplicationQuestionJpaRepository extends JpaRepository<ApplicationQuestion, Long> {
 
     @Modifying
     @Query("delete from ApplicationQuestion aq where aq.moim.id = :moimId")
-    void deleteAllByMoimId(@Param("moimId") final Long moim);
+    void deleteAllByMoimId(@Param("moimId") final Long moimId);
 
-    @Query("select ap from ApplicationQuestion ap where ap.moim.id = :moimId")
+    @Query("select aq from ApplicationQuestion aq where aq.moim.id = :moimId")
     List<ApplicationQuestion> findAllByMoimId(@Param("moimId") final Long moimId);
 }
