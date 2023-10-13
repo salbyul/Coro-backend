@@ -12,6 +12,7 @@ import com.coro.coro.member.service.MemberService;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.dto.response.MoimSearchResponse;
 import com.coro.coro.moim.service.MoimService;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/members")
+@Builder
 public class MemberController implements MemberControllerDocs {
 
     private final MemberService memberService;

@@ -1,6 +1,6 @@
-package com.coro.coro.common.filter;
+package com.coro.coro.auth.filter;
 
-import com.coro.coro.common.domain.jwt.JwtProvider;
+import com.coro.coro.auth.jwt.JwtProviderImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -16,13 +16,13 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtProvider tokenProvider;
+    private final JwtProviderImpl tokenProvider;
 
     @Override
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
         String token = tokenProvider.extractToken(request);
 
-        if (token != null && tokenProvider.validateToken(token)) {
+        if (token != null && tokenProvider.isValidToken(token)) {
             Authentication authentication = tokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

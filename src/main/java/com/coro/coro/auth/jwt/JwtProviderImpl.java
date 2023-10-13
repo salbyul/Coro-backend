@@ -1,4 +1,4 @@
-package com.coro.coro.common.domain.jwt;
+package com.coro.coro.auth.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -25,7 +25,7 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class JwtProvider {
+public class JwtProviderImpl implements JwtProvider {
 
     @Value("${jwt.secretKey}")
     private String secretKey;
@@ -42,6 +42,7 @@ public class JwtProvider {
         key = createKey();
     }
 
+    @Override
     public String generateAccessToken(final String userNickname) {
         Map<String, Object> claims = generateClaims(userNickname);
         Map<String, Object> header = generateHeader();
@@ -74,11 +75,13 @@ public class JwtProvider {
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
+    @Override
     public Authentication getAuthentication(final String token) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(getUserNickname(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", null);
     }
 
+    @Override
     public String getUserNickname(final String token) {
         return (String) Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -88,12 +91,14 @@ public class JwtProvider {
                 .get("nickname");
     }
 
+    @Override
     public String extractToken(final HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");
         return authorization == null ? null : authorization.substring(authorization.indexOf(" ") + 1);
     }
 
-    public boolean validateToken(final String token) {
+    @Override
+    public boolean isValidToken(final String token) {
         try {
             Jws<Claims> claims = Jwts.parserBuilder()
                     .setSigningKey(key)

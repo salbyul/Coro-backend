@@ -1,4 +1,4 @@
-package com.coro.coro.common.filter;
+package com.coro.coro.auth.filter;
 
 import com.coro.coro.common.response.error.ErrorType;
 import com.coro.coro.common.response.error.GlobalErrorResponse;
@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class ExceptionHandlingFilter extends GenericFilterBean {
+public class AuthExceptionHandlingFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {

@@ -19,5 +19,6 @@ public interface MoimRepository {
 
     Optional<Moim> findByName(final String name);
 
+    //    해당 멤버가 가입한 모든 모임 가져오기
     List<Moim> findAllByMemberId(final Long memberId);
 }

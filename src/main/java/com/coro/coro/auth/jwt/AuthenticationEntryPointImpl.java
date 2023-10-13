@@ -1,4 +1,4 @@
-package com.coro.coro.common.domain.jwt;
+package com.coro.coro.auth.jwt;
 
 import com.coro.coro.common.response.error.ErrorType;
 import com.coro.coro.common.response.error.GlobalErrorResponse;

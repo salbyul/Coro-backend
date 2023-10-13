@@ -19,6 +19,7 @@ import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.domain.MoimMember;
 import com.coro.coro.moim.repository.port.MoimMemberRepository;
 import com.coro.coro.moim.repository.port.MoimRepository;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ import static com.coro.coro.common.response.error.ErrorType.*;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Builder
 @Service
 public class ApplicationService {
 

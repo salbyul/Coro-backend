@@ -30,6 +30,7 @@ public class Member extends BaseEntity {
     private String nickname;
     private String introduction;
 
+    @Builder.Default
     @OneToMany(mappedBy = "leader")
     private List<Moim> moimList = new ArrayList<>();
 

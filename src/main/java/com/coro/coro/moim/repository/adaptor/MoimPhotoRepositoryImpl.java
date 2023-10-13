@@ -31,7 +31,7 @@ public class MoimPhotoRepositoryImpl implements MoimPhotoRepository {
     }
 
     @Override
-    public Optional<MoimPhoto> findOptionalById(final Long id) {
+    public Optional<MoimPhoto> findById(final Long id) {
         return moimPhotoJpaRepository.findById(id);
     }
 }

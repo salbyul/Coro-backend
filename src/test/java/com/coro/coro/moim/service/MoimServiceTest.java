@@ -1,16 +1,16 @@
 package com.coro.coro.moim.service;
 
+import com.coro.coro.application.domain.Application;
+import com.coro.coro.application.domain.ApplicationQuestion;
+import com.coro.coro.application.domain.ApplicationStatus;
 import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
+import com.coro.coro.application.dto.request.ApplicationRequest;
 import com.coro.coro.application.dto.response.ApplicationQuestionResponse;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.domain.MemberRole;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
-import com.coro.coro.member.repository.port.MemberRepository;
-import com.coro.coro.member.service.MemberService;
-import com.coro.coro.moim.domain.Moim;
-import com.coro.coro.moim.domain.MoimMember;
-import com.coro.coro.moim.domain.MoimState;
-import com.coro.coro.moim.domain.MoimType;
+import com.coro.coro.mock.FakeContainer;
+import com.coro.coro.moim.domain.*;
 import com.coro.coro.moim.dto.request.MoimMemberModificationRequest;
 import com.coro.coro.moim.dto.request.MoimModificationRequest;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
@@ -19,77 +19,34 @@ import com.coro.coro.moim.dto.response.MoimDetailResponse;
 import com.coro.coro.moim.dto.response.MoimMemberResponse;
 import com.coro.coro.moim.dto.response.MoimModificationResponse;
 import com.coro.coro.moim.exception.MoimException;
-import com.coro.coro.moim.repository.port.MoimMemberRepository;
-import com.coro.coro.moim.repository.port.MoimRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@Transactional
-@SpringBootTest
 class MoimServiceTest {
 
     private static final String EXAMPLE_NAME = "모임 예제";
     private static final String EXAMPLE_INTRODUCTION = "모임 소개입니다.";
     private static final String EXAMPLE_TYPE = "mixed";
 
-    @Autowired
-    private MoimService moimService;
-    @Autowired
-    private MoimRepository moimRepository;
-    @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private MemberService memberService;
-    @Autowired
-    private MoimMemberRepository moimMemberRepository;
-    @PersistenceContext
-    private EntityManager em;
-    private Member member;
-    private MoimRegisterRequest requestMoim;
-    private Long savedMoimId;
-    private MoimMember moimMember;
-
-    @BeforeEach
-    void setUp() throws IOException {
-        memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        member = memberRepository.findByEmail("asdf@asdf.com").get();
-        MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag2", "tag3"));
-        List<ApplicationQuestionRegisterRequest> questionRequests = List.of(
-                new ApplicationQuestionRegisterRequest("질문1", 1),
-                new ApplicationQuestionRegisterRequest("질문2", 2)
-        );
-        savedMoimId = moimService.register(
-                new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true),
-                requestMoimTag,
-                questionRequests,
-                null,
-                member.getId());
-        requestMoim = new MoimRegisterRequest("모임", "모임 소개", "mixed", true);
-        moimMember = moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, member.getId()).get();
-        em.clear();
-    }
-
     @Test
     @DisplayName("[모임 생성] 정상적인 모임 생성")
     void register() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "", "mixed", true);
-        Long moimId = moimService.register(requestMoim, new MoimTagRequest(), null, null, member.getId());
-        Moim moim = moimRepository.findById(moimId).get();
+        Long moimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Moim moim = container.moimRepository.findById(moimId).get();
 
         assertAll(
                 () -> assertThat(moim.getIntroduction()).isEqualTo("우리 모임을 소개해주세요."),
@@ -100,10 +57,19 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("[모임 생성] 이름 중복의 경우")
-    void registerFailByDuplicateName() {
-        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
+    void registerFailByDuplicateName() throws IOException {
+        FakeContainer container = new FakeContainer();
 
-        assertThatThrownBy(() -> moimService.register(requestMoim, new MoimTagRequest(), null, null, member.getId()))
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
+        container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+        MoimRegisterRequest duplicatedMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
+
+        assertThatThrownBy(() ->
+                container.moimService.register(duplicatedMoim, new MoimTagRequest(), null, null, savedMemberId)
+        )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NAME_DUPLICATE.getMessage());
     }
@@ -111,9 +77,14 @@ class MoimServiceTest {
     @Test
     @DisplayName("[모임 생성] 태그 값이 비어있을 경우")
     void registerFailByEmptyTag() {
-        MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag2", ""));
+        FakeContainer container = new FakeContainer();
 
-        assertThatThrownBy(() -> moimService.register(requestMoim, requestMoimTag, null, null, member.getId()))
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+        MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag2", ""));
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
+
+        assertThatThrownBy(() -> container.moimService.register(requestMoim, requestMoimTag, null, null, savedMemberId))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_TAG_NULL.getMessage());
     }
@@ -121,9 +92,14 @@ class MoimServiceTest {
     @Test
     @DisplayName("[모임 생성] 태그 값이 중복될 경우")
     void registerFailByDuplicateTag() {
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
         MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag1"));
 
-        assertThatThrownBy(() -> moimService.register(requestMoim, requestMoimTag, null, null, member.getId()))
+        assertThatThrownBy(() -> container.moimService.register(requestMoim, requestMoimTag, null, null, savedMemberId))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_TAG_DUPLICATE.getMessage());
     }
@@ -132,9 +108,14 @@ class MoimServiceTest {
     @DisplayName("[모임 생성] 태그 값이 유효하지 않을 경우")
     @ValueSource(strings = {"tag12345678", "!@#", "-_a"})
     void registerFailByNotValidTag(final String input) {
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
         MoimTagRequest requestMoimTag = new MoimTagRequest(List.of(input));
 
-        assertThatThrownBy(() -> moimService.register(requestMoim, requestMoimTag, null, null, member.getId()))
+        assertThatThrownBy(() -> container.moimService.register(requestMoim, requestMoimTag, null, null, savedMemberId))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_TAG_NOT_VALID.getMessage());
     }
@@ -142,41 +123,59 @@ class MoimServiceTest {
     @Test
     @DisplayName("[모임 수정] 정상적인 모임 수정")
     void update() throws IOException {
-        MoimTagRequest moimTagRequest = new MoimTagRequest(List.of("tag1", "tag2", "tag3"));
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+        MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag2", "tag3"));
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
         List<ApplicationQuestionRegisterRequest> requestQuestions = List.of(
                 new ApplicationQuestionRegisterRequest("question1", 1),
                 new ApplicationQuestionRegisterRequest("question2", 2)
         );
+        Long savedMoimId = container.moimService.register(requestMoim, requestMoimTag, requestQuestions, null, savedMemberId);
 
-        moimService.update(
-                savedMoimId,
-                new MoimModificationRequest(EXAMPLE_NAME, "수정되었습니다.", "faceToFace", false, false),
-                moimTagRequest,
-                null,
-                requestQuestions,
-                member.getId()
+        MoimTagRequest changedTagList = new MoimTagRequest(List.of("변경된태그1", "변경된태그2", "변경된태그3"));
+        List<ApplicationQuestionRegisterRequest> changedQuestionList = List.of(
+                new ApplicationQuestionRegisterRequest("changed question1", 1),
+                new ApplicationQuestionRegisterRequest("changed question2", 2)
         );
 
-        Moim moim = moimRepository.findById(savedMoimId).get();
+        container.moimService.update(
+                savedMoimId,
+                new MoimModificationRequest(EXAMPLE_NAME, "수정되었습니다.", "faceToFace", false, false),
+                changedTagList,
+                null,
+                changedQuestionList,
+                savedMemberId
+        );
+
+        Moim moim = container.moimRepository.findById(savedMoimId).get();
 
         assertAll(
                 () -> assertThat(moim.getName()).isEqualTo(EXAMPLE_NAME),
                 () -> assertThat(moim.getIntroduction()).isEqualTo("수정되었습니다."),
                 () -> assertThat(moim.getType()).isEqualTo(MoimType.FACE_TO_FACE),
-                () -> assertThat(moim.getVisible()).isFalse()
+                () -> assertThat(moim.getVisible()).isFalse(),
+                () -> assertThat(moim.getTagList()).extracting(MoimTag::getName).containsExactlyInAnyOrder("변경된태그1", "변경된태그2", "변경된태그3"),
+                () -> assertThat(moim.getQuestionList()).extracting(ApplicationQuestion::getContent).containsExactlyInAnyOrder("changed question1", "changed question2")
         );
     }
 
     @Test
     @DisplayName("[모임 수정] 존재하지 않는 모임")
     void updateFailByNotExistId() {
-        assertThatThrownBy(() -> moimService.update(
-                0L,
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+        assertThatThrownBy(() -> container.moimService.update(
+                99999L,
                 new MoimModificationRequest("수정", "소개 수정", "mixed", true, false),
                 null,
                 null,
                 null,
-                member.getId())
+                savedMemberId)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NOT_FOUND.getMessage());
@@ -185,15 +184,24 @@ class MoimServiceTest {
     @Test
     @DisplayName("[모임 수정] 이름 중복의 경우")
     void updateFailByDuplicateName() throws IOException {
-        Long moimId = moimService.register(new MoimRegisterRequest("모임 예", "모임 소개", "mixed", true), null, null, null, member.getId());
+        FakeContainer container = new FakeContainer();
 
-        assertThatThrownBy(() -> moimService.update(
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임 예", "모임 소개", "mixed", true);
+        Long moimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+        MoimRegisterRequest target = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
+        container.moimService.register(target, null, null, null, savedMemberId);
+
+
+        assertThatThrownBy(() -> container.moimService.update(
                 moimId,
                 new MoimModificationRequest(EXAMPLE_NAME, "모임 소개", "mixed", true, false),
                 new MoimTagRequest(),
                 null,
                 null,
-                member.getId())
+                savedMemberId)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NAME_DUPLICATE.getMessage());
@@ -202,7 +210,15 @@ class MoimServiceTest {
     @Test
     @DisplayName("모임 디테일 정보 성공")
     void getDetail() throws IOException {
-        MoimDetailResponse detail = moimService.getDetail(savedMoimId, member.getId());
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+        MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag2", "tag3"));
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        Long savedMoimId = container.moimService.register(requestMoim, requestMoimTag, null, null, savedMemberId);
+
+        MoimDetailResponse detail = container.moimService.getDetail(savedMoimId, savedMemberId);
 
         assertAll(
                 () -> assertThat(detail.getName()).isEqualTo(EXAMPLE_NAME),
@@ -217,7 +233,9 @@ class MoimServiceTest {
     @Test
     @DisplayName("모임 디테일 정보 획득실패 - 올바르지 않는 모임 Id값")
     void getDetailFailByNotValidMoimId() {
-        assertThatThrownBy(() -> moimService.getDetail(19999999L, 1L))
+        FakeContainer container = new FakeContainer();
+
+        assertThatThrownBy(() -> container.moimService.getDetail(19999999L, 1L))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NOT_FOUND.getMessage());
     }
@@ -225,7 +243,19 @@ class MoimServiceTest {
     @Test
     @DisplayName("모임 수정을 위한 데이터 획득 성공")
     void getDetailForModification() throws IOException {
-        MoimModificationResponse result = moimService.getDetailForModification(savedMoimId, member.getId());
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+        MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag2", "tag3"));
+        List<ApplicationQuestionRegisterRequest> requestQuestions = List.of(
+                new ApplicationQuestionRegisterRequest("질문1", 1),
+                new ApplicationQuestionRegisterRequest("질문2", 2)
+        );
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        Long savedMoimId = container.moimService.register(requestMoim, requestMoimTag, requestQuestions, null, savedMemberId);
+
+        MoimModificationResponse result = container.moimService.getDetailForModification(savedMoimId, savedMemberId);
 
         assertAll(
                 () -> assertThat(result.getName()).isEqualTo(EXAMPLE_NAME),
@@ -234,7 +264,6 @@ class MoimServiceTest {
                 () -> assertThat(result.getType()).isEqualTo(MoimType.MIXED.toString()),
                 () -> assertThat(result.getTagList()).size().isEqualTo(3),
                 () -> assertThat(result.getTagList()).containsExactlyInAnyOrder("tag1", "tag2", "tag3"),
-                () -> assertThat(result.getTagList()).containsExactlyInAnyOrder("tag1", "tag2", "tag3"),
                 () -> assertThat(result.getApplicationQuestionList()).size().isEqualTo(2),
                 () -> assertThat(result.getApplicationQuestionList()).extracting(ApplicationQuestionResponse::getContent).containsExactlyInAnyOrder("질문1", "질문2")
         );
@@ -242,8 +271,15 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("모임 수정을 위한 데이터 획득 실패 - 올바르지 않는 모임 Id 값")
-    void getDetailForModificationFailByNotValidMoimId() {
-        assertThatThrownBy(() -> moimService.getDetailForModification(9999999L, member.getId()))
+    void getDetailForModificationFailByNotValidMoimId() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+        assertThatThrownBy(() -> container.moimService.getDetailForModification(9999999L, savedMemberId))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NOT_FOUND.getMessage());
     }
@@ -251,14 +287,21 @@ class MoimServiceTest {
     @Test
     @DisplayName("가입된 모든 모임 획득 성공")
     void getMoimListByMemberId() throws IOException {
-        moimService.register(
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+        container.moimService.register(
                 new MoimRegisterRequest("모임2", "모임 설명", "faceToFace", true),
                 null,
                 null,
                 null,
-                member.getId()
+                savedMemberId
         );
-        List<Moim> moimList = moimService.getMoimListByMemberId(member.getId());
+        List<Moim> moimList = container.moimService.getMoimListByMemberId(savedMemberId);
 
         assertAll(
                 () -> assertThat(moimList).size().isEqualTo(2),
@@ -272,63 +315,92 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("모든 모임 멤버 획득 성공")
-    void getMoimMemberList() {
-        List<MoimMemberResponse> moimMemberList = moimService.getMoimMemberList(savedMoimId);
+    void getMoimMemberList() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
+        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+
+        List<MoimMemberResponse> moimMemberList = container.moimService.getMoimMemberList(savedMoimId);
 
         assertAll(
-                () -> assertThat(moimMemberList).size().isEqualTo(1),
-                () -> assertThat(moimMemberList).extracting(MoimMemberResponse::getMemberName).containsExactlyInAnyOrder("닉네임"),
-                () -> assertThat(moimMemberList).extracting(MoimMemberResponse::getRole).containsExactlyInAnyOrder(MemberRole.LEADER)
+                () -> assertThat(moimMemberList).size().isEqualTo(2),
+                () -> assertThat(moimMemberList).extracting(MoimMemberResponse::getMemberName).containsExactlyInAnyOrder("닉네임", "닉네임2"),
+                () -> assertThat(moimMemberList).extracting(MoimMemberResponse::getRole).containsExactlyInAnyOrder(MemberRole.LEADER, MemberRole.USER)
         );
     }
 
     @Test
     @DisplayName("모임 멤버 수정 성공")
-    void modifyMoimMember() {
-        Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
-        Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember moimMember = MoimMember.builder()
-                .moim(moimRepository.findById(savedMoimId).get())
-                .member(newMember)
-                .role(MemberRole.USER)
-                .build();
-        Long savedId = moimMemberRepository.save(moimMember);
-        MoimMember newMoimMember = moimMemberRepository.findById(savedId).get();
-        moimService.modifyMoimMember(
+    void modifyMoimMember() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
+        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+
+        MoimMember moimMember1 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
+        MoimMember moimMember2 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
+
+        container.moimService.modifyMoimMember(
                 savedMoimId,
                 List.of(
-                        new MoimMemberModificationRequest(this.moimMember.getId(), "닉네임", MemberRole.LEADER),
-                        new MoimMemberModificationRequest(newMoimMember.getId(), "회원2", MemberRole.MANAGER)),
-                member.getId()
+                        new MoimMemberModificationRequest(moimMember1.getId(), "닉네임", MemberRole.MANAGER),
+                        new MoimMemberModificationRequest(moimMember2.getId(), "닉네임2", MemberRole.LEADER)),
+                savedMemberId
         );
 
         assertAll(
-                () -> assertThat(newMoimMember.getMember()).isEqualTo(newMember),
-                () -> assertThat(newMoimMember.getMoim().getName()).isEqualTo(EXAMPLE_NAME),
-                () -> assertThat(newMoimMember.getRole()).isEqualTo(MemberRole.MANAGER)
+                () -> assertThat(moimMember1.getMember().getNickname()).isEqualTo("닉네임"),
+                () -> assertThat(moimMember1.getMoim().getName()).isEqualTo(EXAMPLE_NAME),
+                () -> assertThat(moimMember1.getRole()).isEqualTo(MemberRole.MANAGER),
+                () -> assertThat(moimMember2.getMember().getNickname()).isEqualTo("닉네임2"),
+                () -> assertThat(moimMember2.getMoim().getName()).isEqualTo(EXAMPLE_NAME),
+                () -> assertThat(moimMember2.getRole()).isEqualTo(MemberRole.LEADER)
         );
     }
 
     @Test
     @DisplayName("모임 멤버 수정 실패 - 리더 중복")
-    void modifyMoimMemberFailByDuplicateLeader() {
-        Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
-        Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = MoimMember.builder()
-                .moim(moimRepository.findById(savedMoimId).get())
-                .member(newMember)
-                .role(MemberRole.USER)
-                .build();
+    void modifyMoimMemberFailByDuplicateLeader() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
+        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+
+        MoimMember moimMember1 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
+        MoimMember moimMember2 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 
         assertThatThrownBy(() ->
-                moimService.modifyMoimMember(savedMoimId,
-                        List.of(new MoimMemberModificationRequest(newMoimMember.getId(),
-                                        "회원2",
-                                        MemberRole.LEADER),
-                                new MoimMemberModificationRequest(moimMember.getId(),
+                container.moimService.modifyMoimMember(savedMoimId,
+                        List.of(new MoimMemberModificationRequest(moimMember1.getId(),
                                         "닉네임",
+                                        MemberRole.LEADER),
+                                new MoimMemberModificationRequest(moimMember2.getId(),
+                                        "닉네임2",
                                         MemberRole.LEADER)
-                        ), member.getId())
+                        ), savedMemberId)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_MEMBER_NOT_VALID.getMessage());
@@ -336,22 +408,30 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("모임 멤버 수정 실패 - 리더가 존재하지 않을 경우")
-    void modifyMoimMemberFailByNoLeader() {
-        Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
-        Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = MoimMember.builder()
-                .moim(moimRepository.findById(savedMoimId).get())
-                .member(newMember)
-                .role(MemberRole.USER)
-                .build();
+    void modifyMoimMemberFailByNoLeader() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
+        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+
+        MoimMember moimMember1 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
+        MoimMember moimMember2 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 
         assertThatThrownBy(() ->
-                moimService.modifyMoimMember(
+                container.moimService.modifyMoimMember(
                         savedMoimId,
                         List.of(
-                                new MoimMemberModificationRequest(newMoimMember.getId(), "회원2", MemberRole.MANAGER),
-                                new MoimMemberModificationRequest(moimMember.getId(), "닉네임", MemberRole.MANAGER)
-                        ), member.getId())
+                                new MoimMemberModificationRequest(moimMember1.getId(), "닉네임", MemberRole.MANAGER),
+                                new MoimMemberModificationRequest(moimMember2.getId(), "닉네임2", MemberRole.MANAGER)
+                        ), savedMemberId)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_MEMBER_NOT_VALID.getMessage());
@@ -359,19 +439,27 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("모임 멤버 수정 실패 - 모든 모임 멤버가 아닌 경우")
-    void modifyMoimMemberFailByNotAllMoimMember() {
-        Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
-        Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = MoimMember.builder()
-                .moim(moimRepository.findById(savedMoimId).get())
-                .member(newMember)
-                .role(MemberRole.USER)
-                .build();
+    void modifyMoimMemberFailByNotAllMoimMember() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
+        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+
+        container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
+        MoimMember moimMember2 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 
         assertThatThrownBy(() ->
-                moimService.modifyMoimMember(savedMoimId,
-                        List.of(new MoimMemberModificationRequest(newMoimMember.getId(), "회원2", MemberRole.LEADER)),
-                        member.getId())
+                container.moimService.modifyMoimMember(savedMoimId,
+                        List.of(new MoimMemberModificationRequest(moimMember2.getId(), "닉네임2", MemberRole.LEADER)),
+                        savedMemberId)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_MEMBER_NOT_VALID.getMessage());
@@ -379,23 +467,30 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("모임 멤버 수정 실패 - 올바르지 않은 모임 멤버의 경우")
-    void modifyMoimMemberFailByNotValidMoimMember() {
-        Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
+    void modifyMoimMemberFailByNotValidMoimMember() throws IOException {
+        FakeContainer container = new FakeContainer();
 
-        Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = MoimMember.builder()
-                .moim(moimRepository.findById(savedMoimId).get())
-                .member(newMember)
-                .role(MemberRole.USER)
-                .build();
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
+        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+
+        MoimMember moimMember1 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
+        MoimMember moimMember2 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 
         assertThatThrownBy(() ->
-                moimService.modifyMoimMember(savedMoimId,
+                container.moimService.modifyMoimMember(savedMoimId,
                         List.of(
-                                new MoimMemberModificationRequest(newMoimMember.getId(), "회원2", MemberRole.LEADER),
+                                new MoimMemberModificationRequest(moimMember1.getId(), "회원2", MemberRole.LEADER),
                                 new MoimMemberModificationRequest(99999L, "asdf", MemberRole.USER)
                         ),
-                        member.getId())
+                        savedMemberId)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_MEMBER_NOT_VALID.getMessage());
@@ -403,8 +498,15 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("멤버의 등급 획득 성공")
-    void getMemberRole() {
-        MemberRole memberRole = moimService.getMemberRole(member.getId(), savedMoimId);
+    void getMemberRole() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+        MemberRole memberRole = container.moimService.getMemberRole(savedMemberId, savedMoimId);
 
         assertThat(memberRole.isLeader()).isTrue();
         assertThat(memberRole.isNotLeader()).isFalse();
@@ -412,9 +514,16 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("멤버의 등급 획득 실패 - 올바르지 않은 회원 Id")
-    void getMemberRoleFailByNotValidMemberId() {
+    void getMemberRoleFailByNotValidMemberId() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
         assertThatThrownBy(() ->
-                moimService.getMemberRole(999999L, savedMoimId)
+                container.moimService.getMemberRole(999999L, savedMoimId)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_MEMBER_NOT_FOUND.getMessage());
@@ -422,9 +531,16 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("멤버의 등급 획득 실패 - 올바르지 않은 모임 Id")
-    void getMemberRoleFailByNotValidMoimId() {
+    void getMemberRoleFailByNotValidMoimId() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
         assertThatThrownBy(() ->
-                moimService.getMemberRole(member.getId(), 9999999L)
+                container.moimService.getMemberRole(savedMemberId, 9999999L)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_MEMBER_NOT_FOUND.getMessage());
@@ -432,19 +548,23 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("정상적인 회원 추방")
-    void deport() {
-        Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
+    void deport() throws IOException {
+        FakeContainer container = new FakeContainer();
 
-        Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = MoimMember.builder()
-                .moim(moimRepository.findById(savedMoimId).get())
-                .member(newMember)
-                .role(MemberRole.USER)
-                .build();
-        moimMemberRepository.save(newMoimMember);
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
-        moimService.deport(savedMoimId, newMoimMember.getId(), member.getId());
-        List<MoimMember> moimMemberList = moimMemberRepository.findAllByMoimId(savedMoimId);
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
+        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+
+        MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
+
+        container.moimService.deport(savedMoimId, moimMember.getId(), savedMemberId);
+        List<MoimMember> moimMemberList = container.moimMemberRepository.findAllByMoimId(savedMoimId);
 
         assertThat(moimMemberList).size().isEqualTo(1);
         assertThat(moimMemberList)
@@ -455,19 +575,23 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("회원 추방 실패 - 올바르지 않은 모임 Id")
-    void deportFailByNotValidMoimId() {
-        Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
+    void deportFailByNotValidMoimId() throws IOException {
+        FakeContainer container = new FakeContainer();
 
-        Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = MoimMember.builder()
-                .moim(moimRepository.findById(savedMoimId).get())
-                .member(newMember)
-                .role(MemberRole.USER)
-                .build();
-        moimMemberRepository.save(newMoimMember);
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
+        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+
+        MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 
         assertThatThrownBy(() ->
-                moimService.deport(999999L, newMoimMember.getId(), member.getId())
+                container.moimService.deport(999999L, moimMember.getId(), savedMemberId)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NOT_FOUND.getMessage());
@@ -475,19 +599,23 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("회원 추방 실패 - 권한이 없을 경우")
-    void deportFailByForbidden() {
-        Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
+    void deportFailByForbidden() throws IOException {
+        FakeContainer container = new FakeContainer();
 
-        Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = MoimMember.builder()
-                .moim(moimRepository.findById(savedMoimId).get())
-                .member(newMember)
-                .role(MemberRole.USER)
-                .build();
-        moimMemberRepository.save(newMoimMember);
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
+        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+
+        MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 
         assertThatThrownBy(() ->
-                moimService.deport(savedMoimId, newMoimMember.getId(), newMemberId)
+                container.moimService.deport(savedMoimId, moimMember.getId(), savedMemberId2)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_FORBIDDEN.getMessage());
@@ -495,19 +623,23 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("회원 추방 실패 - 리더 추방의 경우")
-    void deportFailByDeportLeader() {
-        Long newMemberId = memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "회원2"));
-        Member newMember = memberRepository.findById(newMemberId).get();
-        MoimMember newMoimMember = MoimMember.builder()
-                .moim(moimRepository.findById(savedMoimId).get())
-                .member(newMember)
-                .role(MemberRole.MANAGER)
-                .build();
+    void deportFailByDeportLeader() throws IOException {
+        FakeContainer container = new FakeContainer();
 
-        moimMemberRepository.save(newMoimMember);
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
+        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+
+        MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
+                .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 
         assertThatThrownBy(() ->
-                moimService.deport(savedMoimId, moimMember.getId(), newMemberId)
+                container.moimService.deport(savedMoimId, moimMember.getId(), savedMemberId)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_FORBIDDEN.getMessage());

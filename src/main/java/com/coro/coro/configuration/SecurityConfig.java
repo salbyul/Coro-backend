@@ -1,9 +1,9 @@
 package com.coro.coro.configuration;
 
-import com.coro.coro.common.domain.jwt.AuthenticationEntryPointImpl;
-import com.coro.coro.common.domain.jwt.JwtProvider;
-import com.coro.coro.common.filter.ExceptionHandlingFilter;
-import com.coro.coro.common.filter.JwtAuthenticationFilter;
+import com.coro.coro.auth.jwt.AuthenticationEntryPointImpl;
+import com.coro.coro.auth.jwt.JwtProviderImpl;
+import com.coro.coro.auth.filter.AuthExceptionHandlingFilter;
+import com.coro.coro.auth.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtProvider tokenProvider;
+    private final JwtProviderImpl tokenProvider;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .exceptionHandling()
                 .authenticationEntryPoint(new AuthenticationEntryPointImpl())
                 .and()
-                .addFilterBefore(new ExceptionHandlingFilter(), JwtAuthenticationFilter.class);
+                .addFilterBefore(new AuthExceptionHandlingFilter(), JwtAuthenticationFilter.class);
         return http.build();
     }
 

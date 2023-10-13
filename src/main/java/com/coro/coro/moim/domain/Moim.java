@@ -37,9 +37,11 @@ public class Moim extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MoimState state;
 
+    @Builder.Default
     @OneToMany(mappedBy = "moim")
     private List<MoimTag> tagList = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "moim")
     private List<ApplicationQuestion> questionList = new ArrayList<>();
 
@@ -60,5 +62,13 @@ public class Moim extends BaseEntity {
 
     public void changeLeader(final Member newLeader) {
         this.leader = newLeader;
+    }
+
+    public void changeQuestionListTo(final List<ApplicationQuestion> applicationQuestionList) {
+        this.questionList = applicationQuestionList;
+    }
+
+    public void changeMoimTagListTo(final List<MoimTag> tagList) {
+        this.tagList = tagList;
     }
 }

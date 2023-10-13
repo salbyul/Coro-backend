@@ -8,8 +8,6 @@ import javax.persistence.*;
 @Table(name = "moim_tag")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
 @Getter
 public class MoimTag implements Persistable<Long> {
 
@@ -21,6 +19,13 @@ public class MoimTag implements Persistable<Long> {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "moim_id")
     private Moim moim;
+
+    @Builder
+    public MoimTag(final Long id, final String name, final Moim moim) {
+        this.id = id;
+        this.name = name;
+        this.moim = moim;
+    }
 
     @Override
     public Long getId() {

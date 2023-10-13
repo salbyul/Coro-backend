@@ -13,5 +13,5 @@ public interface MoimPhotoRepository {
 
     List<MoimPhoto> findAllByIds(final List<Long> moimIdList);
 
-    Optional<MoimPhoto> findOptionalById(final Long id);
+    Optional<MoimPhoto> findById(final Long id);
 }

@@ -11,8 +11,6 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "application_question")
-@AllArgsConstructor
-@Builder
 public class ApplicationQuestion extends BaseEntity implements Persistable<Long> {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +24,14 @@ public class ApplicationQuestion extends BaseEntity implements Persistable<Long>
     private Moim moim;
 
     private String content;
+
+    @Builder
+    public ApplicationQuestion(final Long id, final Integer order, final Moim moim, final String content) {
+        this.id = id;
+        this.order = order;
+        this.moim = moim;
+        this.content = content;
+    }
 
     @Override
     public Long getId() {

@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Transactional
 @SpringBootTest
-class ApplicationServiceTest {
+class  ApplicationServiceTest {
 
     public static final String MEMBER_NICKNAME_TO_BE_JOIN = "가입할회원";
     @Autowired

@@ -6,6 +6,7 @@ import com.coro.coro.member.domain.MemberPhoto;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.repository.port.MemberPhotoRepository;
 import com.coro.coro.member.repository.port.MemberRepository;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,7 @@ import static com.coro.coro.common.response.error.ErrorType.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Builder
 @Transactional(readOnly = true)
 public class MemberPhotoService {
 
@@ -27,7 +29,7 @@ public class MemberPhotoService {
     private final MemberPhotoRepository memberPhotoRepository;
 
     @Value("${profile.image.dir}")
-    private String path;
+    private static String path;
 
     @Transactional
     public void changeProfileImage(final Long memberId, final MultipartFile multipartFile) throws IOException {

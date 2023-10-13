@@ -1,6 +1,7 @@
 package com.coro.coro.member.service;
 
-import com.coro.coro.common.domain.jwt.JwtProvider;
+import com.coro.coro.auth.jwt.JwtProvider;
+import com.coro.coro.auth.jwt.JwtProviderImpl;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
 import com.coro.coro.member.dto.request.MemberModificationRequest;
@@ -8,6 +9,7 @@ import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.repository.port.MemberRepository;
 import com.coro.coro.member.validator.MemberValidator;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +24,7 @@ import static com.coro.coro.common.response.error.ErrorType.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
+@Builder
 public class MemberService {
 
     private final JwtProvider tokenProvider;
