@@ -20,19 +20,21 @@ class MemberServiceTest {
     private static final String EXAMPLE_PASSWORD = "asdf1234!@";
     private static final String EXAMPLE_NICKNAME = "123";
     private Member member;
-    private FakeContainer container = new FakeContainer();
+    private FakeContainer container;
 
     @BeforeEach
     void setUp() {
+        container = new FakeContainer();
+
         container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
-        member = container.memberRepository.findByEmail(EXAMPLE_EMAIL).get();
+        member = container.memberRepository.findByEmail(EXAMPLE_EMAIL).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
     }
 
     @Test
     @DisplayName("[회원가입] 정상적인 회원가입")
     void register() {
         Long savedId = container.memberService.register(new MemberRegisterRequest("a@a.com", EXAMPLE_PASSWORD, "닉네임입니다"));
-        Member member = container.memberRepository.findById(savedId).get();
+        Member member = container.memberRepository.findById(savedId).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
 
         assertAll(
                 () -> assertThat(member.getEmail()).isEqualTo("a@a.com"),
@@ -186,7 +188,7 @@ class MemberServiceTest {
         MemberModificationRequest requestMember =
                 new MemberModificationRequest(EXAMPLE_PASSWORD, "qwer1234!@", "바뀐 소개입니다.");
         container.memberService.update(member.getId(), requestMember);
-        Member updatedMember = container.memberRepository.findById(member.getId()).get();
+        Member updatedMember = container.memberRepository.findById(member.getId()).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
 
         assertThat(container.passwordEncoder.matches(requestMember.getNewPassword(), updatedMember.getPassword())).isTrue();
         assertThat(updatedMember.getIntroduction()).isEqualTo(requestMember.getIntroduction());
