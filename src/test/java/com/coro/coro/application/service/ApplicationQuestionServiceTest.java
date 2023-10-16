@@ -22,12 +22,14 @@ class ApplicationQuestionServiceTest {
     @Test
     @DisplayName("정상적인 지원 양식 작성")
     void register() throws IOException {
+//        모임 생성
         FakeContainer container = new FakeContainer();
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), null, null, null, memberId);
+
         Moim moim = container.moimRepository.findById(moimId).orElseThrow(() -> new ApplicationException(MOIM_NOT_FOUND));
 
-
+//        지원 양식 제출
         List<ApplicationQuestionRegisterRequest> requestQuestions = generateRequestQuestions("질문", 3);
         container.applicationQuestionService.register(moim.getId(), requestQuestions);
 
@@ -41,13 +43,16 @@ class ApplicationQuestionServiceTest {
     }
 
     @Test
-    @DisplayName("[지원 양식 작성] 이름 초과")
-    void registerFailByNameLength() throws IOException {
+    @DisplayName("[지원 양식 작성] 길이 초과")
+    void registerFailByContentLength() throws IOException {
+//        모임 생성
         FakeContainer container = new FakeContainer();
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), null, null, null, memberId);
+
         Moim moim = container.moimRepository.findById(moimId).orElseThrow(() -> new ApplicationException(MOIM_NOT_FOUND));
 
+//        길이 초과된 지원 양식 생성
         List<ApplicationQuestionRegisterRequest> requestQuestions = new ArrayList<>();
         String value = "글".repeat(201);
         requestQuestions.add(new ApplicationQuestionRegisterRequest(value, 1));
@@ -62,11 +67,14 @@ class ApplicationQuestionServiceTest {
     @Test
     @DisplayName("[지원 양식 작성] 순서 중복")
     void registerFailByDuplicateOrders() throws IOException {
+//        모임 생성
         FakeContainer container = new FakeContainer();
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), null, null, null, memberId);
+
         Moim moim = container.moimRepository.findById(moimId).orElseThrow(() -> new ApplicationException(MOIM_NOT_FOUND));
 
+//        중복된 순서의 지원 양식 생성
         List<ApplicationQuestionRegisterRequest> requestQuestions = new ArrayList<>();
         requestQuestions.add(new ApplicationQuestionRegisterRequest("질문ㅎㅎ", 1));
         requestQuestions.add(new ApplicationQuestionRegisterRequest("질문", 1));
@@ -81,11 +89,14 @@ class ApplicationQuestionServiceTest {
     @Test
     @DisplayName("[지원 양식 작성] 유효하지 않은 순서")
     void registerFailByNotValidOrders() throws IOException {
+//        모임 생성
         FakeContainer container = new FakeContainer();
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), null, null, null, memberId);
+
         Moim moim = container.moimRepository.findById(moimId).orElseThrow(() -> new ApplicationException(MOIM_NOT_FOUND));
 
+//        잘못된 순서의 지원 양식 생성
         List<ApplicationQuestionRegisterRequest> requestQuestions = new ArrayList<>();
         requestQuestions.add(new ApplicationQuestionRegisterRequest("질문ㅎㅎ", 3));
         requestQuestions.add(new ApplicationQuestionRegisterRequest("질문", 2));
@@ -106,11 +117,14 @@ class ApplicationQuestionServiceTest {
     @Test
     @DisplayName("[지원 양식 작성] 10개 초과")
     void registerFailedByOrdersGreaterThanTen() throws IOException {
+//        모임 생성
         FakeContainer container = new FakeContainer();
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), null, null, null, memberId);
+
         Moim moim = container.moimRepository.findById(moimId).orElseThrow(() -> new ApplicationException(MOIM_NOT_FOUND));
 
+//        15개의 지원 양식 생성
         List<ApplicationQuestionRegisterRequest> requestQuestions = generateRequestQuestions("질문", 15);
 
         assertThatThrownBy(() ->
@@ -120,6 +134,32 @@ class ApplicationQuestionServiceTest {
                 .hasMessage(APPLICATION_QUESTION_GREATER_THAN_MAX.getMessage());
     }
 
+    @Test
+    @DisplayName("지원 질문 찾기 성공")
+    void findQuestionList() throws IOException {
+//        모임 생성
+        FakeContainer container = new FakeContainer();
+        Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), null, null, null, memberId);
+        Moim moim = container.moimRepository.findById(moimId).orElseThrow(() -> new ApplicationException(MOIM_NOT_FOUND));
+
+//        지원 양식 제출
+        container.applicationQuestionService.register(
+                moim.getId(),
+                generateRequestQuestions("질문", 2)
+        );
+
+//        해당 모임 지원 양식 가져오기
+        List<ApplicationQuestion> questionList = container.applicationQuestionService.findQuestionList(moim.getId());
+
+        assertAll(
+                () -> assertThat(questionList).extracting(com.coro.coro.application.domain.ApplicationQuestion::getContent).containsExactlyInAnyOrder("질문1", "질문2"),
+                () -> assertThat(questionList).extracting(com.coro.coro.application.domain.ApplicationQuestion::getOrder).containsExactlyInAnyOrder(1, 2),
+                () -> assertThat(questionList).extracting(com.coro.coro.application.domain.ApplicationQuestion::getMoim).containsExactlyInAnyOrder(moim, moim)
+        );
+    }
+
+    //    지원 양식을 해당 counts 만큼 생성한다.
     @SuppressWarnings("SameParameterValue")
     private List<ApplicationQuestionRegisterRequest> generateRequestQuestions(final String content, final int counts) {
         List<ApplicationQuestionRegisterRequest> requestQuestions = new ArrayList<>();
@@ -127,26 +167,5 @@ class ApplicationQuestionServiceTest {
             requestQuestions.add(new ApplicationQuestionRegisterRequest(content + i, i));
         }
         return requestQuestions;
-    }
-
-    @Test
-    @DisplayName("지원 질문 찾기 성공")
-    void findQuestionList() throws IOException {
-        FakeContainer container = new FakeContainer();
-        Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), null, null, null, memberId);
-        Moim moim = container.moimRepository.findById(moimId).orElseThrow(() -> new ApplicationException(MOIM_NOT_FOUND));
-
-        container.applicationQuestionService.register(
-                moim.getId(),
-                generateRequestQuestions("질문", 2)
-        );
-        List<com.coro.coro.application.domain.ApplicationQuestion> questionList = container.applicationQuestionService.findQuestionList(moim.getId());
-
-        assertAll(
-                () -> assertThat(questionList).extracting(com.coro.coro.application.domain.ApplicationQuestion::getContent).containsExactlyInAnyOrder("질문1", "질문2"),
-                () -> assertThat(questionList).extracting(com.coro.coro.application.domain.ApplicationQuestion::getOrder).containsExactlyInAnyOrder(1, 2),
-                () -> assertThat(questionList).extracting(com.coro.coro.application.domain.ApplicationQuestion::getMoim).containsExactlyInAnyOrder(moim, moim)
-        );
     }
 }
