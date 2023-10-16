@@ -34,7 +34,7 @@ public class ApplicationQuestionValidator {
 
     private static void validateOrders(final List<ApplicationQuestion> applicationQuestionList) {
         if (applicationQuestionList.size() > 10) {
-            throw new ApplicationException(APPLICATION_QUESTION_MAX);
+            throw new ApplicationException(APPLICATION_QUESTION_GREATER_THAN_MAX);
         }
         int expectedMaxOrder = applicationQuestionList.size();
         boolean canContinue = true;

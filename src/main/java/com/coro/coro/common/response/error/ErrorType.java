@@ -54,7 +54,7 @@ public enum ErrorType {
     APPLICATION_ALREADY_EXIST("306", "이미 지원한 모임입니다."),
     APPLICATION_EXIST_MEMBER("307", "이미 가입한 모임입니다."),
     APPLICATION_NOT_COMPLETE("308", "답변이 불완전합니다."),
-    APPLICATION_QUESTION_MAX("309", "Application Question은 총 10개까지만 생성이 가능합니다."),
+    APPLICATION_QUESTION_GREATER_THAN_MAX("309", "Application Question은 총 10개까지만 생성이 가능합니다."),
     APPLICATION_QUESTION_CONTENT_VALID("312", "Content 값의 형태가 올바르지 않습니다."),
     APPLICATION_QUESTION_ORDERS_VALID("321", "Orders 값이 올바르지 않습니다."),
     APPLICATION_STATUS_NOT_VALID("332", "Status 값이 올바르지 않습니다."),
