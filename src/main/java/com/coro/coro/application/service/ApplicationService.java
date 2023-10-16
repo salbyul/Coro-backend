@@ -67,7 +67,7 @@ public class ApplicationService {
                 .build();
         Long savedApplicationId = applicationRepository.save(application);
 
-        List<ApplicationAnswer> applicationAnswerList = applicationRequestToDomain(application, applicationQuestionList, applicationList);
+        List<ApplicationAnswer> applicationAnswerList = applicationRequestToDomain(getApplicationById(savedApplicationId), applicationQuestionList, applicationList);
         applicationAnswerRepository.saveAll(applicationAnswerList);
         return savedApplicationId;
     }
@@ -95,12 +95,12 @@ public class ApplicationService {
 //    TODO 이거 어디로??
     private void validateAnswer(final List<ApplicationQuestion> applicationQuestionList, final List<ApplicationDTO> applicationList) {
         if (applicationList.size() != applicationQuestionList.size()) {
-            throw new ApplicationException(APPLICATION_NOT_COMPLETE);
+            throw new ApplicationException(APPLICATION_ANSWER_NOT_COMPLETE);
         }
 
         for (ApplicationDTO applicationDTO : applicationList) {
             if (!StringUtils.hasText(applicationDTO.getContent())) {
-                throw new ApplicationException(APPLICATION_NOT_COMPLETE);
+                throw new ApplicationException(APPLICATION_ANSWER_NOT_COMPLETE);
             }
         }
     }
