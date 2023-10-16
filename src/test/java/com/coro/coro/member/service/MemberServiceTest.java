@@ -25,7 +25,9 @@ class MemberServiceTest {
     void register() {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedId = container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
+
         Member member = container.memberRepository.findById(savedId).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
 
         assertAll(
@@ -63,6 +65,8 @@ class MemberServiceTest {
     @DisplayName("[회원가입] 이메일 중복")
     void registerFailByEmailDuplication() {
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
 
         assertThatThrownBy(() ->
@@ -151,6 +155,7 @@ class MemberServiceTest {
     void registerFailByNicknameDuplication() {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
 
         assertThatThrownBy(() ->
@@ -178,7 +183,9 @@ class MemberServiceTest {
     void login() {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedId = container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
+
         container.memberRepository.findById(savedId).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
         container.memberService.login(new MemberLoginRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD));
     }
@@ -188,8 +195,9 @@ class MemberServiceTest {
     void loginFailByEmail() {
         FakeContainer container = new FakeContainer();
 
-        Long savedId = container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
-        container.memberRepository.findById(savedId).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+//        회원가입
+        container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
+
         assertThatThrownBy(() ->
                 container.memberService.login(new MemberLoginRequest("12@2.com", EXAMPLE_PASSWORD))
         )
@@ -202,8 +210,9 @@ class MemberServiceTest {
     void loginFailByPassword() {
         FakeContainer container = new FakeContainer();
 
-        Long savedId = container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
-        container.memberRepository.findById(savedId).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+//        회원가입
+        container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
+
         assertThatThrownBy(() ->
                 container.memberService.login(new MemberLoginRequest(EXAMPLE_EMAIL, "asdf1234!#"))
         )
@@ -216,15 +225,19 @@ class MemberServiceTest {
     void updateMember() {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedId = container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
         Member member = container.memberRepository.findById(savedId).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
 
+//        회원수정
         MemberModificationRequest requestMember =
                 new MemberModificationRequest(EXAMPLE_PASSWORD, "qwer1234!@", "바뀐 소개입니다.");
         container.memberService.update(member.getId(), requestMember);
-        Member updatedMember = container.memberRepository.findById(member.getId()).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
 
-        assertThat(container.passwordEncoder.matches(requestMember.getNewPassword(), updatedMember.getPassword())).isTrue();
+        Member updatedMember = container.memberRepository.findById(member.getId()).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+        boolean matchPassword = container.passwordEncoder.matches(requestMember.getNewPassword(), updatedMember.getPassword());
+
+        assertThat(matchPassword).isTrue();
         assertThat(updatedMember.getIntroduction()).isEqualTo(requestMember.getIntroduction());
     }
 
@@ -233,8 +246,10 @@ class MemberServiceTest {
     void updateFailByPassword() {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedId = container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
         Member member = container.memberRepository.findById(savedId).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+
         MemberModificationRequest requestMember = new MemberModificationRequest("1234", "qwer1234!@", "바뀐 소개입니다.");
 
         assertThatThrownBy(() ->
