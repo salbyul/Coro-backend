@@ -42,7 +42,10 @@ class MoimServiceTest {
     void register() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "", "mixed", true);
         Long moimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
         Moim moim = container.moimRepository.findById(moimId).orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
@@ -59,8 +62,10 @@ class MoimServiceTest {
     void registerFailByDuplicateName() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
         container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
@@ -78,8 +83,10 @@ class MoimServiceTest {
     void registerFailByEmptyTag() {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
+//        모임 생성
         MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag2", ""));
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
 
@@ -93,8 +100,10 @@ class MoimServiceTest {
     void registerFailByDuplicateTag() {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
         MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag1"));
 
@@ -109,8 +118,10 @@ class MoimServiceTest {
     void registerFailByNotValidTag(final String input) {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
+//        모임 생성 (태그 포함)
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
         MoimTagRequest requestMoimTag = new MoimTagRequest(List.of(input));
 
@@ -124,8 +135,10 @@ class MoimServiceTest {
     void update() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
+//        모임 생성
         MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag2", "tag3"));
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
         List<ApplicationQuestionRegisterRequest> requestQuestions = List.of(
@@ -134,6 +147,7 @@ class MoimServiceTest {
         );
         Long savedMoimId = container.moimService.register(requestMoim, requestMoimTag, requestQuestions, null, savedMemberId);
 
+//        모임 수정
         MoimTagRequest changedTagList = new MoimTagRequest(List.of("변경된태그1", "변경된태그2", "변경된태그3"));
         List<ApplicationQuestionRegisterRequest> changedQuestionList = List.of(
                 new ApplicationQuestionRegisterRequest("changed question1", 1),
@@ -166,6 +180,7 @@ class MoimServiceTest {
     void updateFailByNotExistId() {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
         assertThatThrownBy(() -> container.moimService.update(
@@ -185,8 +200,10 @@ class MoimServiceTest {
     void updateFailByDuplicateName() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임 예", "모임 소개", "mixed", true);
         Long moimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
@@ -211,12 +228,15 @@ class MoimServiceTest {
     void getDetail() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
+//        모임 생성
         MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag2", "tag3"));
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         Long savedMoimId = container.moimService.register(requestMoim, requestMoimTag, null, null, savedMemberId);
 
+//        디테일 정보 가져오기
         MoimDetailResponse detail = container.moimService.getDetail(savedMoimId, savedMemberId);
 
         assertAll(
@@ -231,8 +251,16 @@ class MoimServiceTest {
 
     @Test
     @DisplayName("모임 디테일 정보 획득실패 - 올바르지 않는 모임 Id값")
-    void getDetailFailByNotValidMoimId() {
+    void getDetailFailByNotValidMoimId() throws IOException {
         FakeContainer container = new FakeContainer();
+
+//        회원가입
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
+        MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag2", "tag3"));
+        MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
+        container.moimService.register(requestMoim, requestMoimTag, null, null, savedMemberId);
 
         assertThatThrownBy(() -> container.moimService.getDetail(19999999L, 1L))
                 .isInstanceOf(MoimException.class)
@@ -244,8 +272,10 @@ class MoimServiceTest {
     void getDetailForModification() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
+//        모임 생성
         MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag2", "tag3"));
         List<ApplicationQuestionRegisterRequest> requestQuestions = List.of(
                 new ApplicationQuestionRegisterRequest("질문1", 1),
@@ -254,6 +284,7 @@ class MoimServiceTest {
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         Long savedMoimId = container.moimService.register(requestMoim, requestMoimTag, requestQuestions, null, savedMemberId);
 
+//        모임 수정을 위한 데이터 가져오기
         MoimModificationResponse result = container.moimService.getDetailForModification(savedMoimId, savedMemberId);
 
         assertAll(
@@ -273,8 +304,10 @@ class MoimServiceTest {
     void getDetailForModificationFailByNotValidMoimId() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
@@ -288,8 +321,10 @@ class MoimServiceTest {
     void getMoimListByMemberId() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
@@ -300,6 +335,8 @@ class MoimServiceTest {
                 null,
                 savedMemberId
         );
+
+//        가입된 모든 모임 가져오기
         List<Moim> moimList = container.moimService.getMoimListByMemberId(savedMemberId);
 
         assertAll(
@@ -317,15 +354,19 @@ class MoimServiceTest {
     void getMoimMemberList() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
+//        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
         container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
 
+//        특정 모임의 모든 회원 가져오기
         List<MoimMemberResponse> moimMemberList = container.moimService.getMoimMemberList(savedMoimId);
 
         assertAll(
@@ -340,15 +381,19 @@ class MoimServiceTest {
     void modifyMoimMember() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
+//        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
         container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
 
+//        모임 멤버 수정
         MoimMember moimMember1 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
         MoimMember moimMember2 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
@@ -377,12 +422,15 @@ class MoimServiceTest {
     void modifyMoimMemberFailByDuplicateLeader() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
+//        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
         container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
 
@@ -410,12 +458,15 @@ class MoimServiceTest {
     void modifyMoimMemberFailByNoLeader() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
+//        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
         container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
 
@@ -441,12 +492,15 @@ class MoimServiceTest {
     void modifyMoimMemberFailByNotAllMoimMember() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
+//        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
         container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
 
@@ -469,12 +523,15 @@ class MoimServiceTest {
     void modifyMoimMemberFailByNotValidMoimMember() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
+//        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
         container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
 
@@ -500,11 +557,14 @@ class MoimServiceTest {
     void getMemberRole() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
+//        회원 등급 가져오기
         MemberRole memberRole = container.moimService.getMemberRole(savedMemberId, savedMoimId);
 
         assertThat(memberRole.isLeader()).isTrue();
@@ -516,8 +576,10 @@ class MoimServiceTest {
     void getMemberRoleFailByNotValidMemberId() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
@@ -533,8 +595,10 @@ class MoimServiceTest {
     void getMemberRoleFailByNotValidMoimId() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
@@ -550,18 +614,22 @@ class MoimServiceTest {
     void deport() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
+//        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
         container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
 
         MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 
+//        회원 추방
         container.moimService.deport(savedMoimId, moimMember.getId(), savedMemberId);
         List<MoimMember> moimMemberList = container.moimMemberRepository.findAllByMoimId(savedMoimId);
 
@@ -577,12 +645,15 @@ class MoimServiceTest {
     void deportFailByNotValidMoimId() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
+//        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
         container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
 
@@ -601,12 +672,15 @@ class MoimServiceTest {
     void deportFailByForbidden() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
+//        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
         container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
 
@@ -625,12 +699,15 @@ class MoimServiceTest {
     void deportFailByDeportLeader() throws IOException {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
         Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
+//        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
         container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
 
