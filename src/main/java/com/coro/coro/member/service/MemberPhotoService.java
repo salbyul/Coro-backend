@@ -1,11 +1,14 @@
 package com.coro.coro.member.service;
 
+import com.coro.coro.common.service.port.FileTransferor;
 import com.coro.coro.common.utils.FileSaveUtils;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.domain.MemberPhoto;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.repository.port.MemberPhotoRepository;
 import com.coro.coro.member.repository.port.MemberRepository;
+import com.coro.coro.common.service.port.DateTimeHolder;
+import com.coro.coro.common.service.port.UUIDHolder;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,14 +31,21 @@ public class MemberPhotoService {
     private final MemberRepository memberRepository;
     private final MemberPhotoRepository memberPhotoRepository;
 
-    @Value("${profile.image.dir}")
+    private final DateTimeHolder dateTimeHolder;
+    private final UUIDHolder uuidHolder;
+    private final FileTransferor fileTransferor;
+
+    @Value("${member.image.dir}")
     private static String path;
 
     @Transactional
     public void changeProfileImage(final Long memberId, final MultipartFile multipartFile) throws IOException {
         Member member = getMemberById(memberId);
-        String name = FileSaveUtils.generateFileName(multipartFile);
-        FileSaveUtils.transferFile(multipartFile, path, name);
+
+        validateImageFile(multipartFile);
+
+        String name = FileSaveUtils.generateFileName(multipartFile, dateTimeHolder, uuidHolder);
+        fileTransferor.saveFile(multipartFile, path, name);
 
         memberPhotoRepository.deleteById(memberId);
 
@@ -48,6 +58,16 @@ public class MemberPhotoService {
         memberPhotoRepository.save(memberPhoto);
 
         member.preUpdate();
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    private void validateImageFile(final MultipartFile multipartFile) {
+        if (!multipartFile.getOriginalFilename().contains(".")) {
+            throw new MemberException(MEMBER_PHOTO_NOT_VALID);
+        }
+        if (!multipartFile.getContentType().contains("image")) {
+            throw new MemberException(MEMBER_PHOTO_NOT_VALID);
+        }
     }
 
     private Member getMemberById(final Long memberId) {

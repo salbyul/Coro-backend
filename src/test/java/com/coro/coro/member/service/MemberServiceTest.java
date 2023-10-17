@@ -202,7 +202,7 @@ class MemberServiceTest {
                 container.memberService.login(new MemberLoginRequest("12@2.com", EXAMPLE_PASSWORD))
         )
                 .isInstanceOf(MemberException.class)
-                .hasMessage(MEMBER_NOT_FOUND.getMessage());
+                .hasMessage(MEMBER_EMAIL_NOT_VALID.getMessage());
     }
 
     @Test

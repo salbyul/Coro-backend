@@ -40,8 +40,9 @@ public class MemberController implements MemberControllerDocs {
     @Override
     public APIResponse register(@RequestBody final MemberRegisterRequest requestMember) {
         log.info("member: {}", requestMember);
-        memberService.register(requestMember);
-        return APIResponse.create();
+        Long savedId = memberService.register(requestMember);
+        return APIResponse.create()
+                .addObject("savedId", savedId);
     }
 
     @PostMapping("/login")
@@ -60,9 +61,8 @@ public class MemberController implements MemberControllerDocs {
     @ResponseStatus(HttpStatus.OK)
     @Override
     public APIResponse update(@PathVariable("id") Long memberId,
-                              @RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile,
+                              @RequestPart(name = "profileImage", required = false) final MultipartFile multipartFile,
                               @RequestPart(name = "member", required = false) final MemberModificationRequest requestMember) throws IOException {
-//        아래 합치기?
         if (requestMember != null) {
             memberService.update(memberId, requestMember);
         }

@@ -6,11 +6,14 @@ import com.coro.coro.application.repository.port.ApplicationQuestionRepository;
 import com.coro.coro.application.repository.port.ApplicationRepository;
 import com.coro.coro.application.service.ApplicationQuestionService;
 import com.coro.coro.application.service.ApplicationService;
+import com.coro.coro.common.service.port.FileTransferor;
 import com.coro.coro.member.controller.MemberController;
 import com.coro.coro.member.repository.port.MemberPhotoRepository;
 import com.coro.coro.member.repository.port.MemberRepository;
 import com.coro.coro.member.service.MemberPhotoService;
 import com.coro.coro.member.service.MemberService;
+import com.coro.coro.common.service.port.DateTimeHolder;
+import com.coro.coro.common.service.port.UUIDHolder;
 import com.coro.coro.mock.repository.*;
 import com.coro.coro.moim.controller.MoimController;
 import com.coro.coro.moim.repository.port.MoimMemberRepository;
@@ -23,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class FakeContainer {
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final DataSet dataSet;
 
     public final MemberPhotoRepository memberPhotoRepository;
@@ -46,6 +50,9 @@ public class FakeContainer {
     public final ApplicationController applicationController;
 
     public final PasswordEncoder passwordEncoder;
+    public final UUIDHolder uuidHolder;
+    public final DateTimeHolder dateTimeHolder;
+    public final FileTransferor fileTransferor;
 
     public FakeContainer() {
         dataSet = new DataSet();
@@ -60,6 +67,9 @@ public class FakeContainer {
         this.applicationQuestionRepository = new FakeApplicationQuestionRepository(dataSet);
 
         this.passwordEncoder = new BCryptPasswordEncoder();
+        this.uuidHolder = new FakeUUIDGenerator();
+        this.dateTimeHolder = new FakeDateTime();
+        this.fileTransferor = new FakeFileTransferor();
 
         this.memberService = MemberService.builder()
                 .memberRepository(this.memberRepository)
@@ -69,6 +79,9 @@ public class FakeContainer {
         this.memberPhotoService = MemberPhotoService.builder()
                 .memberRepository(this.memberRepository)
                 .memberPhotoRepository(this.memberPhotoRepository)
+                .uuidHolder(this.uuidHolder)
+                .dateTimeHolder(this.dateTimeHolder)
+                .fileTransferor(this.fileTransferor)
                 .build();
         this.moimService = MoimService.builder()
                 .moimRepository(this.moimRepository)
@@ -77,6 +90,9 @@ public class FakeContainer {
                 .moimPhotoRepository(this.moimPhotoRepository)
                 .applicationQuestionRepository(this.applicationQuestionRepository)
                 .moimMemberRepository(this.moimMemberRepository)
+                .dateTimeHolder(this.dateTimeHolder)
+                .uuidHolder(this.uuidHolder)
+                .fileTransferor(this.fileTransferor)
                 .build();
         this.applicationQuestionService = ApplicationQuestionService.builder()
                 .moimRepository(this.moimRepository)

@@ -27,6 +27,7 @@ public enum ErrorType {
     MEMBER_NICKNAME_NOT_VALID("132", "Nickname 값의 형태가 올바르지 않습니다."),
 
     MEMBER_PHOTO_NOT_FOUND("140", "해당 MemberPhoto가 없습니다."),
+    MEMBER_PHOTO_NOT_VALID("142", "MemberPhoto가 유효하지 않습니다."),
 
     //    Moim
     MOIM_NOT_FOUND("200", "해당 Moim이 없습니다."),
@@ -47,6 +48,7 @@ public enum ErrorType {
     MOIM_TYPE_NOT_VALID("252", "Type 값이 올바르지 않습니다."),
 
     MOIM_PHOTO_NOT_FOUND("260", "해당 MoimPhoto가 없습니다."),
+    MOIM_PHOTO_NOT_VALID("262", "MoimPhoto가 유효하지 않습니다."),
 
 //    Application
     APPLICATION_NOT_FOUND("300", "해당 Application이 없습니다."),

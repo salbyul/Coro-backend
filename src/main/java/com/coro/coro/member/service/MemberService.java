@@ -62,7 +62,7 @@ public class MemberService {
 
     private Member getMemberByEmail(final MemberLoginRequest requestMember) {
         return memberRepository.findByEmail(requestMember.getEmail())
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new MemberException(MEMBER_EMAIL_NOT_VALID));
     }
 
     /* 회원 수정 */
