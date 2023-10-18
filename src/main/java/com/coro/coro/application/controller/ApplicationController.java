@@ -71,8 +71,9 @@ public class ApplicationController implements ApplicationControllerDocs {
                                          @RequestBody final ApplicationRequest applicationRequest,
                                          @AuthenticationPrincipal final User user) {
         log.info("application: {}", applicationRequest);
-        applicationService.register(moimId, applicationRequest, user.getId());
-        return APIResponse.create();
+        Long applicationId = applicationService.register(moimId, applicationRequest, user.getId());
+        return APIResponse.create()
+                .addObject("applicationId", applicationId);
     }
 
     @PutMapping("/{applicationId}")

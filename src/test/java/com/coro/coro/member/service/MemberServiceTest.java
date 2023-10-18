@@ -28,6 +28,7 @@ class MemberServiceTest {
 //        회원가입
         Long savedId = container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
 
+//        검증
         Member member = container.memberRepository.findById(savedId).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
 
         assertAll(
@@ -42,6 +43,7 @@ class MemberServiceTest {
     void registerFailByEmailNull() {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         assertThatThrownBy(() ->
                 container.memberService.register(new MemberRegisterRequest(null, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME))
         )
@@ -54,6 +56,7 @@ class MemberServiceTest {
     void registerFailByEmailBlank() {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         assertThatThrownBy(() ->
                 container.memberService.register(new MemberRegisterRequest("", EXAMPLE_PASSWORD, EXAMPLE_NICKNAME))
         )
@@ -69,6 +72,7 @@ class MemberServiceTest {
 //        회원가입
         container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
 
+//        검증
         assertThatThrownBy(() ->
                 container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, "닉네임2"))
         )
@@ -82,6 +86,7 @@ class MemberServiceTest {
     void registerFailByEmailRegex(final String value) {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         assertThatThrownBy(() ->
                 container.memberService.register(new MemberRegisterRequest(value, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME))
         )
@@ -94,6 +99,7 @@ class MemberServiceTest {
     void registerFailByPasswordNull() {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         assertThatThrownBy(() ->
                 container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, null, EXAMPLE_NICKNAME))
         )
@@ -106,6 +112,7 @@ class MemberServiceTest {
     void registerFailByPasswordBlank() {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         assertThatThrownBy(() ->
                 container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, "", EXAMPLE_NICKNAME))
         )
@@ -119,6 +126,7 @@ class MemberServiceTest {
     void registerFailByPasswordRegex(final String value) {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         assertThatThrownBy(() ->
                 container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, value, EXAMPLE_NICKNAME))
         )
@@ -131,6 +139,7 @@ class MemberServiceTest {
     void registerFailByNicknameNull() {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         assertThatThrownBy(() ->
                 container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, null))
         )
@@ -143,6 +152,7 @@ class MemberServiceTest {
     void registerFailByNicknameBlank() {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         assertThatThrownBy(() ->
                 container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, ""))
         )
@@ -158,6 +168,7 @@ class MemberServiceTest {
 //        회원가입
         container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
 
+//        검증
         assertThatThrownBy(() ->
                 container.memberService.register(new MemberRegisterRequest("a@a.com", EXAMPLE_PASSWORD, EXAMPLE_NICKNAME))
         )
@@ -171,6 +182,7 @@ class MemberServiceTest {
     void registerFailByNicknameRegex(final String value) {
         FakeContainer container = new FakeContainer();
 
+//        회원가입
         assertThatThrownBy(() ->
                 container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, value))
         )
@@ -186,6 +198,7 @@ class MemberServiceTest {
 //        회원가입
         Long savedId = container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
 
+//        로그인
         container.memberRepository.findById(savedId).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
         container.memberService.login(new MemberLoginRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD));
     }
@@ -198,6 +211,7 @@ class MemberServiceTest {
 //        회원가입
         container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
 
+//        검증
         assertThatThrownBy(() ->
                 container.memberService.login(new MemberLoginRequest("12@2.com", EXAMPLE_PASSWORD))
         )
@@ -213,6 +227,7 @@ class MemberServiceTest {
 //        회원가입
         container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
 
+//        검증
         assertThatThrownBy(() ->
                 container.memberService.login(new MemberLoginRequest(EXAMPLE_EMAIL, "asdf1234!#"))
         )
@@ -234,6 +249,7 @@ class MemberServiceTest {
                 new MemberModificationRequest(EXAMPLE_PASSWORD, "qwer1234!@", "바뀐 소개입니다.");
         container.memberService.update(member.getId(), requestMember);
 
+//        검증
         Member updatedMember = container.memberRepository.findById(member.getId()).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
         boolean matchPassword = container.passwordEncoder.matches(requestMember.getNewPassword(), updatedMember.getPassword());
 
@@ -248,8 +264,9 @@ class MemberServiceTest {
 
 //        회원가입
         Long savedId = container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
-        Member member = container.memberRepository.findById(savedId).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
 
+//        회원 수정
+        Member member = container.memberRepository.findById(savedId).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
         MemberModificationRequest requestMember = new MemberModificationRequest("1234", "qwer1234!@", "바뀐 소개입니다.");
 
         assertThatThrownBy(() ->

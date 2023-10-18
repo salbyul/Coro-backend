@@ -27,6 +27,7 @@ class MemberPhotoServiceTest {
 //        유저 사진 변경
         MockMultipartFile multipartFile = new MockMultipartFile("photo.js", "photo.js", "text/javascript", new byte[0]);
 
+//        검증
         assertThatThrownBy(() ->
                 container.memberController.update(savedId, multipartFile, null)
         )

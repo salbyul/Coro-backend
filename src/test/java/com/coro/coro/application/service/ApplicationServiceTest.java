@@ -34,9 +34,11 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 등록")
     void register() throws IOException {
-//        가입할 회원 생성
+//        회원가입
         FakeContainer container = new FakeContainer();
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -47,6 +49,8 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
 //        지원서 제출
@@ -56,6 +60,7 @@ class ApplicationServiceTest {
                 memberIdToBeJoined
         );
 
+//        검증
         Application application = container.applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new ApplicationException(APPLICATION_NOT_FOUND));
 
@@ -75,9 +80,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 등록 실패 - 올바르지 않은 모임 Id")
     void registerFailByNotValidMoimId() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -88,8 +96,11 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
+//        검증
         assertThatThrownBy(() ->
                 container.applicationService.register(
                         99999L,
@@ -104,9 +115,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 등록 실패 - 올바르지 않은 회원 Id")
     void registerFailByNotValidMemberId() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -117,8 +131,11 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
+//        검증
         assertThatThrownBy(() ->
                 container.applicationService.register(
                         moimId,
@@ -133,9 +150,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 등록 성공 - 거절된 지원서가 있을 경우")
     void registerSuccessButExistRefuseApplication() throws IOException {
-        //        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -146,6 +166,8 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
 //        거절된 지원서 생성
@@ -169,6 +191,7 @@ class ApplicationServiceTest {
                 memberIdToBeJoined
         );
 
+//        검증
         Application application = container.applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new ApplicationException(APPLICATION_NOT_FOUND));
 
@@ -182,9 +205,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 등록 실패 - 이미 가입한 모임의 경우")
     void registerSuccessByNotWaitApplication() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -195,6 +221,8 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
 //        가입한 회원으로 전환
@@ -212,6 +240,7 @@ class ApplicationServiceTest {
                         .build()
         );
 
+//        검증
         assertThatThrownBy(() ->
                 container.applicationService.register(
                         moimId,
@@ -226,9 +255,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 등록 실패 - 이미 등록된 지원서가 있을 경우")
     void registerFailByDuplicateApplication() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -239,6 +271,8 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
 //        지원서 제출
@@ -248,6 +282,7 @@ class ApplicationServiceTest {
                 memberIdToBeJoined
         );
 
+//        검증
         assertThatThrownBy(() ->
                 container.applicationService.register(
                         moimId,
@@ -262,9 +297,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 등록 실패 - 답변 수가 다른 경우")
     void registerFailByNotCompletedApplicationAnswer() throws IOException {
-        //        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -275,8 +313,11 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
+//        검증
         assertThatThrownBy(() ->
                 container.applicationService.register(
                         moimId,
@@ -291,9 +332,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 등록 실패 - 답변을 하지 않은 질문이 있을 경우")
     void registerFailByNotCompletedApplicationAnswer2() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -304,8 +348,11 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
+//        검증
         assertThatThrownBy(() ->
                 container.applicationService.register(
                         moimId,
@@ -320,9 +367,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("특정 회원이 제출한 모든 지원서 찾기")
     void getApplication() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -333,6 +383,8 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
 //        거절된 지원서 생성
@@ -360,6 +412,7 @@ class ApplicationServiceTest {
 //        특정 회원이 특정 모임에 제출한 모든 지원서 찾기
         List<ApplicationResponse> applicationList = container.applicationService.getApplication(moimId, memberIdToBeJoined, "all");
 
+//        검증
         assertAll(
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getApplicantName)
@@ -373,9 +426,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("특정 회원의 합격한 지원서 찾기")
     void getApplicationAccept() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -386,6 +442,8 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
 //        합격한 지원서 생성
@@ -405,6 +463,7 @@ class ApplicationServiceTest {
 //        특정 회원이 특정 모임에 제출한 모든 지원서 찾기
         List<ApplicationResponse> applicationList = container.applicationService.getApplication(moimId, memberIdToBeJoined, "accept");
 
+//        검증
         assertAll(
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getApplicantName)
@@ -418,9 +477,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("특정 회원의 거절된 지원서 찾기")
     void getApplicationRefuse() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -431,13 +493,16 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
 //        거절된 지원서 생성
         Member memberToBeJoined = container.memberRepository.findById(memberIdToBeJoined)
                 .orElseThrow(() -> new ApplicationException(MEMBER_NOT_FOUND));
 
-        Moim moim = container.moimRepository.findById(moimId).orElseThrow(() -> new ApplicationException(MOIM_NOT_FOUND));
+        Moim moim = container.moimRepository.findById(moimId)
+                .orElseThrow(() -> new ApplicationException(MOIM_NOT_FOUND));
 
         Application application = Application.builder()
                 .member(memberToBeJoined)
@@ -446,8 +511,10 @@ class ApplicationServiceTest {
                 .build();
         container.applicationRepository.save(application);
 
+//        거절된 지원서 획득
         List<ApplicationResponse> applicationList = container.applicationService.getApplication(moimId, memberIdToBeJoined, "refuse");
 
+//        검증
         assertAll(
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getApplicantName)
@@ -461,9 +528,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("모든 지원서 찾기")
     void getAllApplication() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -474,6 +544,8 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
         Moim moim = container.moimRepository.findById(moimId)
@@ -509,8 +581,10 @@ class ApplicationServiceTest {
         container.applicationRepository.save(refusedApplication);
         container.applicationRepository.save(acceptedApplication);
 
+//        모든 지원서 획득
         List<ApplicationResponse> applicationList = container.applicationService.getApplication(moimId, "all");
 
+//        검증
         assertAll(
                 () -> assertThat(applicationList)
                         .extracting(ApplicationResponse::getApplicantName)
@@ -524,9 +598,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 디테일 정보 획득 성공")
     void getDetailedApplication() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -537,6 +614,8 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
 //        지원서 제출
@@ -549,6 +628,7 @@ class ApplicationServiceTest {
 //        지원서 디테일 정보 가져오기
         DetailedApplicationResponse detailedApplication = container.applicationService.getDetailedApplication(applicationId);
 
+//        검증
         assertAll(
                 () -> assertThat(detailedApplication.getStatus()).isEqualTo(ApplicationStatus.WAIT),
                 () -> assertThat(detailedApplication.getApplicationAnswerDTOList())
@@ -563,9 +643,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 디테일 정보 획득 실패 - 올바르지 않은 지원서 Id")
     void getDetailedApplicationFailByNotValidApplicationId() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -576,6 +659,8 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
 //        지원서 제출
@@ -585,6 +670,7 @@ class ApplicationServiceTest {
                 memberIdToBeJoined
         );
 
+//        검증
         assertThatThrownBy(() ->
                 container.applicationService.getDetailedApplication(99999L)
         )
@@ -595,9 +681,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 거절 성공")
     void decideApplicationToRefuse() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -608,6 +697,8 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
 //        지원서 제출
@@ -620,6 +711,7 @@ class ApplicationServiceTest {
 //        지원서 거절
         container.applicationService.decideApplication(memberId, applicationId, ApplicationStatus.REFUSE);
 
+//        검증
         Application application = container.applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new ApplicationException(APPLICATION_NOT_FOUND));
 
@@ -629,9 +721,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 승인 성공")
     void decideApplicationToAccept() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -642,6 +737,8 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
 //        지원서 제출
@@ -654,6 +751,7 @@ class ApplicationServiceTest {
 //        지원서 승인
         container.applicationService.decideApplication(memberId, applicationId, ApplicationStatus.ACCEPT);
 
+//        검증
         Application application = container.applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new ApplicationException(APPLICATION_NOT_FOUND));
 
@@ -671,9 +769,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 상태 변경 실패 - 올바르지 않은 지원서 Id")
     void decideApplicationFailByNotValidApplicationId() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -684,6 +785,8 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
 //        지원서 제출
@@ -692,6 +795,7 @@ class ApplicationServiceTest {
                 new ApplicationRequest(List.of(new ApplicationDTO("답변1", 1), new ApplicationDTO("답변2", 2))),
                 memberIdToBeJoined);
 
+//        검증
         assertThatThrownBy(() ->
                 container.applicationService.decideApplication(memberId, 99999L, ApplicationStatus.ACCEPT)
         )
@@ -702,9 +806,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 상태 변경 실패 - 권한이 없는 회원이 변경하려는 경우")
     void decideApplicationFailByForbidden() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -715,6 +822,8 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
 //        USER 등급의 회원 모임에 가입
@@ -739,6 +848,7 @@ class ApplicationServiceTest {
                 memberIdToBeJoined
         );
 
+//        검증
         assertThatThrownBy(() ->
                 container.applicationService.decideApplication(joinedMember, applicationId, ApplicationStatus.ACCEPT)
         )
@@ -749,9 +859,12 @@ class ApplicationServiceTest {
     @Test
     @DisplayName("지원서 상태 변경 실패 - 이미 결정된 지원서의 경우")
     void decideApplicationFailByAlreadyDecided() throws IOException {
-//        가입할 회원 생성
         FakeContainer container = new FakeContainer();
+
+//        회원가입
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
                 null,
@@ -762,6 +875,8 @@ class ApplicationServiceTest {
                 null,
                 memberId
         );
+
+//        회원 생성
         Long memberIdToBeJoined = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", MEMBER_NICKNAME_TO_BE_JOINED));
 
 //        지원서 제출
@@ -774,6 +889,7 @@ class ApplicationServiceTest {
 //        지원서 승인
         container.applicationService.decideApplication(memberId, applicationId, ApplicationStatus.ACCEPT);
 
+//        검증
         assertThatThrownBy(() ->
                 container.applicationService.decideApplication(memberId, applicationId, ApplicationStatus.WAIT)
         )
