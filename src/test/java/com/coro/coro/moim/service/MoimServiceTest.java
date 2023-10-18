@@ -48,6 +48,8 @@ class MoimServiceTest {
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "", "mixed", true);
         Long moimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+
+//        검증
         Moim moim = container.moimRepository.findById(moimId).orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
 
         assertAll(
@@ -69,6 +71,7 @@ class MoimServiceTest {
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
         container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
+//        중복된 이름의 모임 생성
         MoimRegisterRequest duplicatedMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
 
         assertThatThrownBy(() ->
@@ -121,7 +124,7 @@ class MoimServiceTest {
 //        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
-//        모임 생성 (태그 포함)
+//        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
         MoimTagRequest requestMoimTag = new MoimTagRequest(List.of(input));
 
@@ -163,7 +166,9 @@ class MoimServiceTest {
                 savedMemberId
         );
 
-        Moim moim = container.moimRepository.findById(savedMoimId).orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
+//        검증
+        Moim moim = container.moimRepository.findById(savedMoimId)
+                .orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
 
         assertAll(
                 () -> assertThat(moim.getName()).isEqualTo(EXAMPLE_NAME),
@@ -183,6 +188,7 @@ class MoimServiceTest {
 //        회원가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
+//        검증
         assertThatThrownBy(() -> container.moimService.update(
                 99999L,
                 new MoimModificationRequest("수정", "소개 수정", "mixed", true, false),
@@ -210,7 +216,7 @@ class MoimServiceTest {
         MoimRegisterRequest target = new MoimRegisterRequest(EXAMPLE_NAME, "", "mixed", true);
         container.moimService.register(target, null, null, null, savedMemberId);
 
-
+//        검증
         assertThatThrownBy(() -> container.moimService.update(
                 moimId,
                 new MoimModificationRequest(EXAMPLE_NAME, "모임 소개", "mixed", true, false),
@@ -239,6 +245,7 @@ class MoimServiceTest {
 //        디테일 정보 가져오기
         MoimDetailResponse detail = container.moimService.getDetail(savedMoimId, savedMemberId);
 
+//        검증
         assertAll(
                 () -> assertThat(detail.getName()).isEqualTo(EXAMPLE_NAME),
                 () -> assertThat(detail.getIntroduction()).isEqualTo(EXAMPLE_INTRODUCTION),
@@ -262,6 +269,7 @@ class MoimServiceTest {
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         container.moimService.register(requestMoim, requestMoimTag, null, null, savedMemberId);
 
+//        검증
         assertThatThrownBy(() -> container.moimService.getDetail(19999999L, 1L))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NOT_FOUND.getMessage());
@@ -287,6 +295,7 @@ class MoimServiceTest {
 //        모임 수정을 위한 데이터 가져오기
         MoimModificationResponse result = container.moimService.getDetailForModification(savedMoimId, savedMemberId);
 
+//        검증
         assertAll(
                 () -> assertThat(result.getName()).isEqualTo(EXAMPLE_NAME),
                 () -> assertThat(result.getIntroduction()).isEqualTo(EXAMPLE_INTRODUCTION),
@@ -311,6 +320,7 @@ class MoimServiceTest {
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
         container.moimService.register(requestMoim, null, null, null, savedMemberId);
 
+//        검증
         assertThatThrownBy(() -> container.moimService.getDetailForModification(9999999L, savedMemberId))
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NOT_FOUND.getMessage());
@@ -339,6 +349,7 @@ class MoimServiceTest {
 //        가입된 모든 모임 가져오기
         List<Moim> moimList = container.moimService.getMoimListByMemberId(savedMemberId);
 
+//        검증
         assertAll(
                 () -> assertThat(moimList).size().isEqualTo(2),
                 () -> assertThat(moimList).extracting(Moim::getName).containsExactlyInAnyOrder(EXAMPLE_NAME, "모임2"),
@@ -369,6 +380,7 @@ class MoimServiceTest {
 //        특정 모임의 모든 회원 가져오기
         List<MoimMemberResponse> moimMemberList = container.moimService.getMoimMemberList(savedMoimId);
 
+//        검증
         assertAll(
                 () -> assertThat(moimMemberList).size().isEqualTo(2),
                 () -> assertThat(moimMemberList).extracting(MoimMemberResponse::getMemberName).containsExactlyInAnyOrder("닉네임", "닉네임2"),
@@ -407,6 +419,7 @@ class MoimServiceTest {
                 savedMemberId
         );
 
+//        검증
         assertAll(
                 () -> assertThat(moimMember1.getMember().getNickname()).isEqualTo("닉네임"),
                 () -> assertThat(moimMember1.getMoim().getName()).isEqualTo(EXAMPLE_NAME),
@@ -423,31 +436,32 @@ class MoimServiceTest {
         FakeContainer container = new FakeContainer();
 
 //        회원가입
-        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+        Long leaderId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
 
 //        모임 지원
-        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
-        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
+        container.applicationService.decideApplication(leaderId, applicationId, ApplicationStatus.ACCEPT);
 
-        MoimMember moimMember1 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
+//        검증
+        MoimMember leaderMoimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, leaderId)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
-        MoimMember moimMember2 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+        MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 
+        List<MoimMemberModificationRequest> moimMemberModificationRequestList = List.of(new MoimMemberModificationRequest(leaderMoimMember.getId(),
+                        "닉네임",
+                        MemberRole.LEADER),
+                new MoimMemberModificationRequest(moimMember.getId(),
+                        "닉네임2",
+                        MemberRole.LEADER)
+        );
         assertThatThrownBy(() ->
-                container.moimService.modifyMoimMember(savedMoimId,
-                        List.of(new MoimMemberModificationRequest(moimMember1.getId(),
-                                        "닉네임",
-                                        MemberRole.LEADER),
-                                new MoimMemberModificationRequest(moimMember2.getId(),
-                                        "닉네임2",
-                                        MemberRole.LEADER)
-                        ), savedMemberId)
+                container.moimService.modifyMoimMember(savedMoimId, moimMemberModificationRequestList, leaderId)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_MEMBER_NOT_VALID.getMessage());
@@ -459,29 +473,31 @@ class MoimServiceTest {
         FakeContainer container = new FakeContainer();
 
 //        회원가입
-        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+        Long leaderId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
 
 //        모임 지원
-        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
-        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
+        container.applicationService.decideApplication(leaderId, applicationId, ApplicationStatus.ACCEPT);
 
-        MoimMember moimMember1 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
+//        검증
+        MoimMember leaderMoimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, leaderId)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
-        MoimMember moimMember2 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+        MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 
+        List<MoimMemberModificationRequest> moimMemberModificationRequestList = List.of(
+                new MoimMemberModificationRequest(leaderMoimMember.getId(), "닉네임", MemberRole.MANAGER),
+                new MoimMemberModificationRequest(moimMember.getId(), "닉네임2", MemberRole.MANAGER)
+        );
         assertThatThrownBy(() ->
                 container.moimService.modifyMoimMember(
                         savedMoimId,
-                        List.of(
-                                new MoimMemberModificationRequest(moimMember1.getId(), "닉네임", MemberRole.MANAGER),
-                                new MoimMemberModificationRequest(moimMember2.getId(), "닉네임2", MemberRole.MANAGER)
-                        ), savedMemberId)
+                        moimMemberModificationRequestList, leaderId)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_MEMBER_NOT_VALID.getMessage());
@@ -493,26 +509,29 @@ class MoimServiceTest {
         FakeContainer container = new FakeContainer();
 
 //        회원가입
-        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+        Long leaderId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
 
 //        모임 지원
-        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
-        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
+        container.applicationService.decideApplication(leaderId, applicationId, ApplicationStatus.ACCEPT);
 
-        container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
+//        검증
+        container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, leaderId)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
-        MoimMember moimMember2 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+        MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
+
+        List<MoimMemberModificationRequest> moimMemberModificationRequestList = List.of(
+                new MoimMemberModificationRequest(moimMember.getId(), "닉네임2", MemberRole.LEADER)
+        );
 
         assertThatThrownBy(() ->
-                container.moimService.modifyMoimMember(savedMoimId,
-                        List.of(new MoimMemberModificationRequest(moimMember2.getId(), "닉네임2", MemberRole.LEADER)),
-                        savedMemberId)
+                container.moimService.modifyMoimMember(savedMoimId, moimMemberModificationRequestList, leaderId)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_MEMBER_NOT_VALID.getMessage());
@@ -524,29 +543,30 @@ class MoimServiceTest {
         FakeContainer container = new FakeContainer();
 
 //        회원가입
-        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+        Long leaderId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
 
 //        모임 지원
-        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
-        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
+        container.applicationService.decideApplication(leaderId, applicationId, ApplicationStatus.ACCEPT);
 
-        MoimMember moimMember1 = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
+//        검증
+        MoimMember leaderMoimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, leaderId)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
-        container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+        container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
+
+        List<MoimMemberModificationRequest> moimMemberModificationRequestList = List.of(
+                new MoimMemberModificationRequest(leaderMoimMember.getId(), "회원2", MemberRole.LEADER),
+                new MoimMemberModificationRequest(99999L, "asdf", MemberRole.USER)
+        );
 
         assertThatThrownBy(() ->
-                container.moimService.modifyMoimMember(savedMoimId,
-                        List.of(
-                                new MoimMemberModificationRequest(moimMember1.getId(), "회원2", MemberRole.LEADER),
-                                new MoimMemberModificationRequest(99999L, "asdf", MemberRole.USER)
-                        ),
-                        savedMemberId)
+                container.moimService.modifyMoimMember(savedMoimId, moimMemberModificationRequestList, leaderId)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_MEMBER_NOT_VALID.getMessage());
@@ -558,15 +578,16 @@ class MoimServiceTest {
         FakeContainer container = new FakeContainer();
 
 //        회원가입
-        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long leaderId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
 
 //        회원 등급 가져오기
-        MemberRole memberRole = container.moimService.getMemberRole(savedMemberId, savedMoimId);
+        MemberRole memberRole = container.moimService.getMemberRole(leaderId, savedMoimId);
 
+//        검증
         assertThat(memberRole.isLeader()).isTrue();
         assertThat(memberRole.isNotLeader()).isFalse();
     }
@@ -577,12 +598,13 @@ class MoimServiceTest {
         FakeContainer container = new FakeContainer();
 
 //        회원가입
-        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long leaderId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
 
+//        검증
         assertThatThrownBy(() ->
                 container.moimService.getMemberRole(999999L, savedMoimId)
         )
@@ -596,14 +618,15 @@ class MoimServiceTest {
         FakeContainer container = new FakeContainer();
 
 //        회원가입
-        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long leaderId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
-        container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        container.moimService.register(requestMoim, null, null, null, leaderId);
 
+//        검증
         assertThatThrownBy(() ->
-                container.moimService.getMemberRole(savedMemberId, 9999999L)
+                container.moimService.getMemberRole(leaderId, 9999999L)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_MEMBER_NOT_FOUND.getMessage());
@@ -615,22 +638,24 @@ class MoimServiceTest {
         FakeContainer container = new FakeContainer();
 
 //        회원가입
-        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+        Long leaderId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
 
 //        모임 지원
-        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
-        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
+        container.applicationService.decideApplication(leaderId, applicationId, ApplicationStatus.ACCEPT);
 
-        MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+        MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 
 //        회원 추방
-        container.moimService.deport(savedMoimId, moimMember.getId(), savedMemberId);
+        container.moimService.deport(savedMoimId, moimMember.getId(), leaderId);
+
+//        검증
         List<MoimMember> moimMemberList = container.moimMemberRepository.findAllByMoimId(savedMoimId);
 
         assertThat(moimMemberList).size().isEqualTo(1);
@@ -646,22 +671,23 @@ class MoimServiceTest {
         FakeContainer container = new FakeContainer();
 
 //        회원가입
-        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+        Long leader = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leader);
 
 //        모임 지원
-        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
-        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
+        container.applicationService.decideApplication(leader, applicationId, ApplicationStatus.ACCEPT);
 
-        MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+//        검증
+        MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 
         assertThatThrownBy(() ->
-                container.moimService.deport(999999L, moimMember.getId(), savedMemberId)
+                container.moimService.deport(999999L, moimMember.getId(), leader)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NOT_FOUND.getMessage());
@@ -673,22 +699,23 @@ class MoimServiceTest {
         FakeContainer container = new FakeContainer();
 
 //        회원가입
-        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+        Long leaderId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
 
 //        모임 지원
-        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
-        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
+        container.applicationService.decideApplication(leaderId, applicationId, ApplicationStatus.ACCEPT);
 
-        MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId2)
+//        검증
+        MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 
         assertThatThrownBy(() ->
-                container.moimService.deport(savedMoimId, moimMember.getId(), savedMemberId2)
+                container.moimService.deport(savedMoimId, moimMember.getId(), savedMemberId)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_FORBIDDEN.getMessage());
@@ -700,22 +727,23 @@ class MoimServiceTest {
         FakeContainer container = new FakeContainer();
 
 //        회원가입
-        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long savedMemberId2 = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+        Long leaderId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long savedMemberId = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest(EXAMPLE_NAME, EXAMPLE_INTRODUCTION, EXAMPLE_TYPE, true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
 
 //        모임 지원
-        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
-        container.applicationService.decideApplication(savedMemberId, applicationId, ApplicationStatus.ACCEPT);
+        Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
+        container.applicationService.decideApplication(leaderId, applicationId, ApplicationStatus.ACCEPT);
 
-        MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, savedMemberId)
+//        검증
+        MoimMember moimMember = container.moimMemberRepository.findByMoimIdAndMemberId(savedMoimId, leaderId)
                 .orElseThrow(() -> new MoimException(MOIM_MEMBER_NOT_FOUND));
 
         assertThatThrownBy(() ->
-                container.moimService.deport(savedMoimId, moimMember.getId(), savedMemberId)
+                container.moimService.deport(savedMoimId, moimMember.getId(), leaderId)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_FORBIDDEN.getMessage());
