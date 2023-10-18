@@ -92,10 +92,10 @@ public class MoimController implements MoimControllerDocs {
     @Override
     public APIResponse getMoimMember(@PathVariable("moimId") final Long moimId, @AuthenticationPrincipal final User user) {
         List<MoimMemberResponse> moimMemberResponseList = moimService.getMoimMemberList(moimId);
-        MemberRole memberRole = moimService.getMemberRole(user.getId(), moimId);
+        MemberRole loggedInMemberRole = moimService.getMemberRole(user.getId(), moimId);
         return APIResponse.create()
                 .addObject("moimMemberList", moimMemberResponseList)
-                .addObject("role", memberRole);
+                .addObject("role", loggedInMemberRole);
     }
 
     @PutMapping("/{moimId}/members")

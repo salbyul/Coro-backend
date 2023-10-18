@@ -55,6 +55,7 @@ public class Moim extends BaseEntity {
     }
 
     public void update(final MoimModificationRequest requestMoim) {
+        this.name = requestMoim.getName();
         this.introduction = requestMoim.getIntroduction();
         this.visible = requestMoim.getVisible();
         this.type = MoimType.getType(requestMoim.getType());
