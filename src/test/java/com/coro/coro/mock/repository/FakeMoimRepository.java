@@ -55,7 +55,7 @@ public class FakeMoimRepository implements MoimRepository {
                 .collect(Collectors.toList());
         int total = totalContent.size();
         List<Moim> content = new ArrayList<>();
-        for (long i = offset; i < size + offset; i++) {
+        for (long i = offset; i < size + offset && i < totalContent.size(); i++) {
             content.add(totalContent.get((int) i));
         }
         return new PageImpl<>(content, pageable, total);

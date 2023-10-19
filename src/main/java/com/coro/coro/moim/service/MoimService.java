@@ -235,10 +235,10 @@ public class MoimService {
     @SuppressWarnings("ConstantConditions")
     public void validateImageFile(final MultipartFile multipartFile) {
         if (!multipartFile.getOriginalFilename().contains(".")) {
-            throw new MemberException(MOIM_PHOTO_NOT_VALID);
+            throw new MoimException(MOIM_PHOTO_NOT_VALID);
         }
         if (!multipartFile.getContentType().contains("image")) {
-            throw new MemberException(MOIM_PHOTO_NOT_VALID);
+            throw new MoimException(MOIM_PHOTO_NOT_VALID);
         }
     }
 
@@ -287,10 +287,10 @@ public class MoimService {
         return result;
     }
 
-    public MoimModificationResponse getDetailForModification(final Long moimId, final Long memberId) throws IOException {
+    public MoimModificationResponse getDetailForModification(final Long moimId, final Long loggedInMemberId) throws IOException {
         Moim moim = getMoimById(moimId);
 
-        MoimMember moimMember = getMoimMemberByMoimIdAndMemberId(moimId, memberId);
+        MoimMember moimMember = getMoimMemberByMoimIdAndMemberId(moimId, loggedInMemberId);
 
         List<ApplicationQuestion> applicationQuestionList = applicationQuestionRepository.findAllByMoimId(moimId);
 
