@@ -3,7 +3,7 @@ package com.coro.coro.moim.controller;
 import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
 import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.domain.MemberRole;
-import com.coro.coro.member.domain.User;
+import com.coro.coro.member.service.User;
 import com.coro.coro.moim.annotation.Search;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.dto.request.*;
@@ -12,6 +12,7 @@ import com.coro.coro.moim.dto.response.MoimMemberResponse;
 import com.coro.coro.moim.dto.response.MoimModificationResponse;
 import com.coro.coro.moim.dto.response.MoimSearchResponse;
 import com.coro.coro.moim.service.MoimService;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Builder
 @RequestMapping("/api/moims")
 public class MoimController implements MoimControllerDocs {
 
@@ -90,10 +92,10 @@ public class MoimController implements MoimControllerDocs {
     @Override
     public APIResponse getMoimMember(@PathVariable("moimId") final Long moimId, @AuthenticationPrincipal final User user) {
         List<MoimMemberResponse> moimMemberResponseList = moimService.getMoimMemberList(moimId);
-        MemberRole memberRole = moimService.getMemberRole(user.getId(), moimId);
+        MemberRole loggedInMemberRole = moimService.getMemberRole(user.getId(), moimId);
         return APIResponse.create()
                 .addObject("moimMemberList", moimMemberResponseList)
-                .addObject("role", memberRole);
+                .addObject("role", loggedInMemberRole);
     }
 
     @PutMapping("/{moimId}/members")

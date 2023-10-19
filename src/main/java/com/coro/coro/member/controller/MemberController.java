@@ -3,7 +3,7 @@ package com.coro.coro.member.controller;
 import com.coro.coro.application.dto.response.ApplicationResponse;
 import com.coro.coro.application.service.ApplicationService;
 import com.coro.coro.common.response.APIResponse;
-import com.coro.coro.member.domain.User;
+import com.coro.coro.member.service.User;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
 import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
@@ -12,6 +12,7 @@ import com.coro.coro.member.service.MemberService;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.dto.response.MoimSearchResponse;
 import com.coro.coro.moim.service.MoimService;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/members")
+@Builder
 public class MemberController implements MemberControllerDocs {
 
     private final MemberService memberService;
@@ -38,8 +40,9 @@ public class MemberController implements MemberControllerDocs {
     @Override
     public APIResponse register(@RequestBody final MemberRegisterRequest requestMember) {
         log.info("member: {}", requestMember);
-        memberService.register(requestMember);
-        return APIResponse.create();
+        Long savedId = memberService.register(requestMember);
+        return APIResponse.create()
+                .addObject("savedId", savedId);
     }
 
     @PostMapping("/login")
@@ -58,9 +61,8 @@ public class MemberController implements MemberControllerDocs {
     @ResponseStatus(HttpStatus.OK)
     @Override
     public APIResponse update(@PathVariable("id") Long memberId,
-                              @RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile,
+                              @RequestPart(name = "profileImage", required = false) final MultipartFile multipartFile,
                               @RequestPart(name = "member", required = false) final MemberModificationRequest requestMember) throws IOException {
-//        아래 합치기?
         if (requestMember != null) {
             memberService.update(memberId, requestMember);
         }

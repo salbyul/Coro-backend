@@ -1,7 +1,7 @@
 package com.coro.coro.member.validator;
 
-import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.exception.MemberException;
+import com.coro.coro.member.domain.Member;
 import org.springframework.util.StringUtils;
 
 import static com.coro.coro.common.response.error.ErrorType.*;

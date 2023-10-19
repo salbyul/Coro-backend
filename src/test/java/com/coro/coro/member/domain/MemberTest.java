@@ -2,73 +2,138 @@ package com.coro.coro.member.domain;
 
 import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.exception.MemberException;
-import org.junit.jupiter.api.BeforeEach;
+import com.coro.coro.mock.FakePasswordEncoder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class MemberTest {
 
-    private Member member;
+    private final PasswordEncoder passwordEncoder = new FakePasswordEncoder();
 
-    @BeforeEach
-    void setUp() {
-        member = Member.builder()
-                .email("asdf@asdf.com")
-                .nickname("닉네임")
-                .password("asdf1234!@")
-                .build();
+    private static final String EMAIL = "asdf@asdf.com";
+    private static final String PASSWORD = "asdf1234!@";
+    private static final String NICKNAME = "닉네임";
+    private static final String INTRODUCTION = "자기소개입니다.";
+    private static final MemberState STATE = MemberState.ACTIVE;
+
+
+    @Test
+    @DisplayName("패스워드 암호화 확인")
+    void encryptPassword() {
+        Member member = generateMember();
+
+        member.encryptPassword(passwordEncoder);
+
+        assertThat(passwordEncoder.matches(PASSWORD, member.getPassword())).isTrue();
     }
 
     @Test
-    @DisplayName("중복된 이메일의 경우 예외 발생")
-    void duplicatedEmail() {
-        Member duplicatedMember = Member.builder()
-                .email("asdf@asdf.com")
-                .nickname("닉네임2")
-                .password("asdf1234!@")
+    @DisplayName("이메일과 닉네임 중복 검사 확인 성공")
+    void verifyDuplication() {
+        Member member = generateMember();
+        Member notDuplicatedMember = Member.builder()
+                .id(2L)
+                .email("a@a.com")
+                .password(PASSWORD)
+                .nickname("닉네임1")
+                .introduction(INTRODUCTION)
+                .moimList(new ArrayList<>())
+                .state(STATE)
+                .build();
+
+        member.verifyDuplication(List.of(notDuplicatedMember));
+    }
+
+    @Test
+    @DisplayName("이메일과 닉네임 중복 검사 확인 실패 - 이메일 중복의 경우")
+    void verifyDuplicationFailByDuplicatedEmail() {
+        Member member = generateMember();
+        Member duplicatedEmailMember = Member.builder()
+                .id(2L)
+                .email(EMAIL)
+                .password(PASSWORD)
+                .nickname("닉네임1")
+                .introduction(INTRODUCTION)
+                .moimList(new ArrayList<>())
+                .state(STATE)
                 .build();
 
         assertThatThrownBy(() ->
-                member.verifyDuplication(List.of(duplicatedMember))
+                member.verifyDuplication(List.of(duplicatedEmailMember))
         )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_EMAIL_DUPLICATE.getMessage());
     }
 
     @Test
-    @DisplayName("중복된 닉네임의 경우 예외 발생")
-    void duplicatedNickname() {
-        Member duplicatedMember = Member.builder()
+    @DisplayName("이메일과 닉네임 중복 검사 확인 실패 - 닉네임 중복의 경우")
+    void verifyDuplicationFailByDuplicatedNickname() {
+        Member member = generateMember();
+        Member duplicatedEmailMember = Member.builder()
+                .id(2L)
                 .email("a@a.com")
-                .nickname("닉네임")
-                .password("asdf1234!@")
+                .password(PASSWORD)
+                .nickname(NICKNAME)
+                .introduction(INTRODUCTION)
+                .moimList(new ArrayList<>())
+                .state(STATE)
                 .build();
 
         assertThatThrownBy(() ->
-                member.verifyDuplication(List.of(duplicatedMember))
+                member.verifyDuplication(List.of(duplicatedEmailMember))
         )
                 .isInstanceOf(MemberException.class)
                 .hasMessage(MEMBER_NICKNAME_DUPLICATE.getMessage());
     }
 
     @Test
-    @DisplayName("올바른 회원 수정")
-    void changeTo() {
-        Member member = Member.builder()
-                .email("asdf@asdf.com")
-                .nickname("닉네임")
-                .password("asdf1234!@")
-                .build();
-        MemberModificationRequest modificationRequest =
-                new MemberModificationRequest("asdf1234!@", "good1234!@", "변경된 회원소개");
-        member.changeTo(modificationRequest);
+    @DisplayName("성공적인 회원 수정")
+    void update() {
+        Member member = generateMember();
+        member.encryptPassword(passwordEncoder);
 
-        assertThat(member.getIntroduction()).isEqualTo("변경된 회원소개");
-        assertThat(member.getPassword()).isEqualTo("good1234!@");
+        MemberModificationRequest requestMember = new MemberModificationRequest(passwordEncoder.encode(PASSWORD), "qwer0987!@", "변경된 자기소개입니다.");
+        member.update(requestMember, passwordEncoder);
+
+        assertAll(
+                () -> assertThat(member.getIntroduction()).isEqualTo(requestMember.getIntroduction()),
+                () -> assertThat(passwordEncoder.matches(requestMember.getNewPassword(), member.getPassword())).isTrue()
+        );
+    }
+
+    @Test
+    @DisplayName("회원수정 실패 - 비밀번호가 다를 경우")
+    void updateFailByNotValidPassword() {
+        Member member = generateMember();
+        member.encryptPassword(passwordEncoder);
+
+        assertThatThrownBy(() ->
+            member.update(
+                    new MemberModificationRequest("vhjs3857#*", "qwer0987!@", "변경된 자기소개입니다."),
+                    passwordEncoder
+            )
+        )
+                .isInstanceOf(MemberException.class)
+                .hasMessage(MEMBER_PASSWORD_NOT_VALID.getMessage());
+    }
+
+    public Member generateMember() {
+        return Member.builder()
+                .id(1L)
+                .email(EMAIL)
+                .password(PASSWORD)
+                .nickname(NICKNAME)
+                .introduction(INTRODUCTION)
+                .moimList(new ArrayList<>())
+                .state(STATE)
+                .build();
     }
 }

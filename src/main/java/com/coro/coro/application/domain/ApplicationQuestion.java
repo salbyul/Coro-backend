@@ -1,11 +1,8 @@
 package com.coro.coro.application.domain;
 
-import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
 import com.coro.coro.common.domain.BaseEntity;
 import com.coro.coro.moim.domain.Moim;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
@@ -28,18 +25,12 @@ public class ApplicationQuestion extends BaseEntity implements Persistable<Long>
 
     private String content;
 
-    public ApplicationQuestion(final Moim moim, final String content, final Integer order) {
+    @Builder
+    public ApplicationQuestion(final Long id, final Integer order, final Moim moim, final String content) {
+        this.id = id;
+        this.order = order;
         this.moim = moim;
         this.content = content;
-        this.order = order;
-    }
-
-    public static ApplicationQuestion generate(final Moim moim, final ApplicationQuestionRegisterRequest requestQuestion) {
-        return new ApplicationQuestion(moim, requestQuestion.getContent(), requestQuestion.getOrder());
-    }
-
-    public int getOrder() {
-        return this.order;
     }
 
     @Override

@@ -4,10 +4,8 @@ import com.coro.coro.application.domain.ApplicationQuestion;
 import com.coro.coro.common.domain.BaseEntity;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.moim.dto.request.MoimModificationRequest;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -16,6 +14,9 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+@Table(name = "moim")
 public class Moim extends BaseEntity {
 
     @Id
@@ -36,41 +37,39 @@ public class Moim extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MoimState state;
 
+    @Builder.Default
     @OneToMany(mappedBy = "moim")
     private List<MoimTag> tagList = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "moim")
     private List<ApplicationQuestion> questionList = new ArrayList<>();
-
-    @Builder
-    public Moim(final Member leader, final String name, final String introduction, final Boolean visible, final MoimType type) {
-        this.leader = leader;
-        this.name = name;
-        this.introduction = introduction;
-        this.visible = visible;
-        this.type = type;
-    }
 
     @Override
     public void prePersist() {
         super.prePersist();
-        if (isEmptyString(this.introduction)) {
+        if (!StringUtils.hasText(this.introduction)) {
             this.introduction = "우리 모임을 소개해주세요.";
         }
         this.state = MoimState.ACTIVE;
     }
 
-    private boolean isEmptyString(final String value) {
-        return value == null || value.equals("");
-    }
-
-    public void changeTo(final MoimModificationRequest requestMoim) {
+    public void update(final MoimModificationRequest requestMoim) {
+        this.name = requestMoim.getName();
         this.introduction = requestMoim.getIntroduction();
-        this.type = MoimType.getType(requestMoim.getType());
         this.visible = requestMoim.getVisible();
+        this.type = MoimType.getType(requestMoim.getType());
     }
 
     public void changeLeader(final Member newLeader) {
         this.leader = newLeader;
+    }
+
+    public void changeQuestionListTo(final List<ApplicationQuestion> applicationQuestionList) {
+        this.questionList = applicationQuestionList;
+    }
+
+    public void changeMoimTagListTo(final List<MoimTag> tagList) {
+        this.tagList = tagList;
     }
 }

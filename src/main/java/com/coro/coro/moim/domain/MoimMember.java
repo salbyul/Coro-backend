@@ -6,9 +6,7 @@ import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.domain.MemberRole;
 import com.coro.coro.moim.dto.request.MoimMemberModificationRequest;
 import com.coro.coro.moim.exception.MoimException;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -16,9 +14,12 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "moim_member")
+@AllArgsConstructor
+@Builder
 public class MoimMember extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,16 +41,6 @@ public class MoimMember extends BaseEntity {
         }
     }
 
-    private MoimMember(final Moim moim, final Member member, final MemberRole role) {
-        this.moim = moim;
-        this.member = member;
-        this.role = role;
-    }
-
-    public static MoimMember generate(final Moim moim, final Member member, final MemberRole role) {
-        return new MoimMember(moim, member, role);
-    }
-
     public boolean canManage() {
         return !this.role.equals(MemberRole.USER);
     }
@@ -59,8 +50,8 @@ public class MoimMember extends BaseEntity {
             throw new MoimException(ErrorType.MOIM_MEMBER_NOT_VALID);
         }
         this.role = moimMemberRequest.getRole();
-        if (moimMemberRequest.getRole().isLeader()) {
-            moim.changeLeader(member);
+        if (this.role == MemberRole.LEADER) {
+            this.moim.changeLeader(this.member);
         }
     }
 

@@ -12,17 +12,17 @@ public class ApplicationQuestionValidator {
 
     private static final int MAX_NAME_LENGTH = 200;
 
-    public static void validateApplicationQuestion(final List<ApplicationQuestion> applicationQuestions) {
-        if (applicationQuestions.size() == 0) {
+    public static void validateApplicationQuestion(final List<ApplicationQuestion> applicationQuestionList) {
+        if (applicationQuestionList.size() == 0) {
             return;
         }
-        validateContent(applicationQuestions);
-        validateOrders(applicationQuestions);
+        validateContent(applicationQuestionList);
+        validateOrders(applicationQuestionList);
     }
 
-    private static void validateContent(final List<ApplicationQuestion> applicationQuestions) {
-        boolean isGreaterThanMaxLength = applicationQuestions.stream().anyMatch(question -> question.getContent().length() > MAX_NAME_LENGTH);
-        boolean isEmpty = applicationQuestions.stream().anyMatch(question -> isEmpty(question.getContent()));
+    private static void validateContent(final List<ApplicationQuestion> applicationQuestionList) {
+        boolean isGreaterThanMaxLength = applicationQuestionList.stream().anyMatch(question -> question.getContent().length() > MAX_NAME_LENGTH);
+        boolean isEmpty = applicationQuestionList.stream().anyMatch(question -> isEmpty(question.getContent()));
         if (isGreaterThanMaxLength || isEmpty) {
             throw new ApplicationException(APPLICATION_QUESTION_CONTENT_VALID);
         }
@@ -32,15 +32,15 @@ public class ApplicationQuestionValidator {
         return !StringUtils.hasText(value);
     }
 
-    private static void validateOrders(final List<ApplicationQuestion> applicationQuestions) {
-        if (applicationQuestions.size() > 10) {
-            throw new ApplicationException(APPLICATION_QUESTION_MAX);
+    private static void validateOrders(final List<ApplicationQuestion> applicationQuestionList) {
+        if (applicationQuestionList.size() > 10) {
+            throw new ApplicationException(APPLICATION_QUESTION_GREATER_THAN_MAX);
         }
-        int expectedMaxOrder = applicationQuestions.size();
+        int expectedMaxOrder = applicationQuestionList.size();
         boolean canContinue = true;
         while (expectedMaxOrder != 0 && canContinue) {
             canContinue = false;
-            for (ApplicationQuestion applicationQuestion : applicationQuestions) {
+            for (ApplicationQuestion applicationQuestion : applicationQuestionList) {
                 if (applicationQuestion.getOrder() == expectedMaxOrder) {
                     canContinue = true;
                     expectedMaxOrder--;

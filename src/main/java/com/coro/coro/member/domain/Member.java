@@ -1,10 +1,10 @@
 package com.coro.coro.member.domain;
 
 import com.coro.coro.common.domain.BaseEntity;
-import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.validator.MemberValidator;
+import com.coro.coro.moim.domain.Moim;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -17,6 +17,9 @@ import static com.coro.coro.common.response.error.ErrorType.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+@Table(name = "member")
 public class Member extends BaseEntity {
 
     @Id
@@ -27,22 +30,12 @@ public class Member extends BaseEntity {
     private String nickname;
     private String introduction;
 
+    @Builder.Default
     @OneToMany(mappedBy = "leader")
     private List<Moim> moimList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private MemberState state;
-
-    @Builder
-    private Member(final String email, final String password, final String nickname) {
-        this.email = email;
-        this.password = password;
-        this.nickname = nickname;
-    }
-
-    public void encryptPassword(final PasswordEncoder passwordEncoder) {
-        this.password = passwordEncoder.encode(password);
-    }
 
     @Override
     public void prePersist() {
@@ -51,20 +44,33 @@ public class Member extends BaseEntity {
         this.state = MemberState.ACTIVE;
     }
 
-    public void verifyDuplication(final List<Member> foundMembers) {
-        for (Member foundMember : foundMembers) {
-            if (foundMember.getEmail().equals(this.email)) {
+    public void encryptPassword(final PasswordEncoder passwordEncoder) {
+        this.password = passwordEncoder.encode(password);
+    }
+
+    public void verifyDuplication(final List<Member> memberList) {
+        for (Member member : memberList) {
+            if (member.getEmail().equals(this.email)) {
                 throw new MemberException(MEMBER_EMAIL_DUPLICATE);
             }
-            if (foundMember.getNickname().equals(this.nickname)) {
+            if (member.getNickname().equals(this.nickname)) {
                 throw new MemberException(MEMBER_NICKNAME_DUPLICATE);
             }
         }
     }
 
-    public void changeTo(final MemberModificationRequest requestMember) {
+    public void update(final MemberModificationRequest requestMember, final PasswordEncoder passwordEncoder) {
+        if (!isRightPassword(requestMember.getOriginalPassword(), passwordEncoder)) {
+            throw new MemberException(MEMBER_PASSWORD_NOT_VALID);
+        }
         this.introduction = requestMember.getIntroduction();
         this.password = requestMember.getNewPassword();
+
         MemberValidator.validateRegistration(this);
+        this.password = passwordEncoder.encode(this.password);
+    }
+
+    public boolean isRightPassword(final String password, final PasswordEncoder passwordEncoder) {
+        return passwordEncoder.matches(password, this.password);
     }
 }

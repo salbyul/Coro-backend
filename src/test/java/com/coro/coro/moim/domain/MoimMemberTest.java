@@ -40,7 +40,11 @@ class MoimMemberTest {
                 .nickname("회원")
                 .password("asdf1234!@")
                 .build();
-        MoimMember moimMember = MoimMember.generate(moim, member, MemberRole.USER);
+        MoimMember moimMember = MoimMember.builder()
+                .moim(moim)
+                .member(member)
+                .role(MemberRole.USER)
+                .build();
 
         assertThat(moimMember.canManage()).isFalse();
     }
@@ -48,7 +52,11 @@ class MoimMemberTest {
     @Test
     @DisplayName("관리할 수 있는 멤버일 경우 확인")
     void canManage() {
-        MoimMember moimMember = MoimMember.generate(moim, leader, MemberRole.LEADER);
+        MoimMember moimMember = MoimMember.builder()
+                .moim(moim)
+                .member(leader)
+                .role(MemberRole.LEADER)
+                .build();
 
         assertThat(moimMember.canManage()).isTrue();
     }
@@ -62,7 +70,11 @@ class MoimMemberTest {
                 .password("asdf1234!@")
                 .build();
 
-        MoimMember moimMember = MoimMember.generate(moim, member, MemberRole.USER);
+        MoimMember moimMember = MoimMember.builder()
+                .moim(moim)
+                .member(member)
+                .role(MemberRole.USER)
+                .build();
         MoimMemberModificationRequest modificationRequest = MoimMemberModificationRequest.builder()
                 .memberName("회원1")
                 .role(MemberRole.MANAGER)
@@ -82,11 +94,16 @@ class MoimMemberTest {
                 .password("asdf1234!@")
                 .build();
 
-        MoimMember moimMember = MoimMember.generate(moim, member, MemberRole.USER);
+        MoimMember moimMember = MoimMember.builder()
+                .moim(moim)
+                .member(member)
+                .role(MemberRole.USER)
+                .build();
         MoimMemberModificationRequest modificationRequest = MoimMemberModificationRequest.builder()
                 .memberName("회원")
                 .role(MemberRole.LEADER)
                 .build();
+
         moimMember.update(modificationRequest);
 
         assertThat(moimMember.canManage()).isTrue();
@@ -102,7 +119,11 @@ class MoimMemberTest {
                 .password("asdf1234!@")
                 .build();
 
-        MoimMember moimMember = MoimMember.generate(moim, member, MemberRole.USER);
+        MoimMember moimMember = MoimMember.builder()
+                .moim(moim)
+                .member(member)
+                .role(MemberRole.USER)
+                .build();
         MoimMemberModificationRequest modificationRequest = MoimMemberModificationRequest.builder()
                 .memberName("회원")
                 .role(MemberRole.MANAGER)

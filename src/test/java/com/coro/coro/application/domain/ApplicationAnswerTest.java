@@ -1,6 +1,5 @@
 package com.coro.coro.application.domain;
 
-import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.domain.MoimType;
@@ -27,17 +26,28 @@ class ApplicationAnswerTest {
                 .visible(true)
                 .type(MoimType.FACE_TO_FACE)
                 .build();
-        Application application = Application.generate(member, moim);
-        ApplicationQuestion applicationQuestion =
-                ApplicationQuestion.generate(moim, new ApplicationQuestionRegisterRequest("질문", 1));
+        Application application = Application.builder()
+                .member(member)
+                .moim(moim)
+                .status(ApplicationStatus.WAIT)
+                .build();
 
-        ApplicationAnswer applicationAnswer = ApplicationAnswer.generate(application, applicationQuestion, "답변입니다.");
+        ApplicationQuestion applicationQuestion = ApplicationQuestion.builder()
+                .order(1)
+                .content("질문")
+                .moim(moim)
+                .build();
+
+        ApplicationAnswer applicationAnswer = ApplicationAnswer.builder()
+                .application(application)
+                .question(applicationQuestion.getContent())
+                .content("답변입니다.")
+                .build();
 
         assertAll(
                 () -> assertThat(applicationAnswer.getApplication()).isEqualTo(application),
                 () -> assertThat(applicationAnswer.getContent()).isEqualTo("답변입니다."),
-                () -> assertThat(applicationAnswer.getQuestion()).isEqualTo("질문"),
-                () -> assertThat(applicationAnswer.isNew()).isTrue()
+                () -> assertThat(applicationAnswer.getQuestion()).isEqualTo("질문")
         );
     }
 }

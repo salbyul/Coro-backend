@@ -9,7 +9,8 @@ import com.coro.coro.application.dto.response.DetailedApplicationResponse;
 import com.coro.coro.application.service.ApplicationQuestionService;
 import com.coro.coro.application.service.ApplicationService;
 import com.coro.coro.common.response.APIResponse;
-import com.coro.coro.member.domain.User;
+import com.coro.coro.member.service.User;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Builder
 @RequestMapping("/api/applications")
 public class ApplicationController implements ApplicationControllerDocs {
 
@@ -69,8 +71,9 @@ public class ApplicationController implements ApplicationControllerDocs {
                                          @RequestBody final ApplicationRequest applicationRequest,
                                          @AuthenticationPrincipal final User user) {
         log.info("application: {}", applicationRequest);
-        applicationService.register(moimId, applicationRequest, user.getId());
-        return APIResponse.create();
+        Long applicationId = applicationService.register(moimId, applicationRequest, user.getId());
+        return APIResponse.create()
+                .addObject("applicationId", applicationId);
     }
 
     @PutMapping("/{applicationId}")

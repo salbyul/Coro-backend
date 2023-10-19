@@ -1,8 +1,6 @@
 package com.coro.coro.moim.domain;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -10,6 +8,8 @@ import javax.persistence.*;
 @Table(name = "moim_photo")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor
 public class MoimPhoto {
 
     @Id
@@ -25,10 +25,4 @@ public class MoimPhoto {
     private String originalName;
 
     private String name;
-
-    public MoimPhoto(final Moim moim, final String originalName, final String name) {
-        this.moim = moim;
-        this.originalName = originalName;
-        this.name = name;
-    }
 }
