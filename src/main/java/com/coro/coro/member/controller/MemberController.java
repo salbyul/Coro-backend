@@ -35,6 +35,11 @@ public class MemberController implements MemberControllerDocs {
     private final MoimService moimService;
     private final ApplicationService applicationService;
 
+    /**
+     * 회원가입
+     * @param requestMember 가입될 회원의 데이터가 담긴 객체
+     * @return 가입된 유저의 Id 값
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Override
@@ -45,6 +50,11 @@ public class MemberController implements MemberControllerDocs {
                 .addObject("savedId", savedId);
     }
 
+    /**
+     * 로그인
+     * @param requestMember 로그인할 회원의 데이터가 담긴 객체
+     * @return 토큰
+     */
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     @Override
@@ -54,8 +64,13 @@ public class MemberController implements MemberControllerDocs {
                 .addObject("token", token);
     }
 
-    /*
-    이미지, 회원정보 따로 수정 가능
+    /**
+     * 회원 정보 수정
+     * @param memberId 수정할 회원의 Id 값
+     * @param multipartFile 수정될 이미지 파일
+     * @param requestMember 수정될 회원의 데이터가 담긴 객체
+     * @return 반환값 없음
+     * @throws IOException 이미지 파일로 인한 예외
      */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -72,6 +87,12 @@ public class MemberController implements MemberControllerDocs {
         return APIResponse.create();
     }
 
+    /**
+     * 회원이 가입한 모든 모임 획득
+     * @param user 로그인한 유저
+     * @return 회원이 가입한 모든 모임 리스트
+     * @throws IOException 이미지 파일로 인한 예외
+     */
     @GetMapping("/moims")
     @ResponseStatus(HttpStatus.OK)
     @Override
@@ -83,6 +104,13 @@ public class MemberController implements MemberControllerDocs {
                 .addObject("list", summaryMoims);
     }
 
+    /**
+     * 회원이 특정 모임에 지원한 특정 상태의 지원서의 상태 획득
+     * @param moimId 해당 모임의 Id 값
+     * @param user 로그인한 유저
+     * @param status 획득할 지원서의 상태 값
+     * @return 지원서
+     */
     @GetMapping("/applications")
     @Override
     public APIResponse getApplication(@ModelAttribute(name = "moim") final Long moimId,
