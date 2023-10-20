@@ -18,11 +18,13 @@ public class MoimPhoto {
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "moim_id")
     private Moim moim;
 
     @Column(name = "original_name")
     private String originalName;
 
     private String name;
+
+    @Column(name = "content_type")
+    private String contentType;
 }

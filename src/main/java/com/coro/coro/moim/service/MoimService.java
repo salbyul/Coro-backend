@@ -8,7 +8,6 @@ import com.coro.coro.common.service.port.FileTransferor;
 import com.coro.coro.common.utils.FileSaveUtils;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.domain.MemberRole;
-import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.repository.port.MemberRepository;
 import com.coro.coro.common.service.port.DateTimeHolder;
 import com.coro.coro.common.service.port.UUIDHolder;
@@ -66,8 +65,12 @@ public class MoimService {
     private final DateTimeHolder dateTimeHolder;
     private final FileTransferor fileTransferor;
 
-    @Value("${moim.image.dir}")
     private static String path;
+
+    @Value("${moim.image.dir}")
+    public void setPath(final String path) {
+        MoimService.path = path;
+    }
 
     public Page<Moim> search(final MoimSearchRequest moimSearchRequest, final Pageable pageable) {
         Page<Moim> moimPage = null;
@@ -221,6 +224,7 @@ public class MoimService {
         validateImageFile(multipartFile);
 
         String name = FileSaveUtils.generateFileName(multipartFile, dateTimeHolder, uuidHolder);
+        log.info("content type: {}", multipartFile.getContentType());
         fileTransferor.saveFile(multipartFile, path, name);
         moimPhotoRepository.save(
                 MoimPhoto.builder()
@@ -228,6 +232,7 @@ public class MoimService {
                         .moim(moim)
                         .originalName(multipartFile.getOriginalFilename())
                         .name(name)
+                        .contentType(multipartFile.getContentType())
                         .build()
                 );
     }
@@ -256,7 +261,7 @@ public class MoimService {
             for (MoimPhoto photo : photos) {
                 if (moim.getId().equals(photo.getId())) {
                     byte[] photoBytes = fileTransferor.getFile(photo.getName(), path);
-                    result.add(new MoimSearchResponse(moim, photo.getOriginalName(), photoBytes));
+                    result.add(new MoimSearchResponse(moim, photo, photoBytes));
                     photos.remove(photo);
                     isAdded = true;
                     break;
@@ -282,7 +287,7 @@ public class MoimService {
         Optional<MoimPhoto> optionalMoimPhoto = moimPhotoRepository.findById(moimId);
         if (optionalMoimPhoto.isPresent()) {
             MoimPhoto moimPhoto = optionalMoimPhoto.get();
-            result.setPhoto(moimPhoto.getOriginalName(), fileTransferor.getFile(moimPhoto.getName(), path));
+            result.setPhoto(moimPhoto, fileTransferor.getFile(moimPhoto.getName(), path));
         }
         return result;
     }
@@ -302,7 +307,7 @@ public class MoimService {
         Optional<MoimPhoto> optionalMoimPhoto = moimPhotoRepository.findById(moimId);
         if (optionalMoimPhoto.isPresent()) {
             MoimPhoto moimPhoto = optionalMoimPhoto.get();
-            result.setPhoto(moimPhoto.getOriginalName(), fileTransferor.getFile(moimPhoto.getName(), path));
+            result.setPhoto(moimPhoto, fileTransferor.getFile(moimPhoto.getName(), path));
         }
         return result;
     }
