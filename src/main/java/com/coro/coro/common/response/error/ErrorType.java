@@ -70,7 +70,8 @@ public enum ErrorType {
     //    Schedule
     SCHEDULE_NOT_FOUND("500", "해당 Schedule이 없습니다."),
     SCHEDULE_NOT_VALID_TITLE("511", "Title 값이 올바르지 않습니다."),
-    SCHEDULE_NOT_VALID_CONTENT("521", "Content 값이 올바르지 않습니다.");
+    SCHEDULE_NOT_VALID_CONTENT("521", "Content 값이 올바르지 않습니다."),
+    SCHEDULE_NOT_VALID_THE_DAY("531", "TheDay 값이 올바르지 않습니다.");
 
     private final String code;
     private final String message;

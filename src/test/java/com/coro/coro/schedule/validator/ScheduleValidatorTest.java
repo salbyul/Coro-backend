@@ -23,7 +23,7 @@ class ScheduleValidatorTest {
                 .build();
 
         assertThatThrownBy(() ->
-                ScheduleValidator.validateSchedule(schedule)
+                ScheduleValidator.validateSchedule(schedule, LocalDate.now())
         )
                 .isInstanceOf(ScheduleException.class)
                 .hasMessage(SCHEDULE_NOT_VALID_TITLE.getMessage());
@@ -40,7 +40,7 @@ class ScheduleValidatorTest {
                 .build();
 
         assertThatThrownBy(() ->
-                ScheduleValidator.validateSchedule(schedule)
+                ScheduleValidator.validateSchedule(schedule, LocalDate.now())
         )
                 .isInstanceOf(ScheduleException.class)
                 .hasMessage(SCHEDULE_NOT_VALID_TITLE.getMessage());
@@ -57,7 +57,7 @@ class ScheduleValidatorTest {
                 .build();
 
         assertThatThrownBy(() ->
-                ScheduleValidator.validateSchedule(schedule)
+                ScheduleValidator.validateSchedule(schedule, LocalDate.now())
         )
                 .isInstanceOf(ScheduleException.class)
                 .hasMessage(SCHEDULE_NOT_VALID_TITLE.getMessage());
@@ -74,9 +74,28 @@ class ScheduleValidatorTest {
                 .build();
 
         assertThatThrownBy(() ->
-            ScheduleValidator.validateSchedule(schedule)
+            ScheduleValidator.validateSchedule(schedule, LocalDate.now())
         )
                 .isInstanceOf(ScheduleException.class)
                 .hasMessage(SCHEDULE_NOT_VALID_CONTENT.getMessage());
+    }
+
+    @Test
+    @DisplayName("일정 날짜가 오늘 이전일 경우")
+    void validateTheDay() {
+        Schedule schedule = Schedule.builder()
+                .moim(null)
+                .title("asdf")
+                .content("a")
+                .theDay(LocalDate.of(2000, 12, 12))
+                .build();
+
+        LocalDate before = LocalDate.of(2023, 12, 12);
+
+        assertThatThrownBy(() ->
+            ScheduleValidator.validateSchedule(schedule, before)
+        )
+                .isInstanceOf(ScheduleException.class)
+                .hasMessage(SCHEDULE_NOT_VALID_THE_DAY.getMessage());
     }
 }
