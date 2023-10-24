@@ -1,7 +1,6 @@
 package com.coro.coro.member.service;
 
 import com.coro.coro.auth.jwt.JwtProvider;
-import com.coro.coro.auth.jwt.JwtProviderImpl;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
 import com.coro.coro.member.dto.request.MemberModificationRequest;
@@ -54,7 +53,7 @@ public class MemberService {
         Member member = getMemberByEmail(requestMember);
         boolean isRightPassword = member.isRightPassword(requestMember.getPassword(), passwordEncoder);
         if (!isRightPassword) {
-            throw new MemberException(MEMBER_PASSWORD_NOT_VALID);
+            throw new MemberException(MEMBER_NOT_VALID_PASSWORD);
         }
 
         return tokenProvider.generateAccessToken(member.getNickname());
@@ -62,7 +61,7 @@ public class MemberService {
 
     private Member getMemberByEmail(final MemberLoginRequest requestMember) {
         return memberRepository.findByEmail(requestMember.getEmail())
-                .orElseThrow(() -> new MemberException(MEMBER_EMAIL_NOT_VALID));
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_VALID_EMAIL));
     }
 
     /* 회원 수정 */
@@ -71,7 +70,7 @@ public class MemberService {
         Member member = getMemberById(id);
         boolean isRightPassword = member.isRightPassword(requestMember.getOriginalPassword(), passwordEncoder);
         if (!isRightPassword) {
-            throw new MemberException(MEMBER_PASSWORD_NOT_VALID);
+            throw new MemberException(MEMBER_NOT_VALID_PASSWORD);
         }
 
         member.update(requestMember, passwordEncoder);

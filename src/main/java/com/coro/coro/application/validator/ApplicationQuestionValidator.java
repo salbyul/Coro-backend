@@ -24,7 +24,7 @@ public class ApplicationQuestionValidator {
         boolean isGreaterThanMaxLength = applicationQuestionList.stream().anyMatch(question -> question.getContent().length() > MAX_NAME_LENGTH);
         boolean isEmpty = applicationQuestionList.stream().anyMatch(question -> isEmpty(question.getContent()));
         if (isGreaterThanMaxLength || isEmpty) {
-            throw new ApplicationException(APPLICATION_QUESTION_CONTENT_VALID);
+            throw new ApplicationException(APPLICATION_QUESTION_NOT_VALID_CONTENT);
         }
     }
 
@@ -49,7 +49,7 @@ public class ApplicationQuestionValidator {
             }
         }
         if (expectedMaxOrder != 0) {
-            throw new ApplicationException(APPLICATION_QUESTION_ORDERS_VALID);
+            throw new ApplicationException(APPLICATION_QUESTION_NOT_VALID_ORDERS);
         }
     }
 }

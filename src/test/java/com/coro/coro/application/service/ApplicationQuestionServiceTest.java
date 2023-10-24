@@ -64,7 +64,7 @@ class ApplicationQuestionServiceTest {
                 container.applicationQuestionService.register(moim.getId(), requestQuestions)
         )
                 .isInstanceOf(ApplicationException.class)
-                .hasMessage(APPLICATION_QUESTION_CONTENT_VALID.getMessage());
+                .hasMessage(APPLICATION_QUESTION_NOT_VALID_CONTENT.getMessage());
     }
 
     @Test
@@ -87,7 +87,7 @@ class ApplicationQuestionServiceTest {
                 container.applicationQuestionService.register(moim.getId(), requestQuestions)
         )
                 .isInstanceOf(ApplicationException.class)
-                .hasMessage(APPLICATION_QUESTION_ORDERS_VALID.getMessage());
+                .hasMessage(APPLICATION_QUESTION_NOT_VALID_ORDERS.getMessage());
     }
 
     @Test
@@ -110,13 +110,13 @@ class ApplicationQuestionServiceTest {
                 container.applicationQuestionService.register(moim.getId(), requestQuestions)
         )
                 .isInstanceOf(ApplicationException.class)
-                .hasMessage(APPLICATION_QUESTION_ORDERS_VALID.getMessage());
+                .hasMessage(APPLICATION_QUESTION_NOT_VALID_ORDERS.getMessage());
 
         assertThatThrownBy(() ->
                 container.applicationQuestionService.register(moim.getId(), List.of(new ApplicationQuestionRegisterRequest("질문", 0)))
         )
                 .isInstanceOf(ApplicationException.class)
-                .hasMessage(APPLICATION_QUESTION_ORDERS_VALID.getMessage());
+                .hasMessage(APPLICATION_QUESTION_NOT_VALID_ORDERS.getMessage());
     }
 
     @Test

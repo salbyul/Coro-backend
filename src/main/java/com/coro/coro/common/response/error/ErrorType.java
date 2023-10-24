@@ -16,15 +16,15 @@ public enum ErrorType {
     MEMBER_NOT_FOUND("100", "해당 Member가 없습니다."),
 
     MEMBER_EMAIL_NULL("110", "Email 값이 비어있습니다."),
-    MEMBER_EMAIL_DUPLICATE("111", "Email 값이 중복됩니다."),
-    MEMBER_EMAIL_NOT_VALID("112", "Email 값의 형태가 올바르지 않습니다."),
+    MEMBER_DUPLICATE_EMAIL("111", "Email 값이 중복됩니다."),
+    MEMBER_NOT_VALID_EMAIL("112", "Email 값의 형태가 올바르지 않습니다."),
 
     MEMBER_PASSWORD_NULL("120", "Password 값이 비어있습니다."),
-    MEMBER_PASSWORD_NOT_VALID("122", "Password 값의 형태가 올바르지 않습니다."),
+    MEMBER_NOT_VALID_PASSWORD("122", "Password 값의 형태가 올바르지 않습니다."),
 
     MEMBER_NICKNAME_NULL("130", "Nickname 값이 비어있습니다."),
-    MEMBER_NICKNAME_DUPLICATE("131", "Nickname 값이 중복됩니다."),
-    MEMBER_NICKNAME_NOT_VALID("132", "Nickname 값의 형태가 올바르지 않습니다."),
+    MEMBER_DUPLICATE_NICKNAME("131", "Nickname 값이 중복됩니다."),
+    MEMBER_NOT_VALID_NICKNAME("132", "Nickname 값의 형태가 올바르지 않습니다."),
 
     MEMBER_PHOTO_NOT_FOUND("140", "해당 MemberPhoto가 없습니다."),
     MEMBER_PHOTO_NOT_VALID("142", "MemberPhoto가 유효하지 않습니다."),
@@ -34,10 +34,10 @@ public enum ErrorType {
     MOIM_FORBIDDEN("201", "권한이 없습니다."),
 
     MOIM_NAME_NULL("210", "Name 값이 비어있습니다."),
-    MOIM_NAME_DUPLICATE("211", "Name 값이 중복됩니다."),
-    MOIM_NAME_NOT_VALID("212", "Name 값의 형태가 올바르지 않습니다."),
+    MOIM_DUPLICATE_NAME("211", "Name 값이 중복됩니다."),
+    MOIM_NOT_VALID_NAME("212", "Name 값의 형태가 올바르지 않습니다."),
 
-    MOIM_INTRODUCTION_NOT_VALID("222", "Introduction 값의 형태가 올바르지 않습니다."),
+    MOIM_NOT_VALID_INTRODUCTION("222", "Introduction 값의 형태가 올바르지 않습니다."),
 
     MOIM_VISIBLE_NULL("230", "Visible 값이 비어있습니다."),
 
@@ -50,23 +50,28 @@ public enum ErrorType {
     MOIM_PHOTO_NOT_FOUND("260", "해당 MoimPhoto가 없습니다."),
     MOIM_PHOTO_NOT_VALID("262", "MoimPhoto가 유효하지 않습니다."),
 
-//    Application
+    //    Application
     APPLICATION_NOT_FOUND("300", "해당 Application이 없습니다."),
     APPLICATION_FORBIDDEN("303", "권한이 없습니다."),
     APPLICATION_ALREADY_EXIST("306", "이미 지원한 모임입니다."),
     APPLICATION_EXIST_MEMBER("307", "이미 가입한 모임입니다."),
     APPLICATION_ANSWER_NOT_COMPLETE("308", "답변이 불완전합니다."),
     APPLICATION_QUESTION_GREATER_THAN_MAX("309", "Application Question은 총 10개까지만 생성이 가능합니다."),
-    APPLICATION_QUESTION_CONTENT_VALID("312", "Content 값의 형태가 올바르지 않습니다."),
-    APPLICATION_QUESTION_ORDERS_VALID("321", "Orders 값이 올바르지 않습니다."),
+    APPLICATION_QUESTION_NOT_VALID_CONTENT("312", "Content 값의 형태가 올바르지 않습니다."),
+    APPLICATION_QUESTION_NOT_VALID_ORDERS("321", "Orders 값이 올바르지 않습니다."),
     APPLICATION_STATUS_NOT_VALID("332", "Status 값이 올바르지 않습니다."),
     APPLICATION_STATUS_ALREADY("339", "이미 처리된 Application 입니다."),
 
     //    MoimMember
     MOIM_MEMBER_NOT_FOUND("400", "해당 MoimMember가 없습니다."),
     MOIM_MEMBER_NOT_VALID("401", "MoimMember가 유효하지 않습니다."),
-    MOIM_MEMBER_FORBIDDN("403", "권한이 없습니다.");
+    MOIM_MEMBER_FORBIDDN("403", "권한이 없습니다."),
 
+    //    Schedule
+    SCHEDULE_NOT_FOUND("500", "해당 Schedule이 없습니다."),
+    SCHEDULE_NOT_VALID_TITLE("511", "Title 값이 올바르지 않습니다."),
+    SCHEDULE_NOT_VALID_CONTENT("521", "Content 값이 올바르지 않습니다."),
+    SCHEDULE_NOT_VALID_THE_DAY("531", "TheDay 값이 올바르지 않습니다.");
 
     private final String code;
     private final String message;

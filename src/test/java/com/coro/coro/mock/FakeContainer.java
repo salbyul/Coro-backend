@@ -21,6 +21,9 @@ import com.coro.coro.moim.repository.port.MoimPhotoRepository;
 import com.coro.coro.moim.repository.port.MoimRepository;
 import com.coro.coro.moim.repository.port.MoimTagRepository;
 import com.coro.coro.moim.service.MoimService;
+import com.coro.coro.schedule.controller.ScheduleController;
+import com.coro.coro.schedule.repository.ScheduleRepository;
+import com.coro.coro.schedule.service.ScheduleService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -49,6 +52,10 @@ public class FakeContainer {
     public final MoimController moimController;
     public final ApplicationController applicationController;
 
+    public final ScheduleController scheduleController;
+    public final ScheduleService scheduleService;
+    public final ScheduleRepository scheduleRepository;
+
     public final PasswordEncoder passwordEncoder;
     public final UUIDHolder uuidHolder;
     public final DateTimeHolder dateTimeHolder;
@@ -65,6 +72,7 @@ public class FakeContainer {
         this.applicationRepository = new FakeApplicationRepository(dataSet);
         this.applicationAnswerRepository = new FakeApplicationAnswerRepository(dataSet);
         this.applicationQuestionRepository = new FakeApplicationQuestionRepository(dataSet);
+        this.scheduleRepository = new FakeScheduleRepository(dataSet);
 
         this.passwordEncoder = new BCryptPasswordEncoder();
         this.uuidHolder = new FakeUUIDGenerator();
@@ -119,6 +127,15 @@ public class FakeContainer {
         this.applicationController = ApplicationController.builder()
                 .applicationQuestionService(this.applicationQuestionService)
                 .applicationService(this.applicationService)
+                .build();
+
+        this.scheduleService = ScheduleService.builder()
+                .scheduleRepository(this.scheduleRepository)
+                .moimMemberRepository(this.moimMemberRepository)
+                .moimRepository(this.moimRepository)
+                .build();
+        this.scheduleController = ScheduleController.builder()
+                .scheduleService(this.scheduleService)
                 .build();
     }
 }

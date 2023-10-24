@@ -2,6 +2,7 @@ package com.coro.coro.moim.dto.response;
 
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.domain.MoimMember;
+import com.coro.coro.moim.domain.MoimPhoto;
 import com.coro.coro.moim.domain.MoimTag;
 import lombok.*;
 
@@ -20,6 +21,7 @@ public class MoimDetailResponse {
     private boolean canManage;
     private String photoName;
     private byte[] photo;
+    private String contentType;
 
     private MoimDetailResponse(final Moim moim, final boolean isJoined, final boolean canManage) {
         this.name = moim.getName();
@@ -39,8 +41,9 @@ public class MoimDetailResponse {
         return new MoimDetailResponse(moim, true, moimMember.canManage());
     }
 
-    public void setPhoto(final String photoName, final byte[] photo) {
-        this.photoName = photoName;
+    public void setPhoto(final MoimPhoto moimPhoto, final byte[] photo) {
+        this.photoName = moimPhoto.getOriginalName();
         this.photo = photo;
+        this.contentType = moimPhoto.getContentType();
     }
 }

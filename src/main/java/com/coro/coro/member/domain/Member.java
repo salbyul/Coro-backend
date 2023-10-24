@@ -51,17 +51,17 @@ public class Member extends BaseEntity {
     public void verifyDuplication(final List<Member> memberList) {
         for (Member member : memberList) {
             if (member.getEmail().equals(this.email)) {
-                throw new MemberException(MEMBER_EMAIL_DUPLICATE);
+                throw new MemberException(MEMBER_DUPLICATE_EMAIL);
             }
             if (member.getNickname().equals(this.nickname)) {
-                throw new MemberException(MEMBER_NICKNAME_DUPLICATE);
+                throw new MemberException(MEMBER_DUPLICATE_NICKNAME);
             }
         }
     }
 
     public void update(final MemberModificationRequest requestMember, final PasswordEncoder passwordEncoder) {
         if (!isRightPassword(requestMember.getOriginalPassword(), passwordEncoder)) {
-            throw new MemberException(MEMBER_PASSWORD_NOT_VALID);
+            throw new MemberException(MEMBER_NOT_VALID_PASSWORD);
         }
         this.introduction = requestMember.getIntroduction();
         this.password = requestMember.getNewPassword();

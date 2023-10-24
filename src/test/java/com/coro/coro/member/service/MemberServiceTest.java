@@ -77,7 +77,7 @@ class MemberServiceTest {
                 container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, "닉네임2"))
         )
                 .isInstanceOf(MemberException.class)
-                .hasMessage(MEMBER_EMAIL_DUPLICATE.getMessage());
+                .hasMessage(MEMBER_DUPLICATE_EMAIL.getMessage());
     }
 
     @ParameterizedTest
@@ -91,7 +91,7 @@ class MemberServiceTest {
                 container.memberService.register(new MemberRegisterRequest(value, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME))
         )
                 .isInstanceOf(MemberException.class)
-                .hasMessage(MEMBER_EMAIL_NOT_VALID.getMessage());
+                .hasMessage(MEMBER_NOT_VALID_EMAIL.getMessage());
     }
 
     @Test
@@ -131,7 +131,7 @@ class MemberServiceTest {
                 container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, value, EXAMPLE_NICKNAME))
         )
                 .isInstanceOf(MemberException.class)
-                .hasMessage(MEMBER_PASSWORD_NOT_VALID.getMessage());
+                .hasMessage(MEMBER_NOT_VALID_PASSWORD.getMessage());
     }
 
     @Test
@@ -173,7 +173,7 @@ class MemberServiceTest {
                 container.memberService.register(new MemberRegisterRequest("a@a.com", EXAMPLE_PASSWORD, EXAMPLE_NICKNAME))
         )
                 .isInstanceOf(MemberException.class)
-                .hasMessage(MEMBER_NICKNAME_DUPLICATE.getMessage());
+                .hasMessage(MEMBER_DUPLICATE_NICKNAME.getMessage());
     }
 
     @ParameterizedTest
@@ -187,7 +187,7 @@ class MemberServiceTest {
                 container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, value))
         )
                 .isInstanceOf(MemberException.class)
-                .hasMessage(MEMBER_NICKNAME_NOT_VALID.getMessage());
+                .hasMessage(MEMBER_NOT_VALID_NICKNAME.getMessage());
     }
 
     @Test
@@ -216,7 +216,7 @@ class MemberServiceTest {
                 container.memberService.login(new MemberLoginRequest("12@2.com", EXAMPLE_PASSWORD))
         )
                 .isInstanceOf(MemberException.class)
-                .hasMessage(MEMBER_EMAIL_NOT_VALID.getMessage());
+                .hasMessage(MEMBER_NOT_VALID_EMAIL.getMessage());
     }
 
     @Test
@@ -232,7 +232,7 @@ class MemberServiceTest {
                 container.memberService.login(new MemberLoginRequest(EXAMPLE_EMAIL, "asdf1234!#"))
         )
                 .isInstanceOf(MemberException.class)
-                .hasMessage(MEMBER_PASSWORD_NOT_VALID.getMessage());
+                .hasMessage(MEMBER_NOT_VALID_PASSWORD.getMessage());
     }
 
     @Test
@@ -273,6 +273,6 @@ class MemberServiceTest {
                 container.memberService.update(member.getId(), requestMember)
         )
                 .isInstanceOf(MemberException.class)
-                .hasMessage(MEMBER_PASSWORD_NOT_VALID.getMessage());
+                .hasMessage(MEMBER_NOT_VALID_PASSWORD.getMessage());
     }
 }
