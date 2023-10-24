@@ -70,7 +70,7 @@ class MemberTest {
                 member.verifyDuplication(List.of(duplicatedEmailMember))
         )
                 .isInstanceOf(MemberException.class)
-                .hasMessage(MEMBER_EMAIL_DUPLICATE.getMessage());
+                .hasMessage(MEMBER_DUPLICATE_EMAIL.getMessage());
     }
 
     @Test
@@ -91,7 +91,7 @@ class MemberTest {
                 member.verifyDuplication(List.of(duplicatedEmailMember))
         )
                 .isInstanceOf(MemberException.class)
-                .hasMessage(MEMBER_NICKNAME_DUPLICATE.getMessage());
+                .hasMessage(MEMBER_DUPLICATE_NICKNAME.getMessage());
     }
 
     @Test
@@ -122,7 +122,7 @@ class MemberTest {
             )
         )
                 .isInstanceOf(MemberException.class)
-                .hasMessage(MEMBER_PASSWORD_NOT_VALID.getMessage());
+                .hasMessage(MEMBER_NOT_VALID_PASSWORD.getMessage());
     }
 
     public Member generateMember() {

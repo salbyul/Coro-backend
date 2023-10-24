@@ -21,7 +21,7 @@ public class MoimValidator {
             throw new MoimException(MOIM_NAME_NULL);
         }
         if (name.length() > 30) {
-            throw new MoimException(MOIM_NAME_NOT_VALID);
+            throw new MoimException(MOIM_NOT_VALID_NAME);
         }
     }
 
@@ -34,7 +34,7 @@ public class MoimValidator {
             return;
         }
         if (introduction.length() > 500) {
-            throw new MoimException(MOIM_INTRODUCTION_NOT_VALID);
+            throw new MoimException(MOIM_NOT_VALID_INTRODUCTION);
         }
     }
 

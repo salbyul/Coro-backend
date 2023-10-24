@@ -139,7 +139,7 @@ public class MoimService {
     private void validateDuplicateMoimName(final String name) {
         Optional<Moim> optionalMoim = moimRepository.findByName(name);
         if (optionalMoim.isPresent()) {
-            throw new MoimException(MOIM_NAME_DUPLICATE);
+            throw new MoimException(MOIM_DUPLICATE_NAME);
         }
     }
 

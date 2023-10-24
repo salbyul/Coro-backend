@@ -75,7 +75,7 @@ class MoimServiceTest {
                 container.moimService.register(duplicatedMoim, new MoimTagRequest(), null, null, savedMemberId)
         )
                 .isInstanceOf(MoimException.class)
-                .hasMessage(MOIM_NAME_DUPLICATE.getMessage());
+                .hasMessage(MOIM_DUPLICATE_NAME.getMessage());
     }
 
     @Test
@@ -227,7 +227,7 @@ class MoimServiceTest {
                 savedMemberId)
         )
                 .isInstanceOf(MoimException.class)
-                .hasMessage(MOIM_NAME_DUPLICATE.getMessage());
+                .hasMessage(MOIM_DUPLICATE_NAME.getMessage());
     }
 
     @Test

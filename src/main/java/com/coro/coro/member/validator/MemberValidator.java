@@ -19,7 +19,7 @@ public class MemberValidator {
             throw new MemberException(MEMBER_EMAIL_NULL);
         }
         if (!isEmail(email)) {
-            throw new MemberException(MEMBER_EMAIL_NOT_VALID);
+            throw new MemberException(MEMBER_NOT_VALID_EMAIL);
         }
     }
 
@@ -36,7 +36,7 @@ public class MemberValidator {
             throw new MemberException(MEMBER_PASSWORD_NULL);
         }
         if (!passwordMatches(password)) {
-            throw new MemberException(MEMBER_PASSWORD_NOT_VALID);
+            throw new MemberException(MEMBER_NOT_VALID_PASSWORD);
         }
     }
 
@@ -49,7 +49,7 @@ public class MemberValidator {
             throw new MemberException(MEMBER_NICKNAME_NULL);
         }
         if (!nicknameMatches(nickname)) {
-            throw new MemberException(MEMBER_NICKNAME_NOT_VALID);
+            throw new MemberException(MEMBER_NOT_VALID_NICKNAME);
         }
     }
 
