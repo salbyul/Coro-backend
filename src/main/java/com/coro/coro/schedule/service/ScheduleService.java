@@ -6,6 +6,8 @@ import com.coro.coro.moim.repository.port.MoimMemberRepository;
 import com.coro.coro.moim.repository.port.MoimRepository;
 import com.coro.coro.schedule.domain.Schedule;
 import com.coro.coro.schedule.dto.request.ScheduleRegisterRequest;
+import com.coro.coro.schedule.dto.response.ScheduleDTO;
+import com.coro.coro.schedule.dto.response.ScheduleResponse;
 import com.coro.coro.schedule.exception.ScheduleException;
 import com.coro.coro.schedule.repository.ScheduleRepository;
 import com.coro.coro.schedule.validator.ScheduleValidator;
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
 
@@ -64,5 +68,23 @@ public class ScheduleService {
                 .content(registerRequest.getContent())
                 .theDay(registerRequest.getDate())
                 .build();
+    }
+
+    public List<ScheduleDTO> getMonthlySchedule(final Long memberId, final Long moimId, final LocalDate date) {
+        getMoimById(moimId);
+        getMoimMemberByMoimIdAndMemberId(moimId, memberId);
+
+        LocalDate start = LocalDate.of(date.getYear(), date.getMonth(), 1);
+        LocalDate end = getNextMonth(date);
+        List<Schedule> scheduleList = scheduleRepository.findAllByMoimIdAndTheDayBetween(moimId, start, end);
+        return scheduleList.stream().map(ScheduleDTO::new).collect(Collectors.toList());
+    }
+
+    private LocalDate getNextMonth(final LocalDate date) {
+        int month = date.getMonthValue();
+        if (month == 12) {
+            return LocalDate.of(date.getYear() + 1, 1, 1).minusDays(1);
+        }
+        return LocalDate.of(date.getYear(), date.getMonthValue() + 1, 1).minusDays(1);
     }
 }

@@ -1,14 +1,20 @@
 package com.coro.coro.schedule.controller;
 
+import com.coro.coro.common.annotation.Date;
 import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.service.User;
 import com.coro.coro.schedule.dto.request.ScheduleRegisterRequest;
+import com.coro.coro.schedule.dto.response.ScheduleDTO;
+import com.coro.coro.schedule.dto.response.ScheduleResponse;
 import com.coro.coro.schedule.service.ScheduleService;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,5 +33,16 @@ public class ScheduleController implements ScheduleControllerDocs {
         Long scheduleId = scheduleService.register(registerRequest, moimId, user.getId());
         return APIResponse.create()
                 .addObject("scheduleId", scheduleId);
+    }
+
+    @GetMapping("/month")
+    @Override
+    public APIResponse getMonthlySchedule(@ModelAttribute(name = "moim") final Long moimId,
+                                          @Date final LocalDate date,
+                                          @AuthenticationPrincipal final User user) {
+        List<ScheduleDTO> scheduleDTOList = scheduleService.getMonthlySchedule(user.getId(), moimId, date);
+        ScheduleResponse scheduleResponse = new ScheduleResponse(scheduleDTOList);
+        return APIResponse.create()
+                .addObject("schedule", scheduleResponse);
     }
 }

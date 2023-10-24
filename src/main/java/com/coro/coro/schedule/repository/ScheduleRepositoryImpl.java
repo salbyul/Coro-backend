@@ -4,6 +4,8 @@ import com.coro.coro.schedule.domain.Schedule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,5 +22,10 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     @Override
     public Optional<Schedule> findById(final Long id) {
         return scheduleJpaRepository.findById(id);
+    }
+
+    @Override
+    public List<Schedule> findAllByMoimIdAndTheDayBetween(final Long moimId, final LocalDate start, final LocalDate end) {
+        return scheduleJpaRepository.findAllByMoimIdAndTheDayBetween(moimId, start, end);
     }
 }

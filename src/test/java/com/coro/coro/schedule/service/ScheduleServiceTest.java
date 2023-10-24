@@ -9,12 +9,14 @@ import com.coro.coro.moim.domain.MoimMember;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
 import com.coro.coro.schedule.domain.Schedule;
 import com.coro.coro.schedule.dto.request.ScheduleRegisterRequest;
+import com.coro.coro.schedule.dto.response.ScheduleDTO;
 import com.coro.coro.schedule.exception.ScheduleException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
 import static org.assertj.core.api.Assertions.*;
@@ -147,5 +149,45 @@ class ScheduleServiceTest {
         )
                 .isInstanceOf(ScheduleException.class)
                 .hasMessage(MOIM_FORBIDDEN.getMessage());
+    }
+
+    @Test
+    @DisplayName("월별 일정 획득")
+    void getMonthlySchedule() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+//        회원가입
+        Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
+        Long moimId = container.moimService.register(
+                new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
+                null,
+                null,
+                null,
+                memberId
+        );
+
+//        일정 생성
+        container.scheduleService.register(
+                new ScheduleRegisterRequest("일정 제목", "일정 내용", LocalDate.of(2023, 12, 1)),
+                moimId,
+                memberId
+        );
+        container.scheduleService.register(
+                new ScheduleRegisterRequest("일정 제목2", "일정 내용2", LocalDate.of(2023, 12, 31)),
+                moimId,
+                memberId
+        );
+
+//        일정 획득
+        List<ScheduleDTO> scheduleDTOList = container.scheduleService.getMonthlySchedule(memberId, moimId, LocalDate.of(2023, 12, 12));
+
+//        검증
+        assertAll(
+                () -> assertThat(scheduleDTOList).extracting(ScheduleDTO::getTitle).containsExactlyInAnyOrder("일정 제목", "일정 제목2"),
+                () -> assertThat(scheduleDTOList).extracting(ScheduleDTO::getContent).containsExactlyInAnyOrder("일정 내용", "일정 내용2"),
+                () -> assertThat((scheduleDTOList)).extracting(ScheduleDTO::getTheDay).containsExactlyInAnyOrder(LocalDate.of(2023, 12, 1), LocalDate.of(2023, 12, 31))
+        );
     }
 }
