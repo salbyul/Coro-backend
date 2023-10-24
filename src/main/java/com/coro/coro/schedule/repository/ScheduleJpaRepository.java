@@ -2,6 +2,7 @@ package com.coro.coro.schedule.repository;
 
 import com.coro.coro.schedule.domain.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -15,4 +16,8 @@ public interface ScheduleJpaRepository extends JpaRepository<Schedule, Long> {
 
     @Query("SELECT s FROM Schedule s WHERE s.moim.id = :moimId AND s.theDay = :date")
     List<Schedule> findByMoimIdAndDate(@Param("moimId") final Long moimId, @Param("date") final LocalDate date);
+
+    @Modifying
+    @Query("DELETE FROM Schedule s WHERE s.id = :scheduleId")
+    void deleteById(@Param("scheduleId") final Long scheduleId);
 }

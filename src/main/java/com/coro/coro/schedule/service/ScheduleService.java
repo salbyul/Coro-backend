@@ -94,4 +94,19 @@ public class ScheduleService {
         List<Schedule> scheduleList = scheduleRepository.findByMoimIdAndDate(moimId, date);
         return scheduleList.stream().map(ScheduleDTO::new).collect(Collectors.toList());
     }
+
+    @Transactional
+    public void deleteSchedule(final Long scheduleId, final Long memberId) {
+        Schedule schedule = getSchedule(scheduleId);
+        MoimMember moimMember = getMoimMemberByMoimIdAndMemberId(schedule.getMoim().getId(), memberId);
+        if (!moimMember.canManage()) {
+            throw new ScheduleException(MOIM_FORBIDDEN);
+        }
+        scheduleRepository.deleteById(scheduleId);
+    }
+
+    private Schedule getSchedule(final Long scheduleId) {
+        return scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ScheduleException(SCHEDULE_NOT_FOUND));
+    }
 }

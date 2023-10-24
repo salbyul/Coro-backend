@@ -33,4 +33,9 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     public List<Schedule> findByMoimIdAndDate(final Long moimId, final LocalDate date) {
         return scheduleJpaRepository.findByMoimIdAndDate(moimId, date);
     }
+
+    @Override
+    public void deleteById(final Long scheduleId) {
+        scheduleJpaRepository.deleteById(scheduleId);
+    }
 }

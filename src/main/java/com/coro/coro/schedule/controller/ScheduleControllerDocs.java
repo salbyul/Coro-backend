@@ -53,4 +53,12 @@ public interface ScheduleControllerDocs {
             @Parameter(name = "date", description = "획득할 일정들의 날짜")
     })
     APIResponse getSchedules(@ModelAttribute(name = "moim") final Long moimId, @Date final LocalDate date, @AuthenticationPrincipal final User user);
+
+    @Operation(summary = "일정 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "일정 삭제 성공"),
+            @ApiResponse(responseCode = "403", description = "유저 권한 없음")
+    })
+    @Parameter(name = "scheduleId", description = "삭제할 일정의 Id 값")
+    APIResponse deleteSchedule(@ModelAttribute(name = "scheduleId") final Long scheduleId, @AuthenticationPrincipal User user);
 }

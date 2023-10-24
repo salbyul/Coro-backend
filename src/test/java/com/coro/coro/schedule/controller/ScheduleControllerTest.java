@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
 import static org.assertj.core.api.Assertions.*;
@@ -142,5 +143,43 @@ class ScheduleControllerTest {
                 () -> assertThat(scheduleDTOList).extracting(ScheduleDTO::getContent).containsExactlyInAnyOrder("일정 내용1"),
                 () -> assertThat(scheduleDTOList).extracting(ScheduleDTO::getTheDay).containsExactlyInAnyOrder(LocalDate.of(9999, 10, 10))
         );
+    }
+
+    @Test
+    @DisplayName("일정 삭제")
+    void deleteSchedule() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+//        회원가입
+        Long leaderId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
+        Long moimId = container.moimService.register(
+                new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
+                null,
+                null,
+                null,
+                leaderId
+        );
+
+//        일정 생성
+        Long scheduleId = container.scheduleService.register(
+                new ScheduleRegisterRequest("일정1", "일정 내용1", LocalDate.of(9999, 10, 10)),
+                moimId,
+                leaderId
+        );
+
+//        일정 삭제
+        Member member = container.memberRepository.findById(leaderId)
+                .orElseThrow(() -> new ScheduleException(MEMBER_NOT_FOUND));
+
+        User user = User.mappingUserDetails(member);
+
+        container.scheduleController.deleteSchedule(scheduleId, user);
+
+//        검증
+        Optional<Schedule> optionalSchedule = container.scheduleRepository.findById(scheduleId);
+
+        assertThat(optionalSchedule.isEmpty()).isTrue();
     }
 }

@@ -56,4 +56,9 @@ public class FakeScheduleRepository implements ScheduleRepository {
                         schedule.getTheDay().isEqual(date))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteById(final Long scheduleId) {
+        dataSet.scheduleData.remove(scheduleId);
+    }
 }

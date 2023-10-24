@@ -57,4 +57,11 @@ public class ScheduleController implements ScheduleControllerDocs {
         return APIResponse.create()
                 .addObject("schedule", scheduleResponse);
     }
+
+    @DeleteMapping
+    @Override
+    public APIResponse deleteSchedule(@ModelAttribute(name = "schedule") final Long scheduleId, @AuthenticationPrincipal final User user) {
+        scheduleService.deleteSchedule(scheduleId, user.getId());
+        return APIResponse.create();
+    }
 }

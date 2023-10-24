@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
 import static org.assertj.core.api.Assertions.*;
@@ -224,5 +225,116 @@ class ScheduleServiceTest {
                 () -> assertThat(scheduleDTOList).extracting(ScheduleDTO::getContent).containsExactlyInAnyOrder("일정 내용"),
                 () -> assertThat((scheduleDTOList)).extracting(ScheduleDTO::getTheDay).containsExactlyInAnyOrder(LocalDate.of(9999, 12, 1))
         );
+    }
+
+    @Test
+    @DisplayName("일정 삭제")
+    void deleteSchedule() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+//        회원가입
+        Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
+        Long moimId = container.moimService.register(
+                new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
+                null,
+                null,
+                null,
+                memberId
+        );
+
+//        일정 생성
+        Long scheduleId = container.scheduleService.register(
+                new ScheduleRegisterRequest("일정 제목", "일정 내용", LocalDate.of(9999, 12, 1)),
+                moimId,
+                memberId
+        );
+
+//        일정 삭제
+        container.scheduleService.deleteSchedule(scheduleId, memberId);
+
+        Optional<Schedule> optionalSchedule = container.scheduleRepository.findById(scheduleId);
+        assertThat(optionalSchedule.isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("일정 삭제 실패 - 권한이 없는 유저의 경우")
+    void deleteScheduleFailByForbidden() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+//        회원가입
+        Long leaderId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long memberId = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+
+//        모임 생성
+        Long moimId = container.moimService.register(
+                new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
+                null,
+                null,
+                null,
+                leaderId
+        );
+
+//        모임 가입
+        Moim moim = container.moimRepository.findById(moimId)
+                .orElseThrow(() -> new ScheduleException(MOIM_NOT_FOUND));
+
+        Member member = container.memberRepository.findById(memberId)
+                .orElseThrow(() -> new ScheduleException(MEMBER_NOT_FOUND));
+
+        MoimMember moimMember = MoimMember.builder()
+                .moim(moim)
+                .member(member)
+                .role(MemberRole.USER)
+                .build();
+        container.moimMemberRepository.save(moimMember);
+
+//        일정 생성
+        Long scheduleId = container.scheduleService.register(
+                new ScheduleRegisterRequest("일정 제목", "일정 내용", LocalDate.of(9999, 12, 1)),
+                moimId,
+                leaderId
+        );
+
+//        검증
+        assertThatThrownBy(() ->
+                container.scheduleService.deleteSchedule(scheduleId, memberId)
+        )
+                .isInstanceOf(ScheduleException.class)
+                .hasMessage(MOIM_FORBIDDEN.getMessage());
+    }
+
+    @Test
+    @DisplayName("일정 삭제 실패 - 가입되지 않은 유저의 경우")
+    void deleteScheduleFailByNotValidMember() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+//        회원가입
+        Long leaderId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+        Long memberId = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
+
+//        모임 생성
+        Long moimId = container.moimService.register(
+                new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
+                null,
+                null,
+                null,
+                leaderId
+        );
+
+//        일정 생성
+        Long scheduleId = container.scheduleService.register(
+                new ScheduleRegisterRequest("일정 제목", "일정 내용", LocalDate.of(9999, 12, 1)),
+                moimId,
+                leaderId
+        );
+
+//        검증
+        assertThatThrownBy(() ->
+                container.scheduleService.deleteSchedule(scheduleId, memberId)
+        )
+                .isInstanceOf(ScheduleException.class)
+                .hasMessage(MOIM_MEMBER_NOT_FOUND.getMessage());
     }
 }
