@@ -14,4 +14,6 @@ public interface ScheduleRepository {
     Optional<Schedule> findById(final Long id);
 
     List<Schedule> findAllByMoimIdAndTheDayBetween(@Param("moimId") final Long moimId, @Param("start") final LocalDate start, @Param("end") final LocalDate end);
+
+    List<Schedule> findByMoimIdAndDate(@Param("moimId") final Long moimId, @Param("date") final LocalDate date);
 }

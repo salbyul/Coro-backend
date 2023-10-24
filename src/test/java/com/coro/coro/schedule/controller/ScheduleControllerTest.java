@@ -104,4 +104,43 @@ class ScheduleControllerTest {
                 () -> assertThat(scheduleDTOList).extracting(ScheduleDTO::getTheDay).containsExactlyInAnyOrder(scheduleDate1, scheduleDate2)
         );
     }
+
+    @Test
+    @DisplayName("특정 날짜의 일정 획득")
+    void getSchedules() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+//        회원가입
+        Long leaderId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
+        Long moimId = container.moimService.register(
+                new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
+                null,
+                null,
+                null,
+                leaderId
+        );
+
+//        일정 생성
+        container.scheduleService.register(new ScheduleRegisterRequest("일정1", "일정 내용1", LocalDate.of(9999, 10, 10)), moimId, leaderId);
+
+//        일정 획득
+        Member member = container.memberRepository.findById(leaderId)
+                .orElseThrow(() -> new ScheduleException(MEMBER_NOT_FOUND));
+
+        User user = User.mappingUserDetails(member);
+
+        APIResponse response = container.scheduleController.getSchedules(moimId, LocalDate.of(9999, 10, 10), user);
+        ScheduleResponse scheduleResponse = (ScheduleResponse) response.getBody().get("schedule");
+        List<ScheduleDTO> scheduleDTOList = scheduleResponse.getScheduleDTOList();
+
+//        검증
+        assertAll(
+                () -> assertThat(scheduleDTOList).size().isEqualTo(1),
+                () -> assertThat(scheduleDTOList).extracting(ScheduleDTO::getTitle).containsExactlyInAnyOrder("일정1"),
+                () -> assertThat(scheduleDTOList).extracting(ScheduleDTO::getContent).containsExactlyInAnyOrder("일정 내용1"),
+                () -> assertThat(scheduleDTOList).extracting(ScheduleDTO::getTheDay).containsExactlyInAnyOrder(LocalDate.of(9999, 10, 10))
+        );
+    }
 }

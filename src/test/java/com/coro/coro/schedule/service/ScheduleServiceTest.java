@@ -190,4 +190,39 @@ class ScheduleServiceTest {
                 () -> assertThat((scheduleDTOList)).extracting(ScheduleDTO::getTheDay).containsExactlyInAnyOrder(LocalDate.of(2023, 12, 1), LocalDate.of(2023, 12, 31))
         );
     }
+
+    @Test
+    @DisplayName("특정 날짜의 일정 획득")
+    void getSchedules() throws IOException {
+        FakeContainer container = new FakeContainer();
+
+//        회원가입
+        Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        모임 생성
+        Long moimId = container.moimService.register(
+                new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
+                null,
+                null,
+                null,
+                memberId
+        );
+
+//        일정 생성
+        container.scheduleService.register(
+                new ScheduleRegisterRequest("일정 제목", "일정 내용", LocalDate.of(9999, 12, 1)),
+                moimId,
+                memberId
+        );
+
+//        일정 획득
+        List<ScheduleDTO> scheduleDTOList = container.scheduleService.getSchedules(memberId, moimId, LocalDate.of(9999, 12, 1));
+
+//        검증
+        assertAll(
+                () -> assertThat(scheduleDTOList).extracting(ScheduleDTO::getTitle).containsExactlyInAnyOrder("일정 제목"),
+                () -> assertThat(scheduleDTOList).extracting(ScheduleDTO::getContent).containsExactlyInAnyOrder("일정 내용"),
+                () -> assertThat((scheduleDTOList)).extracting(ScheduleDTO::getTheDay).containsExactlyInAnyOrder(LocalDate.of(9999, 12, 1))
+        );
+    }
 }

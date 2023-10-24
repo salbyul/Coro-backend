@@ -48,4 +48,12 @@ public class FakeScheduleRepository implements ScheduleRepository {
                         (schedule.getTheDay().isEqual(end) || schedule.getTheDay().isBefore(end)))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Schedule> findByMoimIdAndDate(final Long moimId, final LocalDate date) {
+        return dataSet.scheduleData.values().stream()
+                .filter(schedule -> schedule.getMoim().getId().equals(moimId) &&
+                        schedule.getTheDay().isEqual(date))
+                .collect(Collectors.toList());
+    }
 }

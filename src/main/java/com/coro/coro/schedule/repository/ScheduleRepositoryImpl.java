@@ -28,4 +28,9 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     public List<Schedule> findAllByMoimIdAndTheDayBetween(final Long moimId, final LocalDate start, final LocalDate end) {
         return scheduleJpaRepository.findAllByMoimIdAndTheDayBetween(moimId, start, end);
     }
+
+    @Override
+    public List<Schedule> findByMoimIdAndDate(final Long moimId, final LocalDate date) {
+        return scheduleJpaRepository.findByMoimIdAndDate(moimId, date);
+    }
 }

@@ -39,7 +39,18 @@ public interface ScheduleControllerDocs {
     })
     @Parameters(value = {
             @Parameter(name = "moim", description = "모임 Id 값"),
-            @Parameter(name = "month", description = "획득할 일정의 월")
+            @Parameter(name = "date", description = "획득할 일정의 월")
     })
     APIResponse getMonthlySchedule(@ModelAttribute(name = "moim") final Long moimId, @Date final LocalDate date, @AuthenticationPrincipal final User user);
+
+    @Operation(summary = "특정한 날의 일정 획득")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "일정 획득 성공"),
+            @ApiResponse(responseCode = "403", description = "유저 권한 없음")
+    })
+    @Parameters(value = {
+            @Parameter(name = "moim", description = "모임 Id 값"),
+            @Parameter(name = "date", description = "획득할 일정들의 날짜")
+    })
+    APIResponse getSchedules(@ModelAttribute(name = "moim") final Long moimId, @Date final LocalDate date, @AuthenticationPrincipal final User user);
 }

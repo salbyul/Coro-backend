@@ -31,6 +31,7 @@ public class ScheduleController implements ScheduleControllerDocs {
                                 @RequestBody final ScheduleRegisterRequest registerRequest,
                                 @AuthenticationPrincipal final User user) {
         Long scheduleId = scheduleService.register(registerRequest, moimId, user.getId());
+        log.info("schdule: {}", registerRequest);
         return APIResponse.create()
                 .addObject("scheduleId", scheduleId);
     }
@@ -41,6 +42,17 @@ public class ScheduleController implements ScheduleControllerDocs {
                                           @Date final LocalDate date,
                                           @AuthenticationPrincipal final User user) {
         List<ScheduleDTO> scheduleDTOList = scheduleService.getMonthlySchedule(user.getId(), moimId, date);
+        ScheduleResponse scheduleResponse = new ScheduleResponse(scheduleDTOList);
+        return APIResponse.create()
+                .addObject("schedule", scheduleResponse);
+    }
+
+    @GetMapping
+    @Override
+    public APIResponse getSchedules(@ModelAttribute(name = "moim") final Long moimId,
+                                   @Date final LocalDate date,
+                                   @AuthenticationPrincipal final User user) {
+        List<ScheduleDTO> scheduleDTOList = scheduleService.getSchedules(user.getId(), moimId, date);
         ScheduleResponse scheduleResponse = new ScheduleResponse(scheduleDTOList);
         return APIResponse.create()
                 .addObject("schedule", scheduleResponse);
