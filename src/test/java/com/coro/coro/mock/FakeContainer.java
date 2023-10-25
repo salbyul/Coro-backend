@@ -6,23 +6,27 @@ import com.coro.coro.application.repository.port.ApplicationQuestionRepository;
 import com.coro.coro.application.repository.port.ApplicationRepository;
 import com.coro.coro.application.service.ApplicationQuestionService;
 import com.coro.coro.application.service.ApplicationService;
+import com.coro.coro.auth.controller.AuthController;
+import com.coro.coro.auth.jwt.JwtProvider;
+import com.coro.coro.auth.service.AuthService;
+import com.coro.coro.auth.service.port.RefreshTokenRepository;
 import com.coro.coro.common.service.port.FileTransferor;
 import com.coro.coro.member.controller.MemberController;
-import com.coro.coro.member.repository.port.MemberPhotoRepository;
-import com.coro.coro.member.repository.port.MemberRepository;
+import com.coro.coro.member.service.port.MemberPhotoRepository;
+import com.coro.coro.member.service.port.MemberRepository;
 import com.coro.coro.member.service.MemberPhotoService;
 import com.coro.coro.member.service.MemberService;
 import com.coro.coro.common.service.port.DateTimeHolder;
 import com.coro.coro.common.service.port.UUIDHolder;
 import com.coro.coro.mock.repository.*;
 import com.coro.coro.moim.controller.MoimController;
-import com.coro.coro.moim.repository.port.MoimMemberRepository;
-import com.coro.coro.moim.repository.port.MoimPhotoRepository;
-import com.coro.coro.moim.repository.port.MoimRepository;
-import com.coro.coro.moim.repository.port.MoimTagRepository;
+import com.coro.coro.moim.service.port.MoimMemberRepository;
+import com.coro.coro.moim.service.port.MoimPhotoRepository;
+import com.coro.coro.moim.service.port.MoimRepository;
+import com.coro.coro.moim.service.port.MoimTagRepository;
 import com.coro.coro.moim.service.MoimService;
 import com.coro.coro.schedule.controller.ScheduleController;
-import com.coro.coro.schedule.repository.ScheduleRepository;
+import com.coro.coro.schedule.service.port.ScheduleRepository;
 import com.coro.coro.schedule.service.ScheduleService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -56,10 +60,15 @@ public class FakeContainer {
     public final ScheduleService scheduleService;
     public final ScheduleRepository scheduleRepository;
 
+    public final AuthService authService;
+    public final AuthController authController;
+    public final RefreshTokenRepository refreshTokenRepository;
+
     public final PasswordEncoder passwordEncoder;
     public final UUIDHolder uuidHolder;
     public final DateTimeHolder dateTimeHolder;
     public final FileTransferor fileTransferor;
+    public final JwtProvider jwtProvider;
 
     public FakeContainer() {
         dataSet = new DataSet();
@@ -73,16 +82,17 @@ public class FakeContainer {
         this.applicationAnswerRepository = new FakeApplicationAnswerRepository(dataSet);
         this.applicationQuestionRepository = new FakeApplicationQuestionRepository(dataSet);
         this.scheduleRepository = new FakeScheduleRepository(dataSet);
+        this.refreshTokenRepository = new FakeRefreshTokenRepository(dataSet);
 
         this.passwordEncoder = new BCryptPasswordEncoder();
         this.uuidHolder = new FakeUUIDGenerator();
         this.dateTimeHolder = new FakeDateTime();
         this.fileTransferor = new FakeFileTransferor();
+        this.jwtProvider = new FakeJwtProvider();
 
         this.memberService = MemberService.builder()
                 .memberRepository(this.memberRepository)
                 .passwordEncoder(passwordEncoder)
-                .tokenProvider(new FakeJwtProvider())
                 .build();
         this.memberPhotoService = MemberPhotoService.builder()
                 .memberRepository(this.memberRepository)
@@ -137,5 +147,17 @@ public class FakeContainer {
         this.scheduleController = ScheduleController.builder()
                 .scheduleService(this.scheduleService)
                 .build();
+
+        this.authService = AuthService.builder()
+                .refreshTokenRepository(this.refreshTokenRepository)
+                .jwtProvider(this.jwtProvider)
+                .uuidHolder(this.uuidHolder)
+                .memberRepository(this.memberRepository)
+                .passwordEncoder(this.passwordEncoder)
+                .build();
+        this.authController = AuthController.builder()
+                .authService(this.authService)
+                .build();
+
     }
 }

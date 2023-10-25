@@ -35,17 +35,6 @@ public interface MemberControllerDocs {
     })
     APIResponse register(@RequestBody final MemberRegisterRequest requestMember);
 
-    @Operation(summary = "로그인")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "로그인 성공"),
-            @ApiResponse(responseCode = "400", description = "회원 검증 실패")
-    })
-    @Parameters(value = {
-            @Parameter(name = "email", description = "이메일", example = "asdf@asdf.com", required = true),
-            @Parameter(name = "password", description = "비밀번호", example = "asdf1234!@", required = true)
-    })
-    APIResponse login(@RequestBody final MemberLoginRequest requestMember);
-
     @Operation(summary = "유저 정보 변경")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "정보 변경 성공"),

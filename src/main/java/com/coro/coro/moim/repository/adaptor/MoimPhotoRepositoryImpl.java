@@ -2,7 +2,7 @@ package com.coro.coro.moim.repository.adaptor;
 
 import com.coro.coro.moim.domain.MoimPhoto;
 import com.coro.coro.moim.repository.MoimPhotoJpaRepository;
-import com.coro.coro.moim.repository.port.MoimPhotoRepository;
+import com.coro.coro.moim.service.port.MoimPhotoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

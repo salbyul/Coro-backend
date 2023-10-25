@@ -2,7 +2,7 @@ package com.coro.coro.moim.repository.adaptor;
 
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.repository.MoimJpaRepository;
-import com.coro.coro.moim.repository.port.MoimRepository;
+import com.coro.coro.moim.service.port.MoimRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

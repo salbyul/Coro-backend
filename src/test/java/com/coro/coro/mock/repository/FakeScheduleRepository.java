@@ -1,7 +1,7 @@
 package com.coro.coro.mock.repository;
 
 import com.coro.coro.schedule.domain.Schedule;
-import com.coro.coro.schedule.repository.ScheduleRepository;
+import com.coro.coro.schedule.service.port.ScheduleRepository;
 
 import java.time.LocalDate;
 import java.util.List;

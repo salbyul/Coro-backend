@@ -4,7 +4,6 @@ import com.coro.coro.application.dto.response.ApplicationResponse;
 import com.coro.coro.application.service.ApplicationService;
 import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.service.User;
-import com.coro.coro.member.dto.request.MemberLoginRequest;
 import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.service.MemberPhotoService;
@@ -48,20 +47,6 @@ public class MemberController implements MemberControllerDocs {
         Long savedId = memberService.register(requestMember);
         return APIResponse.create()
                 .addObject("savedId", savedId);
-    }
-
-    /**
-     * 로그인
-     * @param requestMember 로그인할 회원의 데이터가 담긴 객체
-     * @return 토큰
-     */
-    @PostMapping("/login")
-    @ResponseStatus(HttpStatus.OK)
-    @Override
-    public APIResponse login(@RequestBody final MemberLoginRequest requestMember) {
-        String token = memberService.login(requestMember);
-        return APIResponse.create()
-                .addObject("token", token);
     }
 
     /**

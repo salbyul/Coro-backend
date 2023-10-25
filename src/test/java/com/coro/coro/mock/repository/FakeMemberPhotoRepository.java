@@ -1,7 +1,7 @@
 package com.coro.coro.mock.repository;
 
 import com.coro.coro.member.domain.MemberPhoto;
-import com.coro.coro.member.repository.port.MemberPhotoRepository;
+import com.coro.coro.member.service.port.MemberPhotoRepository;
 
 import java.util.Objects;
 import java.util.Optional;

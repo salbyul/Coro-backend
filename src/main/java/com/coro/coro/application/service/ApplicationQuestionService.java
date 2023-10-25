@@ -6,7 +6,7 @@ import com.coro.coro.application.exception.ApplicationException;
 import com.coro.coro.application.repository.port.ApplicationQuestionRepository;
 import com.coro.coro.application.validator.ApplicationQuestionValidator;
 import com.coro.coro.moim.domain.Moim;
-import com.coro.coro.moim.repository.port.MoimRepository;
+import com.coro.coro.moim.service.port.MoimRepository;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

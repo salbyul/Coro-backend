@@ -2,7 +2,7 @@ package com.coro.coro.member.service;
 
 import com.coro.coro.common.response.error.ErrorType;
 import com.coro.coro.member.domain.Member;
-import com.coro.coro.member.repository.port.MemberRepository;
+import com.coro.coro.member.service.port.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

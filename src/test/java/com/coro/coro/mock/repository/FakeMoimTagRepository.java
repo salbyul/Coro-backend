@@ -1,7 +1,7 @@
 package com.coro.coro.mock.repository;
 
 import com.coro.coro.moim.domain.MoimTag;
-import com.coro.coro.moim.repository.port.MoimTagRepository;
+import com.coro.coro.moim.service.port.MoimTagRepository;
 
 import java.util.HashMap;
 import java.util.List;

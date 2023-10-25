@@ -1,6 +1,8 @@
-package com.coro.coro.schedule.repository;
+package com.coro.coro.schedule.repository.adaptor;
 
 import com.coro.coro.schedule.domain.Schedule;
+import com.coro.coro.schedule.repository.ScheduleJpaRepository;
+import com.coro.coro.schedule.service.port.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

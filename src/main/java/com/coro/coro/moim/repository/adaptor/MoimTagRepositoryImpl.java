@@ -2,7 +2,7 @@ package com.coro.coro.moim.repository.adaptor;
 
 import com.coro.coro.moim.domain.MoimTag;
 import com.coro.coro.moim.repository.MoimTagJpaRepository;
-import com.coro.coro.moim.repository.port.MoimTagRepository;
+import com.coro.coro.moim.service.port.MoimTagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
