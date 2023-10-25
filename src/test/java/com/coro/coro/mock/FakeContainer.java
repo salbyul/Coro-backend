@@ -93,9 +93,6 @@ public class FakeContainer {
         this.memberService = MemberService.builder()
                 .memberRepository(this.memberRepository)
                 .passwordEncoder(passwordEncoder)
-                .tokenProvider(this.jwtProvider)
-                .uuidHolder(this.uuidHolder)
-                .refreshTokenRepository(this.refreshTokenRepository)
                 .build();
         this.memberPhotoService = MemberPhotoService.builder()
                 .memberRepository(this.memberRepository)
@@ -155,6 +152,8 @@ public class FakeContainer {
                 .refreshTokenRepository(this.refreshTokenRepository)
                 .jwtProvider(this.jwtProvider)
                 .uuidHolder(this.uuidHolder)
+                .memberRepository(this.memberRepository)
+                .passwordEncoder(this.passwordEncoder)
                 .build();
         this.authController = AuthController.builder()
                 .authService(this.authService)

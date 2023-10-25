@@ -191,51 +191,6 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("[로그인] 정상적인 로그인")
-    void login() {
-        FakeContainer container = new FakeContainer();
-
-//        회원가입
-        Long savedId = container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
-
-//        로그인
-        container.memberRepository.findById(savedId).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
-        container.memberService.login(new MemberLoginRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD));
-    }
-
-    @Test
-    @DisplayName("[로그인] 틀린 이메일의 경우")
-    void loginFailByEmail() {
-        FakeContainer container = new FakeContainer();
-
-//        회원가입
-        container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
-
-//        검증
-        assertThatThrownBy(() ->
-                container.memberService.login(new MemberLoginRequest("12@2.com", EXAMPLE_PASSWORD))
-        )
-                .isInstanceOf(MemberException.class)
-                .hasMessage(MEMBER_NOT_VALID_EMAIL.getMessage());
-    }
-
-    @Test
-    @DisplayName("[로그인] 틀린 비밀번호의 경우")
-    void loginFailByPassword() {
-        FakeContainer container = new FakeContainer();
-
-//        회원가입
-        container.memberService.register(new MemberRegisterRequest(EXAMPLE_EMAIL, EXAMPLE_PASSWORD, EXAMPLE_NICKNAME));
-
-//        검증
-        assertThatThrownBy(() ->
-                container.memberService.login(new MemberLoginRequest(EXAMPLE_EMAIL, "asdf1234!#"))
-        )
-                .isInstanceOf(MemberException.class)
-                .hasMessage(MEMBER_NOT_VALID_PASSWORD.getMessage());
-    }
-
-    @Test
     @DisplayName("[회원수정] 정상적인 회원 수정")
     void updateMember() {
         FakeContainer container = new FakeContainer();

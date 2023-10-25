@@ -17,12 +17,29 @@ import static org.assertj.core.api.Assertions.*;
 class AuthControllerTest {
 
     @Test
+    @DisplayName("로그인 성공")
+    void login() {
+        FakeContainer container = new FakeContainer();
+
+//        회원가입
+        MemberRegisterRequest request = new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임");
+        container.memberController.register(request);
+
+//        로그인
+        APIResponse loginResponse = container.authController.login(new MemberLoginRequest("asdf@asdf.com", "asdf1234!@"));
+        TokenResponse token = (TokenResponse) loginResponse.getBody().get("token");
+
+        assertThat(token.getAccessToken()).isEqualTo("activeAccessToken" + "닉네임");
+        assertThat(token.getRefreshToken()).isEqualTo("uid".repeat(30));
+    }
+
+    @Test
     @DisplayName("새로운 토큰 발행")
     void newTokenResponse() {
         FakeContainer container = new FakeContainer();
 
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        TokenResponse tokenResponse = container.memberService.login(new MemberLoginRequest("asdf@asdf.com", "asdf1234!@"));
+        TokenResponse tokenResponse = container.authService.login(new MemberLoginRequest("asdf@asdf.com", "asdf1234!@"));
 
         Member member = container.memberRepository.findById(memberId)
                 .orElseThrow(() -> new AuthException(MEMBER_NOT_FOUND));

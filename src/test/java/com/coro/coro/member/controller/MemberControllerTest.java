@@ -3,11 +3,9 @@ package com.coro.coro.member.controller;
 import com.coro.coro.application.domain.ApplicationStatus;
 import com.coro.coro.application.dto.request.ApplicationRequest;
 import com.coro.coro.application.dto.response.ApplicationResponse;
-import com.coro.coro.auth.dto.response.TokenResponse;
 import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.domain.MemberPhoto;
-import com.coro.coro.member.dto.request.MemberLoginRequest;
 import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.exception.MemberException;
@@ -31,9 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 class MemberControllerTest {
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private final String ACCESS_TOKEN = "activeAccessToken";
-
     @Test
     @DisplayName("회원가입 성공")
     void register() {
@@ -55,23 +50,6 @@ class MemberControllerTest {
                 () -> assertThat(member.getNickname()).isEqualTo("닉네임"),
                 () -> assertThat(isMatchedPassword).isTrue()
         );
-    }
-
-    @Test
-    @DisplayName("로그인 성공")
-    void login() {
-        FakeContainer container = new FakeContainer();
-
-//        회원가입
-        MemberRegisterRequest request = new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임");
-        container.memberController.register(request);
-
-//        로그인
-        APIResponse loginResponse = container.memberController.login(new MemberLoginRequest("asdf@asdf.com", "asdf1234!@"));
-        TokenResponse token = (TokenResponse) loginResponse.getBody().get("token");
-
-        assertThat(token.getAccessToken()).isEqualTo(ACCESS_TOKEN + "닉네임");
-        assertThat(token.getRefreshToken()).isEqualTo("uid".repeat(30));
     }
 
     @Test
