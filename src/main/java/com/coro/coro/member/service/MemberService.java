@@ -3,6 +3,7 @@ package com.coro.coro.member.service;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
+import com.coro.coro.member.dto.response.MemberInformationResponse;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.service.port.MemberRepository;
 import com.coro.coro.member.validator.MemberValidator;
@@ -45,15 +46,16 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
+    /* 회원 정보 획득 */
+    public MemberInformationResponse getInformation(final Long memberId) {
+        Member member = getMemberById(memberId);
+        return new MemberInformationResponse(member);
+    }
+
     /* 회원 수정 */
     @Transactional
     public void update(final Long id, final MemberModificationRequest requestMember) {
         Member member = getMemberById(id);
-        boolean isRightPassword = member.isRightPassword(requestMember.getOriginalPassword(), passwordEncoder);
-        if (!isRightPassword) {
-            throw new MemberException(MEMBER_NOT_VALID_PASSWORD);
-        }
-
         member.update(requestMember, passwordEncoder);
     }
 

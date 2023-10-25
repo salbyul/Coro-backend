@@ -26,13 +26,12 @@ public class TokenArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public Object resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer, final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
-        String accessToken = request.getHeader("Authorization").split(" ")[1];
         String refreshToken = request.getHeader("refresh");
 
-        if (Objects.isNull(accessToken) || Objects.isNull(refreshToken)) {
+        if (Objects.isNull(refreshToken)) {
             throw new AuthException(AUTH_NOT_VALID_TOKEN);
         }
 
-        return new TokenSetRequest(accessToken, refreshToken);
+        return new TokenSetRequest(refreshToken);
     }
 }

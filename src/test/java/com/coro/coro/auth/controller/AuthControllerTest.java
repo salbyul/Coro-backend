@@ -47,7 +47,7 @@ class AuthControllerTest {
         Member member = container.memberRepository.findById(memberId)
                 .orElseThrow(() -> new AuthException(MEMBER_NOT_FOUND));
 
-        TokenSetRequest tokenSetRequest = new TokenSetRequest(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
+        TokenSetRequest tokenSetRequest = new TokenSetRequest(tokenResponse.getRefreshToken());
         APIResponse response = container.authController.newTokenResponse(tokenSetRequest);
         TokenResponse token = (TokenResponse) response.getBody().get("token");
 
@@ -60,7 +60,7 @@ class AuthControllerTest {
     void newTokenResponseFailByNotExistToken() {
         FakeContainer container = new FakeContainer();
 
-        TokenSetRequest tokenSetRequest = new TokenSetRequest("notExistAccessToken", "notExistRefreshToken");
+        TokenSetRequest tokenSetRequest = new TokenSetRequest("notExistRefreshToken");
 
         assertThatThrownBy(() ->
                 container.authController.newTokenResponse(tokenSetRequest)
@@ -84,7 +84,7 @@ class AuthControllerTest {
         container.refreshTokenRepository.save(token);
 
 //        로그아웃
-        TokenSetRequest tokenSetRequest = new TokenSetRequest("accessToken", refreshToken);
+        TokenSetRequest tokenSetRequest = new TokenSetRequest(refreshToken);
         container.authController.logout(tokenSetRequest);
 
 //        검증

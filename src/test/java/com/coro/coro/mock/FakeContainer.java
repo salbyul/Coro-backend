@@ -12,9 +12,7 @@ import com.coro.coro.auth.service.AuthService;
 import com.coro.coro.auth.service.port.RefreshTokenRepository;
 import com.coro.coro.common.service.port.FileTransferor;
 import com.coro.coro.member.controller.MemberController;
-import com.coro.coro.member.service.port.MemberPhotoRepository;
 import com.coro.coro.member.service.port.MemberRepository;
-import com.coro.coro.member.service.MemberPhotoService;
 import com.coro.coro.member.service.MemberService;
 import com.coro.coro.common.service.port.DateTimeHolder;
 import com.coro.coro.common.service.port.UUIDHolder;
@@ -36,7 +34,6 @@ public class FakeContainer {
     @SuppressWarnings("FieldCanBeLocal")
     private final DataSet dataSet;
 
-    public final MemberPhotoRepository memberPhotoRepository;
     public final MemberRepository memberRepository;
     public final MoimRepository moimRepository;
     public final MoimTagRepository moimTagRepository;
@@ -47,7 +44,6 @@ public class FakeContainer {
     public final ApplicationQuestionRepository applicationQuestionRepository;
 
     public final MemberService memberService;
-    public final MemberPhotoService memberPhotoService;
     public final MoimService moimService;
     public final ApplicationQuestionService applicationQuestionService;
     public final ApplicationService applicationService;
@@ -72,7 +68,6 @@ public class FakeContainer {
 
     public FakeContainer() {
         dataSet = new DataSet();
-        this.memberPhotoRepository = new FakeMemberPhotoRepository(dataSet);
         this.memberRepository = new FakeMemberRepository(dataSet);
         this.moimTagRepository = new FakeMoimTagRepository(dataSet);
         this.moimRepository = new FakeMoimRepository(dataSet);
@@ -94,13 +89,7 @@ public class FakeContainer {
                 .memberRepository(this.memberRepository)
                 .passwordEncoder(passwordEncoder)
                 .build();
-        this.memberPhotoService = MemberPhotoService.builder()
-                .memberRepository(this.memberRepository)
-                .memberPhotoRepository(this.memberPhotoRepository)
-                .uuidHolder(this.uuidHolder)
-                .dateTimeHolder(this.dateTimeHolder)
-                .fileTransferor(this.fileTransferor)
-                .build();
+
         this.moimService = MoimService.builder()
                 .moimRepository(this.moimRepository)
                 .moimTagRepository(this.moimTagRepository)
@@ -127,7 +116,6 @@ public class FakeContainer {
 
         this.memberController = MemberController.builder()
                 .memberService(this.memberService)
-                .memberPhotoService(this.memberPhotoService)
                 .moimService(this.moimService)
                 .applicationService(this.applicationService)
                 .build();

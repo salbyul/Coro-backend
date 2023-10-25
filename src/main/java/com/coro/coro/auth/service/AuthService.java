@@ -36,7 +36,7 @@ public class AuthService {
         Member member = getMemberByEmail(requestMember);
         boolean isRightPassword = member.isRightPassword(requestMember.getPassword(), passwordEncoder);
         if (!isRightPassword) {
-            throw new MemberException(MEMBER_NOT_VALID_PASSWORD);
+            throw new AuthException(MEMBER_NOT_VALID_PASSWORD);
         }
 
         String accessToken = jwtProvider.generateAccessToken(member.getNickname());

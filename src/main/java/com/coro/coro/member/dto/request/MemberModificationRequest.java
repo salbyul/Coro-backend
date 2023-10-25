@@ -11,5 +11,4 @@ public class MemberModificationRequest {
 
     private String originalPassword;
     private String newPassword;
-    private String introduction;
 }

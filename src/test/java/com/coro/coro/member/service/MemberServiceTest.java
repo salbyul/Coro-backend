@@ -4,6 +4,7 @@ import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
 import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
+import com.coro.coro.member.dto.response.MemberInformationResponse;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.mock.FakeContainer;
 import org.junit.jupiter.api.*;
@@ -191,6 +192,38 @@ class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("유저 정보 획득")
+    void getInformation() {
+        FakeContainer container = new FakeContainer();
+
+//        회원가입
+        Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        유저 정보 획득
+        MemberInformationResponse response = container.memberService.getInformation(memberId);
+
+//        검증
+        assertThat(response.getEmail()).isEqualTo("asdf@asdf.com");
+        assertThat(response.getNickname()).isEqualTo("닉네임");
+    }
+
+    @Test
+    @DisplayName("유저 정보 획득 실패 - 유효하지 않은 Id 값")
+    void getInformationFailByNotValidId() {
+        FakeContainer container = new FakeContainer();
+
+//        회원가입
+        container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        검증
+        assertThatThrownBy(() ->
+                container.memberService.getInformation(9999L)
+        )
+                .isInstanceOf(MemberException.class)
+                .hasMessage(MEMBER_NOT_FOUND.getMessage());
+    }
+
+    @Test
     @DisplayName("[회원수정] 정상적인 회원 수정")
     void updateMember() {
         FakeContainer container = new FakeContainer();
@@ -201,7 +234,7 @@ class MemberServiceTest {
 
 //        회원수정
         MemberModificationRequest requestMember =
-                new MemberModificationRequest(EXAMPLE_PASSWORD, "qwer1234!@", "바뀐 소개입니다.");
+                new MemberModificationRequest(EXAMPLE_PASSWORD, "qwer1234!@");
         container.memberService.update(member.getId(), requestMember);
 
 //        검증
@@ -209,7 +242,6 @@ class MemberServiceTest {
         boolean matchPassword = container.passwordEncoder.matches(requestMember.getNewPassword(), updatedMember.getPassword());
 
         assertThat(matchPassword).isTrue();
-        assertThat(updatedMember.getIntroduction()).isEqualTo(requestMember.getIntroduction());
     }
 
     @Test
@@ -222,7 +254,7 @@ class MemberServiceTest {
 
 //        회원 수정
         Member member = container.memberRepository.findById(savedId).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
-        MemberModificationRequest requestMember = new MemberModificationRequest("1234", "qwer1234!@", "바뀐 소개입니다.");
+        MemberModificationRequest requestMember = new MemberModificationRequest("1234", "qwer1234!@");
 
         assertThatThrownBy(() ->
                 container.memberService.update(member.getId(), requestMember)
