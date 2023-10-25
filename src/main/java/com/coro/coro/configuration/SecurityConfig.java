@@ -60,7 +60,7 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web ->
                 web.ignoring()
-                        .antMatchers(HttpMethod.POST, "/api/members", "/api/members/login", "/api/auth/new");
+                        .antMatchers(HttpMethod.POST, "/api/members", "/api/auth/login", "/api/auth/new");
     }
 
     @Bean
