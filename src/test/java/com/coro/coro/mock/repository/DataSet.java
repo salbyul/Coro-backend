@@ -5,7 +5,6 @@ import com.coro.coro.application.domain.ApplicationAnswer;
 import com.coro.coro.application.domain.ApplicationQuestion;
 import com.coro.coro.auth.domain.RefreshToken;
 import com.coro.coro.member.domain.Member;
-import com.coro.coro.member.domain.MemberPhoto;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.domain.MoimMember;
 import com.coro.coro.moim.domain.MoimPhoto;
@@ -19,8 +18,6 @@ public class DataSet {
 
     protected final Map<Long, Member> memberData = new HashMap<>();
     protected Long memberSequence = 1L;
-
-    protected final Map<Long, MemberPhoto> memberPhotoData = new HashMap<>();
 
     protected final Map<Long, Moim> moimData = new HashMap<>();
     protected Long moimSequence = 1L;

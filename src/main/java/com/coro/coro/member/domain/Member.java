@@ -28,7 +28,6 @@ public class Member extends BaseEntity {
     private String email;
     private String password;
     private String nickname;
-    private String introduction;
 
     @Builder.Default
     @OneToMany(mappedBy = "leader")
@@ -40,7 +39,6 @@ public class Member extends BaseEntity {
     @Override
     public void prePersist() {
         super.prePersist();
-        this.introduction = "나를 소개합니다.\uD83D\uDE00";
         this.state = MemberState.ACTIVE;
     }
 
@@ -63,7 +61,6 @@ public class Member extends BaseEntity {
         if (!isRightPassword(requestMember.getOriginalPassword(), passwordEncoder)) {
             throw new MemberException(MEMBER_NOT_VALID_PASSWORD);
         }
-        this.introduction = requestMember.getIntroduction();
         this.password = requestMember.getNewPassword();
 
         MemberValidator.validateRegistration(this);

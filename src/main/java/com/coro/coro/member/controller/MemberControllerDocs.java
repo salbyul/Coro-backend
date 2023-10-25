@@ -35,6 +35,13 @@ public interface MemberControllerDocs {
     })
     APIResponse register(@RequestBody final MemberRegisterRequest requestMember);
 
+    @Operation(summary = "유저 정보 획득")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "정보 획득 성공"),
+            @ApiResponse(responseCode = "403", description = "유저 인증 실패")
+    })
+    APIResponse getInformation(@AuthenticationPrincipal final User user);
+
     @Operation(summary = "유저 정보 변경")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "정보 변경 성공"),
@@ -45,10 +52,8 @@ public interface MemberControllerDocs {
             @Parameter(name = "id", description = "회원 id", required = true),
             @Parameter(name = "originalPassword", description = "기존 비밀번호"),
             @Parameter(name = "newPassword", description = "새로운 비밀번호"),
-            @Parameter(name = "introduction", description = "회원 소개"),
-            @Parameter(name = "profileImage", description = "프로필 이미지")
     })
-    APIResponse update(@PathVariable("id") Long memberId, @RequestPart(required = false, name = "profileImage") final MultipartFile multipartFile, @RequestPart(name = "member", required = false) final MemberModificationRequest requestMember) throws IOException;
+    APIResponse updatePassword(@RequestBody final MemberModificationRequest requestMember, @AuthenticationPrincipal final User user) throws IOException;
 
     @Operation(summary = "내 모임")
     @ApiResponses(value = {

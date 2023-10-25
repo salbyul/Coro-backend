@@ -5,9 +5,9 @@ import com.coro.coro.application.dto.request.ApplicationRequest;
 import com.coro.coro.application.dto.response.ApplicationResponse;
 import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.domain.Member;
-import com.coro.coro.member.domain.MemberPhoto;
 import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
+import com.coro.coro.member.dto.response.MemberInformationResponse;
 import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.service.User;
 import com.coro.coro.mock.FakeContainer;
@@ -53,8 +53,30 @@ class MemberControllerTest {
     }
 
     @Test
+    @DisplayName("유저 정보 획득")
+    void getInformation() {
+        FakeContainer container = new FakeContainer();
+
+//        회원가입
+        Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
+
+//        유저 정보 획득
+        Member member = container.memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+
+        User user = User.mappingUserDetails(member);
+
+        APIResponse response = container.memberController.getInformation(user);
+        MemberInformationResponse memberInformation = (MemberInformationResponse) response.getBody().get("member");
+
+//        검증
+        assertThat(memberInformation.getEmail()).isEqualTo("asdf@asdf.com");
+        assertThat(memberInformation.getNickname()).isEqualTo("닉네임");
+    }
+
+    @Test
     @DisplayName("유저 정보 수정 성공")
-    void update() throws IOException {
+    void update() {
         FakeContainer container = new FakeContainer();
 
 //        회원가입
@@ -62,10 +84,13 @@ class MemberControllerTest {
         APIResponse joinResponse = container.memberController.register(request);
         Long savedId = (Long) joinResponse.getBody().get("savedId");
 
-        container.memberController.update(savedId, null, new MemberModificationRequest("asdf1234!@", "qwer1234!@", "바뀐 자기소개입니다."));
-
         Member member = container.memberRepository.findById(savedId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+
+        User user = User.mappingUserDetails(member);
+
+        container.memberController.updatePassword(new MemberModificationRequest("asdf1234!@", "qwer1234!@"), user);
+
 
         boolean isMatchedPassword = container.passwordEncoder.matches("qwer1234!@", member.getPassword());
 
@@ -73,75 +98,7 @@ class MemberControllerTest {
                 () -> assertThat(member.getId()).isEqualTo(savedId),
                 () -> assertThat(member.getEmail()).isEqualTo("asdf@asdf.com"),
                 () -> assertThat(isMatchedPassword).isTrue(),
-                () -> assertThat(member.getNickname()).isEqualTo("닉네임"),
-                () -> assertThat(member.getIntroduction()).isEqualTo("바뀐 자기소개입니다.")
-        );
-    }
-
-    @Test
-    @DisplayName("유저 사진 변경 성공")
-    void updateMemberPhoto() throws IOException {
-        FakeContainer container = new FakeContainer();
-
-//        회원가입
-        MemberRegisterRequest request = new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임");
-        APIResponse joinResponse = container.memberController.register(request);
-        Long savedId = (Long) joinResponse.getBody().get("savedId");
-
-//        유저 사진 변경
-        MockMultipartFile multipartFile = new MockMultipartFile("photo.jpeg", "photo.jpeg", "image/jpeg", new byte[0]);
-        container.memberController.update(savedId, multipartFile, null);
-
-        MemberPhoto memberPhoto = container.memberPhotoRepository.findById(savedId)
-                .orElseThrow(() -> new MemberException(MEMBER_PHOTO_NOT_FOUND));
-
-        Member member = container.memberRepository.findById(savedId)
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
-
-        String expectedName = container.uuidHolder.generateUUID() + "[" + container.dateTimeHolder.now() + "]" + multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().indexOf("."));
-
-        assertAll(
-                () -> assertThat(memberPhoto.getMemberId()).isEqualTo(savedId),
-                () -> assertThat(memberPhoto.getMember()).isEqualTo(member),
-                () -> assertThat(memberPhoto.getOriginalName()).isEqualTo(multipartFile.getOriginalFilename()),
-                () -> assertThat(memberPhoto.getName()).isEqualTo(expectedName)
-        );
-    }
-
-    @Test
-    @DisplayName("유저 정보와 사진 변경")
-    void updateMemberPhotoAndMemberInformation() throws IOException {
-        FakeContainer container = new FakeContainer();
-
-//        회원가입
-        MemberRegisterRequest request = new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임");
-        APIResponse joinResponse = container.memberController.register(request);
-        Long savedId = (Long) joinResponse.getBody().get("savedId");
-
-//        유저 정보와 사진 변경
-        MockMultipartFile multipartFile = new MockMultipartFile("photo.jpeg", "photo.jpeg", "image/jpeg", new byte[0]);
-        MemberModificationRequest modificationRequest = new MemberModificationRequest("asdf1234!@", "qwer1234!@", "바뀐 자기소개입니다.");
-        container.memberController.update(savedId, multipartFile, modificationRequest);
-
-        MemberPhoto memberPhoto = container.memberPhotoRepository.findById(savedId)
-                .orElseThrow(() -> new MemberException(MEMBER_PHOTO_NOT_FOUND));
-
-        Member member = container.memberRepository.findById(savedId)
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
-
-        boolean isMatchedPassword = container.passwordEncoder.matches("qwer1234!@", member.getPassword());
-        String expectedName = container.uuidHolder.generateUUID() + "[" + container.dateTimeHolder.now() + "]" + multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().indexOf("."));
-
-        assertAll(
-                () -> assertThat(memberPhoto.getMemberId()).isEqualTo(savedId),
-                () -> assertThat(memberPhoto.getMember()).isEqualTo(member),
-                () -> assertThat(memberPhoto.getOriginalName()).isEqualTo(multipartFile.getOriginalFilename()),
-                () -> assertThat(memberPhoto.getName()).isEqualTo(expectedName),
-                () -> assertThat(member.getId()).isEqualTo(savedId),
-                () -> assertThat(member.getEmail()).isEqualTo("asdf@asdf.com"),
-                () -> assertThat(isMatchedPassword).isTrue(),
-                () -> assertThat(member.getNickname()).isEqualTo("닉네임"),
-                () -> assertThat(member.getIntroduction()).isEqualTo("바뀐 자기소개입니다.")
+                () -> assertThat(member.getNickname()).isEqualTo("닉네임")
         );
     }
 

@@ -60,7 +60,7 @@ class AuthServiceTest {
         assertThatThrownBy(() ->
                 container.authService.login(new MemberLoginRequest("asdf@asdf.com", "asdf1234!#"))
         )
-                .isInstanceOf(MemberException.class)
+                .isInstanceOf(AuthException.class)
                 .hasMessage(MEMBER_NOT_VALID_PASSWORD.getMessage());
     }
 
@@ -78,7 +78,7 @@ class AuthServiceTest {
         TokenResponse existToken = container.authService.login(new MemberLoginRequest("asdf@asdf.com", "asdf1234!@"));
 
 //        새로운 토큰 발행
-        TokenResponse tokenResponse = container.authService.issueNewTokenSet(new TokenSetRequest(existToken.getAccessToken(), existToken.getRefreshToken()));
+        TokenResponse tokenResponse = container.authService.issueNewTokenSet(new TokenSetRequest(existToken.getRefreshToken()));
 
 //        검증
         assertThat(tokenResponse.getAccessToken()).isEqualTo("activeAccessToken" + member.getNickname());
@@ -91,7 +91,7 @@ class AuthServiceTest {
         FakeContainer container = new FakeContainer();
 
         assertThatThrownBy(() ->
-                container.authService.issueNewTokenSet(new TokenSetRequest("notExistAccessToken", "notExistRefreshToken"))
+                container.authService.issueNewTokenSet(new TokenSetRequest("notExistRefreshToken"))
         )
                 .isInstanceOf(AuthException.class)
                 .hasMessage(AUTH_TOKEN_NOT_FOUND.getMessage());
@@ -111,7 +111,7 @@ class AuthServiceTest {
         container.refreshTokenRepository.save(token);
 
 //        로그아웃
-        TokenSetRequest tokenSetRequest = new TokenSetRequest("accessToken", "refreshToken");
+        TokenSetRequest tokenSetRequest = new TokenSetRequest("refreshToken");
         container.authService.logout(tokenSetRequest);
 
 //        검증

@@ -23,7 +23,6 @@ public class FakeMemberRepository implements MemberRepository {
                     .email(member.getEmail())
                     .password(member.getPassword())
                     .nickname(member.getNickname())
-                    .introduction(member.getIntroduction())
                     .build();
             toBeSaved.prePersist();
             dataSet.memberData.put(toBeSaved.getId(), toBeSaved);

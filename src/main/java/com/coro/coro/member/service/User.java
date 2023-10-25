@@ -17,7 +17,6 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String nickname;
-    private String introduction;
     private MemberState state;
 
     @Override
@@ -61,7 +60,6 @@ public class User implements UserDetails {
                 .email(member.getEmail())
                 .password(member.getPassword())
                 .nickname(member.getNickname())
-                .introduction(member.getIntroduction())
                 .state(member.getState())
                 .build();
     }

@@ -6,9 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 public class TokenSetRequest {
 
-    private String accessToken;
     private String refreshToken;
 }

@@ -44,7 +44,6 @@ class MemberTest {
                 .email("a@a.com")
                 .password(PASSWORD)
                 .nickname("닉네임1")
-                .introduction(INTRODUCTION)
                 .moimList(new ArrayList<>())
                 .state(STATE)
                 .build();
@@ -61,7 +60,6 @@ class MemberTest {
                 .email(EMAIL)
                 .password(PASSWORD)
                 .nickname("닉네임1")
-                .introduction(INTRODUCTION)
                 .moimList(new ArrayList<>())
                 .state(STATE)
                 .build();
@@ -82,7 +80,6 @@ class MemberTest {
                 .email("a@a.com")
                 .password(PASSWORD)
                 .nickname(NICKNAME)
-                .introduction(INTRODUCTION)
                 .moimList(new ArrayList<>())
                 .state(STATE)
                 .build();
@@ -100,11 +97,10 @@ class MemberTest {
         Member member = generateMember();
         member.encryptPassword(passwordEncoder);
 
-        MemberModificationRequest requestMember = new MemberModificationRequest(passwordEncoder.encode(PASSWORD), "qwer0987!@", "변경된 자기소개입니다.");
+        MemberModificationRequest requestMember = new MemberModificationRequest(passwordEncoder.encode(PASSWORD), "qwer0987!@");
         member.update(requestMember, passwordEncoder);
 
         assertAll(
-                () -> assertThat(member.getIntroduction()).isEqualTo(requestMember.getIntroduction()),
                 () -> assertThat(passwordEncoder.matches(requestMember.getNewPassword(), member.getPassword())).isTrue()
         );
     }
@@ -117,7 +113,7 @@ class MemberTest {
 
         assertThatThrownBy(() ->
             member.update(
-                    new MemberModificationRequest("vhjs3857#*", "qwer0987!@", "변경된 자기소개입니다."),
+                    new MemberModificationRequest("vhjs3857#*", "qwer0987!@"),
                     passwordEncoder
             )
         )
@@ -131,7 +127,6 @@ class MemberTest {
                 .email(EMAIL)
                 .password(PASSWORD)
                 .nickname(NICKNAME)
-                .introduction(INTRODUCTION)
                 .moimList(new ArrayList<>())
                 .state(STATE)
                 .build();
