@@ -1,12 +1,16 @@
 package com.coro.coro.member.service;
 
+import com.coro.coro.auth.domain.RefreshToken;
+import com.coro.coro.auth.dto.response.TokenResponse;
 import com.coro.coro.auth.jwt.JwtProvider;
+import com.coro.coro.auth.service.port.RefreshTokenRepository;
+import com.coro.coro.common.service.port.UUIDHolder;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
 import com.coro.coro.member.dto.request.MemberModificationRequest;
 import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.exception.MemberException;
-import com.coro.coro.member.repository.port.MemberRepository;
+import com.coro.coro.member.service.port.MemberRepository;
 import com.coro.coro.member.validator.MemberValidator;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +33,8 @@ public class MemberService {
     private final JwtProvider tokenProvider;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UUIDHolder uuidHolder;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     /* 회원가입 */
     @Transactional
@@ -49,14 +55,21 @@ public class MemberService {
     }
 
     /* 로그인 */
-    public String login(final MemberLoginRequest requestMember) {
+    public TokenResponse login(final MemberLoginRequest requestMember) {
         Member member = getMemberByEmail(requestMember);
         boolean isRightPassword = member.isRightPassword(requestMember.getPassword(), passwordEncoder);
         if (!isRightPassword) {
             throw new MemberException(MEMBER_NOT_VALID_PASSWORD);
         }
 
-        return tokenProvider.generateAccessToken(member.getNickname());
+        String accessToken = tokenProvider.generateAccessToken(member.getNickname());
+        String refreshToken = uuidHolder.generateUUID();
+        RefreshToken token = RefreshToken.builder()
+                .nickname(member.getNickname())
+                .refreshToken(refreshToken)
+                .build();
+        refreshTokenRepository.save(token);
+        return new TokenResponse(accessToken, refreshToken);
     }
 
     private Member getMemberByEmail(final MemberLoginRequest requestMember) {

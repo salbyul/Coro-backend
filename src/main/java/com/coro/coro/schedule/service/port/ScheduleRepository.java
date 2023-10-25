@@ -1,4 +1,4 @@
-package com.coro.coro.schedule.repository;
+package com.coro.coro.schedule.service.port;
 
 import com.coro.coro.schedule.domain.Schedule;
 

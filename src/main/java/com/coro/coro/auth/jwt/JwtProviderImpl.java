@@ -32,10 +32,9 @@ public class JwtProviderImpl implements JwtProvider {
     private final UserDetailsService userDetailsService;
     private Key key;
 
-    //    토근 유효시간 30분
+    //    access token 유효시간 30분
     @SuppressWarnings("FieldCanBeLocal")
-    private final long tokenValidTime = 30 * 60 * 1000L;
-
+    private final long validTimeOfAccessToken = 30 * 60 * 1000L;
 
     @PostConstruct
     protected void init() {
@@ -52,7 +51,7 @@ public class JwtProviderImpl implements JwtProvider {
                 .setHeader(header)
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + tokenValidTime))
+                .setExpiration(new Date(now.getTime() + validTimeOfAccessToken))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }

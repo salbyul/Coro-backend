@@ -2,7 +2,7 @@ package com.coro.coro.member.repository.adaptor;
 
 import com.coro.coro.member.domain.MemberPhoto;
 import com.coro.coro.member.repository.MemberPhotoJpaRepository;
-import com.coro.coro.member.repository.port.MemberPhotoRepository;
+import com.coro.coro.member.service.port.MemberPhotoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

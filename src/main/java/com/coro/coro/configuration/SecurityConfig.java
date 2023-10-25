@@ -44,7 +44,6 @@ public class SecurityConfig {
         http
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/api/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/members", "/api/members/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/**").authenticated()
                 .antMatchers(HttpMethod.PUT, "/api/**").authenticated()
                 .antMatchers(HttpMethod.DELETE, "/api/**").authenticated();
@@ -61,7 +60,7 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web ->
                 web.ignoring()
-                        .antMatchers(HttpMethod.POST, "/api/members", "/api/members/login");
+                        .antMatchers(HttpMethod.POST, "/api/members", "/api/members/login", "/api/auth/new");
     }
 
     @Bean

@@ -3,6 +3,7 @@ package com.coro.coro.member.controller;
 import com.coro.coro.application.domain.ApplicationStatus;
 import com.coro.coro.application.dto.request.ApplicationRequest;
 import com.coro.coro.application.dto.response.ApplicationResponse;
+import com.coro.coro.auth.dto.response.TokenResponse;
 import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.domain.MemberPhoto;
@@ -67,9 +68,10 @@ class MemberControllerTest {
 
 //        로그인
         APIResponse loginResponse = container.memberController.login(new MemberLoginRequest("asdf@asdf.com", "asdf1234!@"));
-        String token = (String) loginResponse.getBody().get("token");
+        TokenResponse token = (TokenResponse) loginResponse.getBody().get("token");
 
-        assertThat(token).isEqualTo(ACCESS_TOKEN + "닉네임");
+        assertThat(token.getAccessToken()).isEqualTo(ACCESS_TOKEN + "닉네임");
+        assertThat(token.getRefreshToken()).isEqualTo("uid".repeat(30));
     }
 
     @Test

@@ -2,7 +2,7 @@ package com.coro.coro.moim.repository.adaptor;
 
 import com.coro.coro.moim.domain.MoimMember;
 import com.coro.coro.moim.repository.MoimMemberJpaRepository;
-import com.coro.coro.moim.repository.port.MoimMemberRepository;
+import com.coro.coro.moim.service.port.MoimMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

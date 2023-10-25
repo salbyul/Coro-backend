@@ -2,7 +2,7 @@ package com.coro.coro.mock.repository;
 
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.domain.MoimMember;
-import com.coro.coro.moim.repository.port.MoimRepository;
+import com.coro.coro.moim.service.port.MoimRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;

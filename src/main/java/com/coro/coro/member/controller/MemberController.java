@@ -2,6 +2,7 @@ package com.coro.coro.member.controller;
 
 import com.coro.coro.application.dto.response.ApplicationResponse;
 import com.coro.coro.application.service.ApplicationService;
+import com.coro.coro.auth.dto.response.TokenResponse;
 import com.coro.coro.common.response.APIResponse;
 import com.coro.coro.member.service.User;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
@@ -59,7 +60,7 @@ public class MemberController implements MemberControllerDocs {
     @ResponseStatus(HttpStatus.OK)
     @Override
     public APIResponse login(@RequestBody final MemberLoginRequest requestMember) {
-        String token = memberService.login(requestMember);
+        TokenResponse token = memberService.login(requestMember);
         return APIResponse.create()
                 .addObject("token", token);
     }

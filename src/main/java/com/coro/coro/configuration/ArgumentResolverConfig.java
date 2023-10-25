@@ -1,6 +1,7 @@
 package com.coro.coro.configuration;
 
 import com.coro.coro.application.annotation.resolver.StatusResolver;
+import com.coro.coro.auth.annotation.resolver.TokenArgumentResolver;
 import com.coro.coro.common.annotation.resolver.DateArgumentResolver;
 import com.coro.coro.moim.annotation.resolver.SearchArgumentResolver;
 import org.springframework.context.annotation.Configuration;
@@ -17,5 +18,6 @@ public class ArgumentResolverConfig implements WebMvcConfigurer {
         resolvers.add(new SearchArgumentResolver());
         resolvers.add(new StatusResolver());
         resolvers.add(new DateArgumentResolver());
+        resolvers.add(new TokenArgumentResolver());
     }
 }

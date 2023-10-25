@@ -1,7 +1,7 @@
 package com.coro.coro.mock.repository;
 
 import com.coro.coro.member.domain.Member;
-import com.coro.coro.member.repository.port.MemberRepository;
+import com.coro.coro.member.service.port.MemberRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;

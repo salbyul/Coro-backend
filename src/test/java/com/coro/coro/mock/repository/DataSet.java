@@ -3,6 +3,7 @@ package com.coro.coro.mock.repository;
 import com.coro.coro.application.domain.Application;
 import com.coro.coro.application.domain.ApplicationAnswer;
 import com.coro.coro.application.domain.ApplicationQuestion;
+import com.coro.coro.auth.domain.RefreshToken;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.domain.MemberPhoto;
 import com.coro.coro.moim.domain.Moim;
@@ -43,4 +44,6 @@ public class DataSet {
 
     protected final Map<Long, Schedule> scheduleData = new HashMap<>();
     protected Long scheduleSequence = 1L;
+
+    protected final Map<String, RefreshToken> refreshTokenData = new HashMap<>();
 }

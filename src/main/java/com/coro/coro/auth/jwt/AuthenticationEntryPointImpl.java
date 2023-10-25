@@ -3,6 +3,7 @@ package com.coro.coro.auth.jwt;
 import com.coro.coro.common.response.error.ErrorType;
 import com.coro.coro.common.response.error.GlobalErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+@Slf4j
 public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
 
     /* 인증 중에 예외가 발생하면 잘못된 토큰으로 인식하고 ErrorResponse를 전송한다. */

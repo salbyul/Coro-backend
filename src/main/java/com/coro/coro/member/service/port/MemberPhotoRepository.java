@@ -1,4 +1,4 @@
-package com.coro.coro.member.repository.port;
+package com.coro.coro.member.service.port;
 
 import com.coro.coro.member.domain.MemberPhoto;
 

@@ -1,7 +1,7 @@
 package com.coro.coro.mock.repository;
 
 import com.coro.coro.moim.domain.MoimPhoto;
-import com.coro.coro.moim.repository.port.MoimPhotoRepository;
+import com.coro.coro.moim.service.port.MoimPhotoRepository;
 
 import java.util.*;
 

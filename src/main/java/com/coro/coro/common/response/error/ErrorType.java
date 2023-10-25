@@ -7,10 +7,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ErrorType {
 
-    UNKNOWN("000", "정의되지 않은 에러입니다."),
+    UNKNOWN("999", "정의되지 않은 에러입니다."),
 
     //    Auth
+    AUTH_TOKEN_NOT_FOUND("000", "해당 토큰이 없습니다."),
     AUTH_ERROR("001", "인증 에러입니다."),
+    AUTH_EXPIRED_ACCESS_TOKEN("002", "토큰이 만료되었습니다."),
+    AUTH_NOT_VALID_TOKEN("003", "유횽하지 않은 토큰입니다."),
 
     //    Member
     MEMBER_NOT_FOUND("100", "해당 Member가 없습니다."),

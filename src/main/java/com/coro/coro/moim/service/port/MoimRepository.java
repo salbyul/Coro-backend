@@ -1,4 +1,4 @@
-package com.coro.coro.moim.repository.port;
+package com.coro.coro.moim.service.port;
 
 import com.coro.coro.moim.domain.Moim;
 import org.springframework.data.domain.Page;

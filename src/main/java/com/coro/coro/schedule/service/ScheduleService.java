@@ -2,13 +2,13 @@ package com.coro.coro.schedule.service;
 
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.domain.MoimMember;
-import com.coro.coro.moim.repository.port.MoimMemberRepository;
-import com.coro.coro.moim.repository.port.MoimRepository;
+import com.coro.coro.moim.service.port.MoimMemberRepository;
+import com.coro.coro.moim.service.port.MoimRepository;
 import com.coro.coro.schedule.domain.Schedule;
 import com.coro.coro.schedule.dto.request.ScheduleRegisterRequest;
 import com.coro.coro.schedule.dto.response.ScheduleDTO;
 import com.coro.coro.schedule.exception.ScheduleException;
-import com.coro.coro.schedule.repository.ScheduleRepository;
+import com.coro.coro.schedule.service.port.ScheduleRepository;
 import com.coro.coro.schedule.validator.ScheduleValidator;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
