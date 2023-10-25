@@ -35,11 +35,23 @@ public class AuthController implements AuthControllerDocs{
                 .addObject("token", token);
     }
 
+    /**
+     * 토큰 재발급
+     * @param tokenSetRequest 유저의 토큰이 담겨있는 객체
+     * @return 새로운 토큰
+     */
     @Override
     @PostMapping("/new")
     public APIResponse newTokenResponse(@TokenSet final TokenSetRequest tokenSetRequest) {
         TokenResponse tokenResponse = authService.issueNewTokenSet(tokenSetRequest);
         return APIResponse.create()
                 .addObject("token", tokenResponse);
+    }
+
+    @Override
+    @DeleteMapping("/logout")
+    public APIResponse logout(@TokenSet final TokenSetRequest tokenSetRequest) {
+        authService.logout(tokenSetRequest);
+        return APIResponse.create();
     }
 }

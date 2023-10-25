@@ -73,4 +73,8 @@ public class AuthService {
         return refreshTokenRepository.findById(refreshToken)
                 .orElseThrow(() -> new AuthException(AUTH_TOKEN_NOT_FOUND));
     }
+
+    public void logout(final TokenSetRequest tokenSetRequest) {
+        refreshTokenRepository.deleteById(tokenSetRequest.getRefreshToken());
+    }
 }

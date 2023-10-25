@@ -11,4 +11,6 @@ public interface RefreshTokenRepository {
     Optional<RefreshToken> findById(final String id);
 
     void delete(final RefreshToken refreshToken);
+
+    void deleteById(final String refreshToken);
 }

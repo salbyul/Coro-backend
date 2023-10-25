@@ -1,5 +1,6 @@
 package com.coro.coro.auth.service;
 
+import com.coro.coro.auth.domain.RefreshToken;
 import com.coro.coro.auth.dto.request.TokenSetRequest;
 import com.coro.coro.auth.dto.response.TokenResponse;
 import com.coro.coro.auth.exception.AuthException;
@@ -10,6 +11,8 @@ import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.mock.FakeContainer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
 import static org.assertj.core.api.Assertions.*;
@@ -92,5 +95,28 @@ class AuthServiceTest {
         )
                 .isInstanceOf(AuthException.class)
                 .hasMessage(AUTH_TOKEN_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("로그아웃")
+    void logout() {
+        FakeContainer container = new FakeContainer();
+
+//        리프레시 토큰 생성
+        String refreshToken = "refreshToken";
+        RefreshToken token = RefreshToken.builder()
+                .refreshToken(refreshToken)
+                .nickname("nickname")
+                .build();
+        container.refreshTokenRepository.save(token);
+
+//        로그아웃
+        TokenSetRequest tokenSetRequest = new TokenSetRequest("accessToken", "refreshToken");
+        container.authService.logout(tokenSetRequest);
+
+//        검증
+        Optional<RefreshToken> optionalRefreshToken = container.refreshTokenRepository.findById("refreshToken:" + refreshToken);
+
+        assertThat(optionalRefreshToken.isEmpty()).isTrue();
     }
 }

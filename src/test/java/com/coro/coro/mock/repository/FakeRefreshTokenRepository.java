@@ -31,4 +31,9 @@ public class FakeRefreshTokenRepository implements RefreshTokenRepository {
                 .findAny();
         optionalRefreshToken.ifPresent(token -> dataSet.refreshTokenData.remove(token.getRefreshToken()));
     }
+
+    @Override
+    public void deleteById(final String refreshToken) {
+        dataSet.refreshTokenData.remove(REFRESH_TOKEN + ":" + refreshToken);
+    }
 }

@@ -28,4 +28,9 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
     public void delete(final RefreshToken refreshToken) {
         refreshTokenJpaRepository.delete(refreshToken);
     }
+
+    @Override
+    public void deleteById(final String refreshToken) {
+        refreshTokenJpaRepository.deleteById(refreshToken);
+    }
 }
