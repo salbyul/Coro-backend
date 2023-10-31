@@ -24,5 +24,6 @@ public class Schedule extends BaseEntity {
 
     private String title;
     private String content;
+    @Column(name = "the_day")
     private LocalDate theDay;
 }
