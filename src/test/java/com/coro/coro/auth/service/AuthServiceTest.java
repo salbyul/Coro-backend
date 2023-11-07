@@ -44,7 +44,7 @@ class AuthServiceTest {
         assertThatThrownBy(() ->
                 container.authService.login(new MemberLoginRequest("12@2.com", "asdf1234!@"))
         )
-                .isInstanceOf(MemberException.class)
+                .isInstanceOf(AuthException.class)
                 .hasMessage(MEMBER_NOT_VALID_EMAIL.getMessage());
     }
 

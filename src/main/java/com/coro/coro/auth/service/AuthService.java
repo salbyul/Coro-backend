@@ -51,7 +51,7 @@ public class AuthService {
 
     private Member getMemberByEmail(final MemberLoginRequest requestMember) {
         return memberRepository.findByEmail(requestMember.getEmail())
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_VALID_EMAIL));
+                .orElseThrow(() -> new AuthException(MEMBER_NOT_VALID_EMAIL));
     }
 
     public TokenResponse issueNewTokenSet(final TokenSetRequest tokenSetRequest) {
