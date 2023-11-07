@@ -135,7 +135,6 @@ public class MoimService {
                 .orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
     }
 
-//    TODO 이거 어디로??
     private void validateDuplicateMoimName(final String name) {
         Optional<Moim> optionalMoim = moimRepository.findByName(name);
         if (optionalMoim.isPresent()) {
@@ -341,7 +340,6 @@ public class MoimService {
         updateMoimMember(moimMemberList, requestMoimMember);
     }
 
-//    TODO 이거 어디로??
     private void validateModificationMoimMember(final List<MoimMemberModificationRequest> requestMoimMember) {
         long leaderCounts = requestMoimMember.stream()
                 .filter(moimMember -> moimMember.getRole().isLeader())

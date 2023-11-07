@@ -82,7 +82,6 @@ public class ApplicationService {
                 .orElseThrow(() -> new ApplicationException(MEMBER_NOT_FOUND));
     }
 
-//    TODO 이거 어디로??
     private void validateHasWaitApplication(final Long moimId, final Long memberId) {
         List<Application> existApplication = applicationRepository.findByMemberIdAndMoimId(memberId, moimId);
         for (Application application : existApplication) {
@@ -92,7 +91,6 @@ public class ApplicationService {
         }
     }
 
-//    TODO 이거 어디로??
     private void validateAnswer(final List<ApplicationQuestion> applicationQuestionList, final List<ApplicationDTO> applicationList) {
         if (applicationList.size() != applicationQuestionList.size()) {
             throw new ApplicationException(APPLICATION_ANSWER_NOT_COMPLETE);
@@ -105,7 +103,6 @@ public class ApplicationService {
         }
     }
 
-//    TODO 이거 어디로??
     private void validateExistMoimMember(final Long moimId, final Long memberId) {
         if (moimMemberRepository.findByMoimIdAndMemberId(moimId, memberId).isPresent()) {
             throw new ApplicationException(APPLICATION_EXIST_MEMBER);
