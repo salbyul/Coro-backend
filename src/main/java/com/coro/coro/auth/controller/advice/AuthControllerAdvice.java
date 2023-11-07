@@ -3,7 +3,6 @@ package com.coro.coro.auth.controller.advice;
 import com.coro.coro.auth.exception.AuthException;
 import com.coro.coro.common.response.error.DomainErrorResponse;
 import com.coro.coro.common.response.error.GlobalErrorResponse;
-import com.coro.coro.member.exception.MemberException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
