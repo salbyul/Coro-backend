@@ -2,7 +2,7 @@ package com.coro.coro.moim.service;
 
 import com.coro.coro.application.domain.ApplicationQuestion;
 import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
-import com.coro.coro.application.repository.port.ApplicationQuestionRepository;
+import com.coro.coro.application.service.port.ApplicationQuestionRepository;
 import com.coro.coro.application.validator.ApplicationQuestionValidator;
 import com.coro.coro.common.service.port.FileTransferor;
 import com.coro.coro.common.utils.FileSaveUtils;

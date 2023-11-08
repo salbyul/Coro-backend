@@ -1,4 +1,4 @@
-package com.coro.coro.application.repository.port;
+package com.coro.coro.application.service.port;
 
 import com.coro.coro.application.domain.ApplicationQuestion;
 

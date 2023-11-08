@@ -2,7 +2,7 @@ package com.coro.coro.application.repository.adaptor;
 
 import com.coro.coro.application.domain.Application;
 import com.coro.coro.application.repository.ApplicationJpaRepository;
-import com.coro.coro.application.repository.port.ApplicationRepository;
+import com.coro.coro.application.service.port.ApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

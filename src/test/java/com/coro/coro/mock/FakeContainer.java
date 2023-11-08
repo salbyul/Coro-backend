@@ -1,9 +1,9 @@
 package com.coro.coro.mock;
 
 import com.coro.coro.application.controller.ApplicationController;
-import com.coro.coro.application.repository.port.ApplicationAnswerRepository;
-import com.coro.coro.application.repository.port.ApplicationQuestionRepository;
-import com.coro.coro.application.repository.port.ApplicationRepository;
+import com.coro.coro.application.service.port.ApplicationAnswerRepository;
+import com.coro.coro.application.service.port.ApplicationQuestionRepository;
+import com.coro.coro.application.service.port.ApplicationRepository;
 import com.coro.coro.application.service.ApplicationQuestionService;
 import com.coro.coro.application.service.ApplicationService;
 import com.coro.coro.auth.controller.AuthController;

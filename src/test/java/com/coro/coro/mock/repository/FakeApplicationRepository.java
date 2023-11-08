@@ -2,7 +2,7 @@ package com.coro.coro.mock.repository;
 
 import com.coro.coro.application.domain.Application;
 import com.coro.coro.application.domain.ApplicationStatus;
-import com.coro.coro.application.repository.port.ApplicationRepository;
+import com.coro.coro.application.service.port.ApplicationRepository;
 
 import java.util.List;
 import java.util.Objects;

@@ -1,7 +1,7 @@
 package com.coro.coro.mock.repository;
 
 import com.coro.coro.application.domain.ApplicationQuestion;
-import com.coro.coro.application.repository.port.ApplicationQuestionRepository;
+import com.coro.coro.application.service.port.ApplicationQuestionRepository;
 
 import java.util.List;
 import java.util.Objects;

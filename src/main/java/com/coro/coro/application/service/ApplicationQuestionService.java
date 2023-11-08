@@ -3,7 +3,7 @@ package com.coro.coro.application.service;
 import com.coro.coro.application.domain.ApplicationQuestion;
 import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
 import com.coro.coro.application.exception.ApplicationException;
-import com.coro.coro.application.repository.port.ApplicationQuestionRepository;
+import com.coro.coro.application.service.port.ApplicationQuestionRepository;
 import com.coro.coro.application.validator.ApplicationQuestionValidator;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.service.port.MoimRepository;
