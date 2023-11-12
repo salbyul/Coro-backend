@@ -129,6 +129,13 @@ public class ApplicationService {
         return result;
     }
 
+    /**
+     * 특정 회원이 모임에 지원한 지원서 반환 메서드
+     * @param moimId 모임의 Id값
+     * @param memberId 회원의 Id값
+     * @param status 지원서의 상태
+     * @return 찾은 지원서들
+     */
     public List<ApplicationResponse> getApplication(final Long moimId, final Long memberId, final String status) {
         List<Application> applicationList;
         if (status.equals(ALL)) {
@@ -141,6 +148,12 @@ public class ApplicationService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 모임의 지원된 지원서 반환
+     * @param moimId 모임의 Id값
+     * @param status 지원서의 상태
+     * @return 찾은 지원서들
+     */
     public List<ApplicationResponse> getApplication(final Long moimId, final String status) {
         List<Application> applicationList;
         if (status.equals(ALL)) {
@@ -165,17 +178,17 @@ public class ApplicationService {
     }
 
     @Transactional
-    public void decideApplication(final Long loggedInMemberId, final Long applicationId, final ApplicationStatus status) {
+    public void decideApplication(final Long managerId, final Long applicationId, final ApplicationStatus status) {
         Application application = getApplicationById(applicationId);
 
         if (!application.isWait()) {
-            throw new ApplicationException(APPLICATION_STATUS_ALREADY);
+            throw new ApplicationException(APPLICATION_STATUS_ALREADY_DECIDED);
         }
 
         Long moimId = application.getMoim().getId();
 
-        MoimMember loggedInMoimMember = getMoimMemberByMoimIdAndMemberId(moimId, loggedInMemberId);
-        if (!loggedInMoimMember.canManage()) {
+        MoimMember managerMoimMember = getMoimMemberByMoimIdAndMemberId(moimId, managerId);
+        if (!managerMoimMember.canManage()) {
             throw new ApplicationException(APPLICATION_FORBIDDEN);
         }
         application.updateStatusTo(status);
@@ -190,8 +203,8 @@ public class ApplicationService {
         }
     }
 
-    private MoimMember getMoimMemberByMoimIdAndMemberId(final Long moimId, final Long loggedInMemberId) {
-        return moimMemberRepository.findByMoimIdAndMemberId(moimId, loggedInMemberId)
+    private MoimMember getMoimMemberByMoimIdAndMemberId(final Long moimId, final Long managerId) {
+        return moimMemberRepository.findByMoimIdAndMemberId(moimId, managerId)
                 .orElseThrow(() -> new ApplicationException(MOIM_MEMBER_NOT_FOUND));
     }
 }

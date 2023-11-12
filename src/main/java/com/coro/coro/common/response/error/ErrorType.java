@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorType {
 
     UNKNOWN("999", "정의되지 않은 에러입니다."),
+    WRONG_ARGUMENT("998", "잘못된 형태의 데이터입니다."),
 
     //    Auth
     AUTH_TOKEN_NOT_FOUND("000", "해당 토큰이 없습니다."),
@@ -63,7 +64,7 @@ public enum ErrorType {
     APPLICATION_QUESTION_NOT_VALID_CONTENT("312", "Content 값의 형태가 올바르지 않습니다."),
     APPLICATION_QUESTION_NOT_VALID_ORDERS("321", "Orders 값이 올바르지 않습니다."),
     APPLICATION_STATUS_NOT_VALID("332", "Status 값이 올바르지 않습니다."),
-    APPLICATION_STATUS_ALREADY("339", "이미 처리된 Application 입니다."),
+    APPLICATION_STATUS_ALREADY_DECIDED("339", "이미 처리된 Application 입니다."),
 
     //    MoimMember
     MOIM_MEMBER_NOT_FOUND("400", "해당 MoimMember가 없습니다."),

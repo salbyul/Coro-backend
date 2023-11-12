@@ -49,7 +49,7 @@ class MoimControllerTest {
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임소개", "mixed", true);
         MoimTagRequest moimTagRequest = new MoimTagRequest(List.of("tag1", "tag2", "tag3"));
         MockMultipartFile multipartFile = new MockMultipartFile("photo.jpeg", "photo.jpeg", "image/jpeg", new byte[1]);
-        Long moimIdSaved = container.moimService.register(requestMoim, moimTagRequest, null, multipartFile, memberIdSaved);
+        Long moimIdSaved = container.moimService.register(requestMoim, moimTagRequest, new ArrayList<>(), multipartFile, memberIdSaved);
 
         Member member = container.memberRepository.findById(memberIdSaved)
                 .orElseThrow(() -> new MoimException(MEMBER_NOT_FOUND));
@@ -57,7 +57,7 @@ class MoimControllerTest {
 //        디테일 정보 획득
         User user = User.mappingUserDetails(member);
 
-        APIResponse response = container.moimController.detail(moimIdSaved, user);
+        APIResponse response = container.moimController.getDetailed(moimIdSaved, user);
 
 //        검증
         MoimDetailResponse moimDetail = (MoimDetailResponse) response.getBody().get("moim");
@@ -87,7 +87,7 @@ class MoimControllerTest {
         User user = User.mappingUserDetails(member);
 
         assertThatThrownBy(() ->
-                container.moimController.detail(1L, user)
+                container.moimController.getDetailed(1L, user)
         )
                 .isInstanceOf(MoimException.class)
                 .hasMessage(MOIM_NOT_FOUND.getMessage());
@@ -146,7 +146,7 @@ class MoimControllerTest {
             container.moimService.register(
                     moimRegisterRequest,
                     moimTagRequest,
-                    null,
+                    new ArrayList<>(),
                     mockMultipartFile,
                     memberId
             );
@@ -419,7 +419,7 @@ class MoimControllerTest {
                 .orElseThrow(() -> new MoimException(MEMBER_NOT_FOUND));
         User user = User.mappingUserDetails(leader);
 
-        container.moimController.changeMoimMember(moimId, moimMemberModificationRequests, user);
+        container.moimController.updateMoimMember(moimId, moimMemberModificationRequests, user);
 
 //        검증
         MoimMember moimMember = container.moimMemberRepository.findById(savedMoimMemberId)

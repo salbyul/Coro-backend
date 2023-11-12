@@ -28,7 +28,10 @@ public class ApplicationQuestionService {
     private final MoimRepository moimRepository;
     private final ApplicationQuestionRepository applicationQuestionRepository;
 
-    /* All delete and All Insert */
+    /*
+    등록 메서드
+    All delete and All Insert
+     */
     @Transactional
     public void register(final Long moimId, final List<ApplicationQuestionRegisterRequest> requestQuestions) {
         Moim moim = getMoimById(moimId);
@@ -55,7 +58,7 @@ public class ApplicationQuestionService {
     }
 
     public List<ApplicationQuestion> findQuestionList(final Long moimId) {
-        return  applicationQuestionRepository.findAllByMoimId(moimId);
+        return applicationQuestionRepository.findAllByMoimId(moimId);
     }
 }
 

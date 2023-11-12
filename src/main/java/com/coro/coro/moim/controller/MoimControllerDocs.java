@@ -32,7 +32,7 @@ public interface MoimControllerDocs {
     @Parameters(value = {
             @Parameter(name = "id", description = "모임 Id 값")
     })
-    APIResponse detail(@PathVariable("id") final Long moimId, @AuthenticationPrincipal final User user) throws IOException;
+    APIResponse getDetailed(@PathVariable("id") final Long moimId, @AuthenticationPrincipal final User user) throws IOException;
 
     @Operation(summary = "모임 검색")
     @ApiResponses(value = {
@@ -61,8 +61,8 @@ public interface MoimControllerDocs {
             @Parameter(name = "tagList", description = "모임 태그들", example = "[\"tag1\", \"tag2\", \"tag3\"]"),
     })
     APIResponse register(@RequestPart(name = "moim") final MoimRegisterRequest requestMoim,
-                         @RequestPart(required = false, name = "tagList") final MoimTagRequest requestTag,
-                         @RequestPart(required = false, name = "applicationQuestionList") final List<ApplicationQuestionRegisterRequest> requestQuestions,
+                         @RequestPart(name = "tagList") final MoimTagRequest requestTag,
+                         @RequestPart(name = "applicationQuestionList") final List<ApplicationQuestionRegisterRequest> requestQuestions,
                          @RequestPart(name = "photo", required = false) final MultipartFile multipartFile,
                          @AuthenticationPrincipal final User user) throws IOException;
 
@@ -118,7 +118,7 @@ public interface MoimControllerDocs {
             @Parameter(name = "moimId", description = "모임 Id 값"),
             @Parameter(name = "requestMoimMember", description = "수정된 회원들의 목록")
     })
-    APIResponse changeMoimMember(@PathVariable("moimId") final Long moimId, final List<MoimMemberModificationRequest> requestMoimMember, @AuthenticationPrincipal final User user);
+    APIResponse updateMoimMember(@PathVariable("moimId") final Long moimId, final List<MoimMemberModificationRequest> requestMoimMember, @AuthenticationPrincipal final User user);
 
     @Operation(summary = "회원 추방")
     @ApiResponses(value = {

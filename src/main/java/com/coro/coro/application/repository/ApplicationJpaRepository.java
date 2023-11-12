@@ -9,15 +9,15 @@ import java.util.List;
 
 public interface ApplicationJpaRepository extends JpaRepository<Application, Long> {
 
-    @Query("select a from Application a where a.moim.id = :moimId and a.member.id = :memberId")
+    @Query("SELECT a FROM Application a WHERE a.moim.id = :moimId AND a.member.id = :memberId")
     List<Application> findByMemberIdAndMoimId(@Param("memberId") final Long memberId, @Param("moimId") final Long moimId);
 
-    @Query("select a from Application a where a.moim.id = :moimId and a.member.id = :memberId and a.status = UPPER( :status)")
+    @Query("SELECT a FROM Application a WHERE a.moim.id = :moimId AND a.member.id = :memberId AND a.status = UPPER( :status)")
     List<Application> findByMemberIdAndMoimIdAndStatus(@Param("memberId") final Long memberId, @Param("moimId") final Long moimId, @Param("status") final String status);
 
-    @Query("select a from Application a where a.moim.id = :moimId and a.status = UPPER(:status)")
+    @Query("SELECT a FROM Application a WHERE a.moim.id = :moimId AND a.status = UPPER(:status)")
     List<Application> findAllByMoimIdAndStatus(@Param("moimId") final Long moimId, @Param("status") final String status);
 
-    @Query("select a from Application a where a.moim.id = :moimId")
+    @Query("SELECT a FROM Application a WHERE a.moim.id = :moimId")
     List<Application> findAllByMoimId(@Param("moimId") final Long moimId);
 }

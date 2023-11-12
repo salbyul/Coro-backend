@@ -15,7 +15,9 @@ import java.io.PrintWriter;
 @Slf4j
 public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
 
-    /* 인증 중에 예외가 발생하면 잘못된 토큰으로 인식하고 ErrorResponse를 전송한다. */
+    /**
+     * 인증 중에 예외가 발생하면 잘못된 토큰으로 인식하고 ErrorResponse를 전송한다.
+     */
     @Override
     public void commence(final HttpServletRequest request, final HttpServletResponse response, final AuthenticationException authException) throws IOException {
 

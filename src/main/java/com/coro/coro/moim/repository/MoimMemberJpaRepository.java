@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public interface MoimMemberJpaRepository extends JpaRepository<MoimMember, Long> {
 
-    @Query("select mm from MoimMember mm where mm.moim.id = :moimId")
+    @Query("SELECT mm FROM MoimMember mm WHERE mm.moim.id = :moimId")
     List<MoimMember> findAllByMoimId(@Param("moimId") final Long moimId);
 
-    @Query("select mm from MoimMember mm where mm.moim.id = :moimId and mm.member.id = :memberId")
+    @Query("SELECT mm FROM MoimMember mm WHERE mm.moim.id = :moimId AND mm.member.id = :memberId")
     Optional<MoimMember> findByMoimIdAndMemberId(@Param("moimId") final Long moimId, @Param("memberId") final Long memberId);
 }

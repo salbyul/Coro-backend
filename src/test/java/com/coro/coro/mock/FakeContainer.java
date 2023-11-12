@@ -23,6 +23,7 @@ import com.coro.coro.moim.service.port.MoimPhotoRepository;
 import com.coro.coro.moim.service.port.MoimRepository;
 import com.coro.coro.moim.service.port.MoimTagRepository;
 import com.coro.coro.moim.service.MoimService;
+import com.coro.coro.moim.validator.MoimValidator;
 import com.coro.coro.schedule.controller.ScheduleController;
 import com.coro.coro.schedule.service.port.ScheduleRepository;
 import com.coro.coro.schedule.service.ScheduleService;
@@ -66,6 +67,8 @@ public class FakeContainer {
     public final FileTransferor fileTransferor;
     public final JwtProvider jwtProvider;
 
+    public final MoimValidator moimValidator;
+
     public FakeContainer() {
         dataSet = new DataSet();
         this.memberRepository = new FakeMemberRepository(dataSet);
@@ -85,6 +88,10 @@ public class FakeContainer {
         this.fileTransferor = new FakeFileTransferor();
         this.jwtProvider = new FakeJwtProvider();
 
+        this.moimValidator = MoimValidator.builder()
+                .moimRepository(this.moimRepository)
+                .build();
+
         this.memberService = MemberService.builder()
                 .memberRepository(this.memberRepository)
                 .passwordEncoder(passwordEncoder)
@@ -100,6 +107,7 @@ public class FakeContainer {
                 .dateTimeHolder(this.dateTimeHolder)
                 .uuidHolder(this.uuidHolder)
                 .fileTransferor(this.fileTransferor)
+                .moimValidator(this.moimValidator)
                 .build();
         this.applicationQuestionService = ApplicationQuestionService.builder()
                 .moimRepository(this.moimRepository)

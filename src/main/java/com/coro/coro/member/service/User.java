@@ -13,11 +13,11 @@ import java.util.Collection;
 @Builder
 public class User implements UserDetails {
 
-    private Long id;
-    private String email;
-    private String password;
-    private String nickname;
-    private MemberState state;
+    private final Long id;
+    private final String email;
+    private final String password;
+    private final String nickname;
+    private final MemberState state;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

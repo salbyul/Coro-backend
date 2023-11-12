@@ -35,7 +35,7 @@ public interface AuthControllerDocs {
             @Parameter(name = "accessToken", description = "엑세스 토큰 (쿠키)"),
             @Parameter(name = "refreshToken", description = "리프레쉬 토큰 (쿠키)")
     })
-    APIResponse newTokenResponse(@TokenSet final TokenSetRequest tokenSetRequest);
+    APIResponse issueNewTokenResponse(@TokenSet final TokenSetRequest tokenSetRequest);
 
     @Operation(summary = "로그아웃")
     @ApiResponses(value = {

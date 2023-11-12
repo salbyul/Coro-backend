@@ -12,7 +12,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,6 +43,8 @@ public class SecurityConfig {
         http
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/api/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/members", "/api/auth/login", "/api/auth/new").permitAll()
+                .antMatchers(HttpMethod.DELETE, "/api/auth/logout").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/**").authenticated()
                 .antMatchers(HttpMethod.PUT, "/api/**").authenticated()
                 .antMatchers(HttpMethod.DELETE, "/api/**").authenticated();
@@ -54,14 +55,6 @@ public class SecurityConfig {
                 .and()
                 .addFilterBefore(new AuthExceptionHandlingFilter(), JwtAuthenticationFilter.class);
         return http.build();
-    }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web ->
-                web.ignoring()
-                        .antMatchers(HttpMethod.POST, "/api/members", "/api/auth/login", "/api/auth/new")
-                        .antMatchers(HttpMethod.DELETE, "/api/auth/logout");
     }
 
     @Bean

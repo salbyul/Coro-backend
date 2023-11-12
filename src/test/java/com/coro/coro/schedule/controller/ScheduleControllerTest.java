@@ -6,6 +6,7 @@ import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.member.service.User;
 import com.coro.coro.mock.FakeContainer;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
+import com.coro.coro.moim.dto.request.MoimTagRequest;
 import com.coro.coro.schedule.domain.Schedule;
 import com.coro.coro.schedule.dto.request.ScheduleRegisterRequest;
 import com.coro.coro.schedule.dto.response.ScheduleDTO;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,8 +38,8 @@ class ScheduleControllerTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 leaderId
         );
@@ -75,8 +77,8 @@ class ScheduleControllerTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 leaderId
         );
@@ -117,8 +119,8 @@ class ScheduleControllerTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 leaderId
         );
@@ -156,8 +158,8 @@ class ScheduleControllerTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 leaderId
         );

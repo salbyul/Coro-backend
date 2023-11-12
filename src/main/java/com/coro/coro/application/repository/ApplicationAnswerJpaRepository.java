@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface ApplicationAnswerJpaRepository extends JpaRepository<ApplicationAnswer, Long> {
 
-    @Query("select aa from ApplicationAnswer aa where aa.application.id = :applicationId")
+    @Query("SELECT aa FROM ApplicationAnswer aa WHERE aa.application.id = :applicationId")
     List<ApplicationAnswer> findAllByApplicationId(@Param("applicationId") final Long applicationId);
 }

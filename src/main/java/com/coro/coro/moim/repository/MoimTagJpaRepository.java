@@ -9,6 +9,6 @@ import org.springframework.data.repository.query.Param;
 public interface MoimTagJpaRepository extends JpaRepository<MoimTag, Long> {
 
     @Modifying
-    @Query("delete from MoimTag m where m.moim.id = :moimId")
+    @Query("DELETE FROM MoimTag m WHERE m.moim.id = :moimId")
     void deleteAllByMoimId(@Param("moimId") final Long moimId);
 }

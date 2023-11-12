@@ -28,7 +28,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    /* 회원가입 */
     @Transactional
     public Long register(final MemberRegisterRequest requestMember) {
         Member member =
@@ -37,22 +36,20 @@ public class MemberService {
                         .password(requestMember.getPassword())
                         .nickname(requestMember.getNickname())
                         .build();
+
         MemberValidator.validateRegistration(member);
 
         List<Member> memberList = memberRepository.findByEmailOrNickname(member.getEmail(), member.getNickname());
         member.verifyDuplication(memberList);
         member.encryptPassword(passwordEncoder);
-
         return memberRepository.save(member);
     }
 
-    /* 회원 정보 획득 */
     public MemberInformationResponse getInformation(final Long memberId) {
         Member member = getMemberById(memberId);
         return new MemberInformationResponse(member);
     }
 
-    /* 회원 수정 */
     @Transactional
     public void update(final Long id, final MemberModificationRequest requestMember) {
         Member member = getMemberById(id);

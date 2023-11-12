@@ -1,7 +1,6 @@
 package com.coro.coro.application.service;
 
 import com.coro.coro.application.domain.Application;
-import com.coro.coro.application.domain.ApplicationAnswer;
 import com.coro.coro.application.domain.ApplicationStatus;
 import com.coro.coro.application.dto.request.ApplicationDTO;
 import com.coro.coro.application.dto.request.ApplicationQuestionRegisterRequest;
@@ -17,6 +16,7 @@ import com.coro.coro.mock.FakeContainer;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.domain.MoimMember;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
+import com.coro.coro.moim.dto.request.MoimTagRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +41,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -88,7 +88,7 @@ class ApplicationServiceTest {
 //        모임 생성
         container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -123,7 +123,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -158,7 +158,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -213,7 +213,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -263,7 +263,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -305,7 +305,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -340,7 +340,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -375,7 +375,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -434,7 +434,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -485,7 +485,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -536,7 +536,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -606,7 +606,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -651,7 +651,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -689,7 +689,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -729,7 +729,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -777,7 +777,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -814,7 +814,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -867,7 +867,7 @@ class ApplicationServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 소개", "mixed", true),
-                null,
+                new MoimTagRequest(),
                 List.of(
                         new ApplicationQuestionRegisterRequest("질문1", 1),
                         new ApplicationQuestionRegisterRequest("질문2", 2)
@@ -894,6 +894,6 @@ class ApplicationServiceTest {
                 container.applicationService.decideApplication(memberId, applicationId, ApplicationStatus.WAIT)
         )
                 .isInstanceOf(ApplicationException.class)
-                .hasMessage(APPLICATION_STATUS_ALREADY.getMessage());
+                .hasMessage(APPLICATION_STATUS_ALREADY_DECIDED.getMessage());
     }
 }

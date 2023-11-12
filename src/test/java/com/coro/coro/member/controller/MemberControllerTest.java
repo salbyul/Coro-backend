@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
@@ -120,18 +121,15 @@ class MemberControllerTest {
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
                 tagRequest,
-                null,
+                new ArrayList<>(),
                 multipartFile,
                 member.getId());
         Moim moim = container.moimRepository.findById(moimId)
                 .orElseThrow(() -> new MemberException(MOIM_NOT_FOUND));
 
-        MoimPhoto moimPhoto = container.moimPhotoRepository.findById(moimId)
-                .orElseThrow(() -> new MemberException(MOIM_PHOTO_NOT_FOUND));
-
         User user = User.mappingUserDetails(member);
 
-        APIResponse response = container.memberController.getMoim(user);
+        APIResponse response = container.memberController.getMoimJoinedList(user);
         List<MoimSearchResponse> list = (List<MoimSearchResponse>) response.getBody().get("list");
 
         assertAll(
@@ -163,7 +161,7 @@ class MemberControllerTest {
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
                 tagRequest,
-                null,
+                new ArrayList<>(),
                 multipartFile,
                 member.getId());
 
@@ -178,7 +176,7 @@ class MemberControllerTest {
 //        지원서 생성
         Long savedApplicationId = container.applicationService.register(moimId, new ApplicationRequest(List.of()), applicantId);
 
-        APIResponse response = container.memberController.getApplication(moimId, user, "wait");
+        APIResponse response = container.memberController.getApplications(moimId, user, "wait");
         List<ApplicationResponse> applicationList = (List<ApplicationResponse>) response.getBody().get("applicationList");
 
         assertAll(
@@ -206,7 +204,7 @@ class MemberControllerTest {
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
                 tagRequest,
-                null,
+                new ArrayList<>(),
                 multipartFile,
                 member.getId());
 
@@ -221,7 +219,7 @@ class MemberControllerTest {
 //        지원서 생성
         Long savedApplicationId = container.applicationService.register(moimId, new ApplicationRequest(List.of()), applicantId);
 
-        APIResponse response = container.memberController.getApplication(moimId, user, "all");
+        APIResponse response = container.memberController.getApplications(moimId, user, "all");
         List<ApplicationResponse> applicationList = (List<ApplicationResponse>) response.getBody().get("applicationList");
 
         assertAll(

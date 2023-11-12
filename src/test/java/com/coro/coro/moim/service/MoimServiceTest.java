@@ -44,7 +44,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "", "mixed", true);
-        Long moimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Long moimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, savedMemberId);
 
 //        검증
         Moim moim = container.moimRepository.findById(moimId).orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
@@ -66,7 +66,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "", "mixed", true);
-        container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, savedMemberId);
 
 //        중복된 이름의 모임 생성
         MoimRegisterRequest duplicatedMoim = new MoimRegisterRequest("모임", "", "mixed", true);
@@ -212,10 +212,10 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임 예", "모임 소개", "mixed", true);
-        Long moimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Long moimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, savedMemberId);
 
         MoimRegisterRequest target = new MoimRegisterRequest("모임", "", "mixed", true);
-        container.moimService.register(target, null, null, null, savedMemberId);
+        container.moimService.register(target, new MoimTagRequest(), new ArrayList<>(), null, savedMemberId);
 
 //        검증
         assertThatThrownBy(() -> container.moimService.update(
@@ -223,7 +223,7 @@ class MoimServiceTest {
                 new MoimModificationRequest("모임", "모임 소개", "mixed", true, false),
                 new MoimTagRequest(),
                 null,
-                null,
+                new ArrayList<>(),
                 savedMemberId)
         )
                 .isInstanceOf(MoimException.class)
@@ -240,16 +240,16 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        Long moimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Long moimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, savedMemberId);
 
 //        검증
         MoimModificationRequest moimModificationRequest = new MoimModificationRequest("모임", "모임 소개", "mixed", true, false);
         assertThatThrownBy(() -> container.moimService.update(
                 moimId,
                 moimModificationRequest,
-                null,
+                new MoimTagRequest(),
                 new MockMultipartFile("spring.js", "spring.js", "text/javascript", new byte[1]),
-                null,
+                new ArrayList<>(),
                 savedMemberId)
         )
                 .isInstanceOf(MoimException.class)
@@ -258,9 +258,9 @@ class MoimServiceTest {
         assertThatThrownBy(() -> container.moimService.update(
                 moimId,
                 moimModificationRequest,
-                null,
+                new MoimTagRequest(),
                 new MockMultipartFile("spring", "spring", "image/jpeg", new byte[1]),
-                null,
+                new ArrayList<>(),
                 savedMemberId)
         )
                 .isInstanceOf(MoimException.class)
@@ -278,7 +278,7 @@ class MoimServiceTest {
 //        모임 생성
         MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag2", "tag3"));
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "faceToFace", true);
-        Long savedMoimId = container.moimService.register(requestMoim, requestMoimTag, null, null, savedMemberId);
+        Long savedMoimId = container.moimService.register(requestMoim, requestMoimTag, new ArrayList<>(), null, savedMemberId);
 
 //        디테일 정보 가져오기
         MoimDetailResponse detail = container.moimService.getDetail(savedMoimId, savedMemberId);
@@ -305,7 +305,7 @@ class MoimServiceTest {
 //        모임 생성
         MoimTagRequest requestMoimTag = new MoimTagRequest(List.of("tag1", "tag2", "tag3"));
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "faceToFace", true);
-        container.moimService.register(requestMoim, requestMoimTag, null, null, savedMemberId);
+        container.moimService.register(requestMoim, requestMoimTag, new ArrayList<>(), null, savedMemberId);
 
 //        검증
         assertThatThrownBy(() -> container.moimService.getDetail(19999999L, 1L))
@@ -356,7 +356,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "faceToFace", true);
-        container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, savedMemberId);
 
 //        검증
         assertThatThrownBy(() -> container.moimService.getDetailForModification(9999999L, savedMemberId))
@@ -374,7 +374,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "faceToFace", true);
-        Long moimId = container.moimService.register(requestMoim, null, null, null, leader);
+        Long moimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, leader);
 
 //        새로운 회원의 모임 가입
         Long savedMemberId = container.memberService.register(new MemberRegisterRequest("a@a.com", "asdf1234!@", "닉네임2"));
@@ -405,12 +405,12 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, savedMemberId);
 
         container.moimService.register(
                 new MoimRegisterRequest("모임2", "모임 설명2", "faceToFace", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 savedMemberId
         );
@@ -445,7 +445,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Long savedMoimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, savedMemberId);
 
 //        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
@@ -473,7 +473,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, savedMemberId);
+        Long savedMoimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, savedMemberId);
 
 //        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId2);
@@ -515,7 +515,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
+        Long savedMoimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, leaderId);
 
 //        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
@@ -552,7 +552,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
+        Long savedMoimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, leaderId);
 
 //        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
@@ -588,7 +588,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
+        Long savedMoimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, leaderId);
 
 //        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
@@ -622,7 +622,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
+        Long savedMoimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, leaderId);
 
 //        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
@@ -657,7 +657,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
+        Long savedMoimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, leaderId);
 
 //        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
@@ -692,7 +692,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
+        Long savedMoimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, leaderId);
 
 //        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
@@ -726,7 +726,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
+        Long savedMoimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, leaderId);
 
 //        회원 등급 가져오기
         MemberRole memberRole = container.moimService.getMemberRole(leaderId, savedMoimId);
@@ -746,7 +746,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
+        Long savedMoimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, leaderId);
 
 //        검증
         assertThatThrownBy(() ->
@@ -766,7 +766,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        container.moimService.register(requestMoim, null, null, null, leaderId);
+        container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, leaderId);
 
 //        검증
         assertThatThrownBy(() ->
@@ -787,7 +787,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
+        Long savedMoimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, leaderId);
 
 //        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
@@ -820,7 +820,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leader);
+        Long savedMoimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, leader);
 
 //        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
@@ -848,7 +848,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
+        Long savedMoimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, leaderId);
 
 //        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
@@ -876,7 +876,7 @@ class MoimServiceTest {
 
 //        모임 생성
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        Long savedMoimId = container.moimService.register(requestMoim, null, null, null, leaderId);
+        Long savedMoimId = container.moimService.register(requestMoim, new MoimTagRequest(), new ArrayList<>(), null, leaderId);
 
 //        모임 지원
         Long applicationId = container.applicationService.register(savedMoimId, new ApplicationRequest(new ArrayList<>()), savedMemberId);
@@ -906,9 +906,9 @@ class MoimServiceTest {
         MoimTagRequest moimTagRequest2 = new MoimTagRequest(List.of("태그1", "태그2", "태그3"));
         MockMultipartFile mockMultipartFile = new MockMultipartFile("photo.jpeg", "photo.jpeg", "image/jpeg", new byte[1]);
         MoimRegisterRequest requestMoim = new MoimRegisterRequest("모임", "모임 설명", "mixed", true);
-        container.moimService.register(requestMoim, moimTagRequest, null, mockMultipartFile, leaderId);
+        container.moimService.register(requestMoim, moimTagRequest, new ArrayList<>(), mockMultipartFile, leaderId);
         MoimRegisterRequest requestMoim2 = new MoimRegisterRequest("모임2", "모임 설명2", "faceToFace", true);
-        container.moimService.register(requestMoim2, moimTagRequest2, null, null, leaderId);
+        container.moimService.register(requestMoim2, moimTagRequest2, new ArrayList<>(), null, leaderId);
 
         Page<Moim> page = container.moimService.search(new MoimSearchRequest("name", "모임"), PageRequest.of(0, 10));
         List<Moim> moimList = page.getContent();

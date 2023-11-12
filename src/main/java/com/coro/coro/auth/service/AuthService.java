@@ -9,7 +9,6 @@ import com.coro.coro.auth.service.port.RefreshTokenRepository;
 import com.coro.coro.common.service.port.UUIDHolder;
 import com.coro.coro.member.domain.Member;
 import com.coro.coro.member.dto.request.MemberLoginRequest;
-import com.coro.coro.member.exception.MemberException;
 import com.coro.coro.member.service.port.MemberRepository;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,6 @@ public class AuthService {
     private final UUIDHolder uuidHolder;
     private final PasswordEncoder passwordEncoder;
 
-    /* 로그인 */
     public TokenResponse login(final MemberLoginRequest requestMember) {
         Member member = getMemberByEmail(requestMember);
         boolean isRightPassword = member.isRightPassword(requestMember.getPassword(), passwordEncoder);
@@ -39,13 +37,14 @@ public class AuthService {
             throw new AuthException(MEMBER_NOT_VALID_PASSWORD);
         }
 
-        String accessToken = jwtProvider.generateAccessToken(member.getNickname());
         String refreshToken = uuidHolder.generateUUID();
         RefreshToken token = RefreshToken.builder()
                 .nickname(member.getNickname())
                 .refreshToken(refreshToken)
                 .build();
         refreshTokenRepository.save(token);
+
+        String accessToken = jwtProvider.generateAccessToken(member.getNickname());
         return new TokenResponse(accessToken, refreshToken);
     }
 
@@ -58,14 +57,14 @@ public class AuthService {
         RefreshToken refreshToken = getRefreshTokenById(tokenSetRequest.getRefreshToken());
 
         String newRefreshToken = uuidHolder.generateUUID();
-        String newAccessToken = jwtProvider.generateAccessToken(refreshToken.getNickname());
-
-        RefreshToken refreshTokenObject = RefreshToken.builder()
+        RefreshToken newRefreshTokenEntity = RefreshToken.builder()
                 .nickname(refreshToken.getNickname())
                 .refreshToken(newRefreshToken)
                 .build();
         refreshTokenRepository.delete(refreshToken);
-        refreshTokenRepository.save(refreshTokenObject);
+        refreshTokenRepository.save(newRefreshTokenEntity);
+
+        String newAccessToken = jwtProvider.generateAccessToken(refreshToken.getNickname());
         return new TokenResponse(newAccessToken, newRefreshToken);
     }
 

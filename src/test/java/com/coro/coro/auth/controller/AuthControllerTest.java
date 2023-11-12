@@ -48,7 +48,7 @@ class AuthControllerTest {
                 .orElseThrow(() -> new AuthException(MEMBER_NOT_FOUND));
 
         TokenSetRequest tokenSetRequest = new TokenSetRequest(tokenResponse.getRefreshToken());
-        APIResponse response = container.authController.newTokenResponse(tokenSetRequest);
+        APIResponse response = container.authController.issueNewTokenResponse(tokenSetRequest);
         TokenResponse token = (TokenResponse) response.getBody().get("token");
 
         assertThat(token.getAccessToken()).isEqualTo("activeAccessToken" + member.getNickname());
@@ -63,7 +63,7 @@ class AuthControllerTest {
         TokenSetRequest tokenSetRequest = new TokenSetRequest("notExistRefreshToken");
 
         assertThatThrownBy(() ->
-                container.authController.newTokenResponse(tokenSetRequest)
+                container.authController.issueNewTokenResponse(tokenSetRequest)
         )
                 .isInstanceOf(AuthException.class)
                 .hasMessage(AUTH_TOKEN_NOT_FOUND.getMessage());

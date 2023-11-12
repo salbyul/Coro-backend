@@ -39,7 +39,12 @@ public class ScheduleService {
         MoimMember moimMember = getMoimMemberByMoimIdAndMemberId(moimId, memberId);
         validateMoimMember(moimMember);
 
-        Schedule schedule = toSchedule(registerRequest, moim);
+        Schedule schedule = Schedule.builder()
+                .moim(moim)
+                .title(registerRequest.getTitle())
+                .content(registerRequest.getContent())
+                .theDay(registerRequest.getDate())
+                .build();
         ScheduleValidator.validateSchedule(schedule, LocalDate.now());
         return scheduleRepository.save(schedule);
     }
@@ -60,15 +65,6 @@ public class ScheduleService {
         }
     }
 
-    private Schedule toSchedule(final ScheduleRegisterRequest registerRequest, final Moim moim) {
-        return Schedule.builder()
-                .moim(moim)
-                .title(registerRequest.getTitle())
-                .content(registerRequest.getContent())
-                .theDay(registerRequest.getDate())
-                .build();
-    }
-
     public List<ScheduleDTO> getMonthlySchedule(final Long memberId, final Long moimId, final LocalDate date) {
         getMoimById(moimId);
         getMoimMemberByMoimIdAndMemberId(moimId, memberId);
@@ -87,7 +83,7 @@ public class ScheduleService {
         return LocalDate.of(date.getYear(), date.getMonthValue() + 1, 1).minusDays(1);
     }
 
-    public List<ScheduleDTO> getSchedules(final Long memberId, final Long moimId, final LocalDate date) {
+    public List<ScheduleDTO> getScheduleDTOs(final Long memberId, final Long moimId, final LocalDate date) {
         getMoimById(moimId);
         getMoimMemberByMoimIdAndMemberId(moimId, memberId);
 

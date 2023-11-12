@@ -31,6 +31,7 @@ public class ApplicationController implements ApplicationControllerDocs {
 
     /**
      * 특정 모임의 지원된 특정 상태의 지원서 모두 획득 (상태)
+     *
      * @param moimId 해당 모임의 Id 값
      * @param status 획득할 지원서의 상태 값
      * @return 지원서 리스트
@@ -45,6 +46,7 @@ public class ApplicationController implements ApplicationControllerDocs {
 
     /**
      * 특정 회원이 특정 모임에 지원한 특정 상태의 지원서 획득 (상태)
+     *
      * @param moimId 해당 모임의 Id 값
      * @param status 획득할 지원서의 상태 값
      * @param user 로그인한 유저
@@ -62,6 +64,7 @@ public class ApplicationController implements ApplicationControllerDocs {
 
     /**
      * 디테일한 지원서 데이터 획득
+     *
      * @param applicationId 획득할 지원서의 Id 값
      * @return 디테일한 지원서 데이터
      */
@@ -74,6 +77,7 @@ public class ApplicationController implements ApplicationControllerDocs {
 
     /**
      * 특정 모임의 지원 양식 획득
+     *
      * @param moimId 해당 모임의 Id 값
      * @return 지원 양식
      */
@@ -90,6 +94,7 @@ public class ApplicationController implements ApplicationControllerDocs {
 
     /**
      * 지원서 제출
+     *
      * @param moimId 지원될 모임의 Id 값
      * @param applicationRequest 지원서의 데이터가 담긴 객체
      * @param user 로그인한 유저
@@ -100,7 +105,6 @@ public class ApplicationController implements ApplicationControllerDocs {
     public APIResponse submitApplication(@PathVariable("moimId") final Long moimId,
                                          @RequestBody final ApplicationRequest applicationRequest,
                                          @AuthenticationPrincipal final User user) {
-        log.info("application: {}", applicationRequest);
         Long applicationId = applicationService.register(moimId, applicationRequest, user.getId());
         return APIResponse.create()
                 .addObject("applicationId", applicationId);
@@ -108,6 +112,7 @@ public class ApplicationController implements ApplicationControllerDocs {
 
     /**
      * 지원서 상태 변경
+     *
      * @param applicationId 상태 변경될 지원서의 Id 값
      * @param status 변경될 상태 값
      * @param user 로그인한 유저

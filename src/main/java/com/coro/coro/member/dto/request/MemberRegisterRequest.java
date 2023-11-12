@@ -1,11 +1,12 @@
 package com.coro.coro.member.dto.request;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class MemberRegisterRequest {
 
     private String email;

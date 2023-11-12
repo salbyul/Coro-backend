@@ -19,10 +19,12 @@ import com.coro.coro.mock.FakeContainer;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.domain.MoimMember;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
+import com.coro.coro.moim.dto.request.MoimTagRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.coro.coro.common.response.error.ErrorType.*;
@@ -43,8 +45,8 @@ class ApplicationControllerTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임설명", "faceToFace", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 leaderId
         );
@@ -91,8 +93,8 @@ class ApplicationControllerTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임설명", "faceToFace", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 leaderId
         );
@@ -131,7 +133,7 @@ class ApplicationControllerTest {
         );
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임설명", "faceToFace", true),
-                null,
+                new MoimTagRequest(),
                 questionRequestList,
                 null,
                 leaderId
@@ -175,7 +177,7 @@ class ApplicationControllerTest {
         );
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임설명", "faceToFace", true),
-                null,
+                new MoimTagRequest(),
                 questionRequestList,
                 null,
                 leaderId
@@ -202,7 +204,7 @@ class ApplicationControllerTest {
         );
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임설명", "faceToFace", true),
-                null,
+                new MoimTagRequest(),
                 questionRequestList,
                 null,
                 leaderId
@@ -254,7 +256,7 @@ class ApplicationControllerTest {
         );
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임설명", "faceToFace", true),
-                null,
+                new MoimTagRequest(),
                 questionRequestList,
                 null,
                 leaderId

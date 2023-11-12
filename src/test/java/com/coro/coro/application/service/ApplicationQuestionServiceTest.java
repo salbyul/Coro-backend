@@ -7,6 +7,7 @@ import com.coro.coro.member.dto.request.MemberRegisterRequest;
 import com.coro.coro.mock.FakeContainer;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
+import com.coro.coro.moim.dto.request.MoimTagRequest;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ class ApplicationQuestionServiceTest {
 //        모임 생성
         FakeContainer container = new FakeContainer();
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), null, null, null, memberId);
+        Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), new MoimTagRequest(), new ArrayList<>(), null, memberId);
 
 //        지원 양식 제출
         Moim moim = container.moimRepository.findById(moimId)
@@ -50,7 +51,7 @@ class ApplicationQuestionServiceTest {
 //        모임 생성
         FakeContainer container = new FakeContainer();
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), null, null, null, memberId);
+        Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), new MoimTagRequest(), new ArrayList<>(), null, memberId);
 
 //        길이 초과된 지원 양식 생성
         Moim moim = container.moimRepository.findById(moimId)
@@ -73,7 +74,7 @@ class ApplicationQuestionServiceTest {
 //        모임 생성
         FakeContainer container = new FakeContainer();
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), null, null, null, memberId);
+        Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), new MoimTagRequest(), new ArrayList<>(), null, memberId);
 
 //        중복된 순서의 지원 양식 생성
         Moim moim = container.moimRepository.findById(moimId)
@@ -96,7 +97,7 @@ class ApplicationQuestionServiceTest {
 //        모임 생성
         FakeContainer container = new FakeContainer();
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), null, null, null, memberId);
+        Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), new MoimTagRequest(), new ArrayList<>(), null, memberId);
 
 //        잘못된 순서의 지원 양식 생성
         Moim moim = container.moimRepository.findById(moimId)
@@ -125,7 +126,7 @@ class ApplicationQuestionServiceTest {
 //        모임 생성
         FakeContainer container = new FakeContainer();
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), null, null, null, memberId);
+        Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), new MoimTagRequest(), new ArrayList<>(), null, memberId);
 
 //        15개의 지원 양식 생성
         Moim moim = container.moimRepository.findById(moimId)
@@ -146,7 +147,7 @@ class ApplicationQuestionServiceTest {
 //        모임 생성
         FakeContainer container = new FakeContainer();
         Long memberId = container.memberService.register(new MemberRegisterRequest("asdf@asdf.com", "asdf1234!@", "닉네임"));
-        Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), null, null, null, memberId);
+        Long moimId = container.moimService.register(new MoimRegisterRequest("모임", "모임설명", "mixed", true), new MoimTagRequest(), new ArrayList<>(), null, memberId);
 
 //        지원 양식 제출
         Moim moim = container.moimRepository.findById(moimId)

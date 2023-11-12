@@ -7,6 +7,7 @@ import com.coro.coro.mock.FakeContainer;
 import com.coro.coro.moim.domain.Moim;
 import com.coro.coro.moim.domain.MoimMember;
 import com.coro.coro.moim.dto.request.MoimRegisterRequest;
+import com.coro.coro.moim.dto.request.MoimTagRequest;
 import com.coro.coro.schedule.domain.Schedule;
 import com.coro.coro.schedule.dto.request.ScheduleRegisterRequest;
 import com.coro.coro.schedule.dto.response.ScheduleDTO;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,8 +37,8 @@ class ScheduleServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 leaderId);
 
@@ -67,8 +69,8 @@ class ScheduleServiceTest {
 //        모임 생성
         container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 leaderId);
 
@@ -96,8 +98,8 @@ class ScheduleServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 leaderId);
 
@@ -123,8 +125,8 @@ class ScheduleServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 leaderId);
 
@@ -163,8 +165,8 @@ class ScheduleServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 memberId
         );
@@ -203,8 +205,8 @@ class ScheduleServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 memberId
         );
@@ -217,7 +219,7 @@ class ScheduleServiceTest {
         );
 
 //        일정 획득
-        List<ScheduleDTO> scheduleDTOList = container.scheduleService.getSchedules(memberId, moimId, LocalDate.of(9999, 12, 1));
+        List<ScheduleDTO> scheduleDTOList = container.scheduleService.getScheduleDTOs(memberId, moimId, LocalDate.of(9999, 12, 1));
 
 //        검증
         assertAll(
@@ -238,8 +240,8 @@ class ScheduleServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 memberId
         );
@@ -270,8 +272,8 @@ class ScheduleServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 leaderId
         );
@@ -317,8 +319,8 @@ class ScheduleServiceTest {
 //        모임 생성
         Long moimId = container.moimService.register(
                 new MoimRegisterRequest("모임", "모임 설명", "mixed", true),
-                null,
-                null,
+                new MoimTagRequest(),
+                new ArrayList<>(),
                 null,
                 leaderId
         );

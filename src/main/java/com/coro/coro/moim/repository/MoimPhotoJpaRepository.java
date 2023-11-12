@@ -11,9 +11,9 @@ import java.util.List;
 public interface MoimPhotoJpaRepository extends JpaRepository<MoimPhoto, Long> {
 
     @Modifying
-    @Query("delete from MoimPhoto mp where mp.id = :moimId")
+    @Query("DELETE FROM MoimPhoto mp WHERE mp.id = :moimId")
     void deleteById(@Param("moimId") Long moimId);
 
-    @Query("select mp from MoimPhoto mp where mp.id in :moimIds")
+    @Query("SELECT mp FROM MoimPhoto mp WHERE mp.id IN :moimIds")
     List<MoimPhoto> findAllByIds(@Param("moimIds") List<Long> moimIds);
 }

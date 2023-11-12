@@ -11,9 +11,9 @@ import java.util.List;
 public interface ApplicationQuestionJpaRepository extends JpaRepository<ApplicationQuestion, Long> {
 
     @Modifying
-    @Query("delete from ApplicationQuestion aq where aq.moim.id = :moimId")
+    @Query("DELETE FROM ApplicationQuestion aq WHERE aq.moim.id = :moimId")
     void deleteAllByMoimId(@Param("moimId") final Long moimId);
 
-    @Query("select aq from ApplicationQuestion aq where aq.moim.id = :moimId")
+    @Query("SELECT aq FROM ApplicationQuestion aq WHERE aq.moim.id = :moimId")
     List<ApplicationQuestion> findAllByMoimId(@Param("moimId") final Long moimId);
 }

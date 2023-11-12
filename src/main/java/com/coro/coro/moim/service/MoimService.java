@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,6 +57,7 @@ public class MoimService {
     private final MoimTagRepository moimTagRepository;
     private final MoimPhotoRepository moimPhotoRepository;
     private final MoimMemberRepository moimMemberRepository;
+    private final MoimValidator moimValidator;
 
     private final MemberRepository memberRepository;
 
@@ -73,13 +75,12 @@ public class MoimService {
     }
 
     public Page<Moim> search(final MoimSearchRequest moimSearchRequest, final Pageable pageable) {
-        Page<Moim> moimPage = null;
         if (moimSearchRequest.getOption().equals(NAME)) {
-            moimPage = moimRepository.findPageByName(moimSearchRequest.getValue(), pageable);
+            return moimRepository.findPageByName(moimSearchRequest.getValue(), pageable);
         } else if (moimSearchRequest.getOption().equals(TAG)) {
-            moimPage = moimRepository.findPageByTag(moimSearchRequest.getValue(), pageable);
+            return moimRepository.findPageByTag(moimSearchRequest.getValue(), pageable);
         }
-        return moimPage;
+        return new PageImpl<>(new ArrayList<>());
     }
 
     @Transactional
@@ -93,7 +94,7 @@ public class MoimService {
         Long savedMoimId = saveMoim(requestMoim, member);
         Moim moim = getMoimById(savedMoimId);
 
-        saveTag(requestMoimTag, moim);
+        saveTags(requestMoimTag, moim);
         saveQuestions(requestQuestions, moim);
 
         if (multipartFile != null && !multipartFile.isEmpty()) {
@@ -124,9 +125,8 @@ public class MoimService {
                 .type(MoimType.getType(requestMoim.getType()))
                 .build();
 
-        MoimValidator.validateMoim(moim);
-        validateDuplicateMoimName(moim.getName());
-
+        moimValidator.validateMoim(moim);
+        moimValidator.validateDuplicateName(moim.getName());
         return moimRepository.save(moim);
     }
 
@@ -135,17 +135,7 @@ public class MoimService {
                 .orElseThrow(() -> new MoimException(MOIM_NOT_FOUND));
     }
 
-    private void validateDuplicateMoimName(final String name) {
-        Optional<Moim> optionalMoim = moimRepository.findByName(name);
-        if (optionalMoim.isPresent()) {
-            throw new MoimException(MOIM_DUPLICATE_NAME);
-        }
-    }
-
-    private void saveTag(final MoimTagRequest requestMoimTag, final Moim moim) {
-        if (requestMoimTag == null) {
-            return;
-        }
+    private void saveTags(final MoimTagRequest requestMoimTag, final Moim moim) {
         List<MoimTag> tagList = requestMoimTag.getTagList()
                 .stream()
                 .map(tag ->
@@ -155,11 +145,8 @@ public class MoimService {
                             .build()
                 )
                 .collect(Collectors.toList());
-
         MoimTagValidator.validateTag(tagList);
-
         moim.changeMoimTagListTo(tagList);
-
         moimTagRepository.saveAll(tagList);
     }
 
@@ -169,23 +156,27 @@ public class MoimService {
                        final MoimTagRequest requestTag,
                        final MultipartFile multipartFile,
                        final List<ApplicationQuestionRegisterRequest> requestQuestions,
-                       final Long memberId) throws IOException {
+                       final Long managerId) throws IOException {
         Moim moim = getMoimById(moimId);
 
-        moimMemberRepository.findByMoimIdAndMemberId(moimId, memberId);
+        MoimMember moimMember = getMoimMemberByMoimIdAndMemberId(moimId, managerId);
+        if (!moimMember.canManage()) {
+            throw new MoimException(MOIM_FORBIDDEN);
+        }
 
         if (!requestMoim.getName().equals(moim.getName())) {
-            validateDuplicateMoimName(requestMoim.getName());
+            moimValidator.validateDuplicateName(requestMoim.getName());
         }
         moim.update(requestMoim);
-        MoimValidator.validateMoim(moim);
+        moimValidator.validateMoim(moim);
 
         moimTagRepository.deleteAllByMoimId(moim.getId());
-        saveTag(requestTag, moim);
+        saveTags(requestTag, moim);
 
+        applicationQuestionRepository.deleteAllByMoimId(moim.getId());
         saveQuestions(requestQuestions, moim);
 
-        if (multipartFile != null) {
+        if (multipartFile != null && !multipartFile.isEmpty()) {
             updateImage(moim, multipartFile);
         }
         if (requestMoim.getIsDeletedPhoto()) {
@@ -194,7 +185,7 @@ public class MoimService {
     }
 
     private void saveQuestions(final List<ApplicationQuestionRegisterRequest> requestQuestions, final Moim moim) {
-        if (requestQuestions == null || requestQuestions.size() == 0) {
+        if (requestQuestions.isEmpty()) {
             return;
         }
 
@@ -207,12 +198,8 @@ public class MoimService {
                             .build()
                 )
                 .collect(Collectors.toList());
-
         ApplicationQuestionValidator.validateApplicationQuestion(applicationQuestionList);
-
         moim.changeQuestionListTo(applicationQuestionList);
-
-        applicationQuestionRepository.deleteAllByMoimId(moim.getId());
         applicationQuestionRepository.saveAll(applicationQuestionList);
     }
 
@@ -222,15 +209,14 @@ public class MoimService {
 
         validateImageFile(multipartFile);
 
-        String name = FileSaveUtils.generateFileName(multipartFile, dateTimeHolder, uuidHolder);
-        log.info("content type: {}", multipartFile.getContentType());
-        fileTransferor.saveFile(multipartFile, path, name);
+        String generatedFileName = FileSaveUtils.generateFileName(multipartFile, dateTimeHolder, uuidHolder);
+        fileTransferor.saveFile(multipartFile, path, generatedFileName);
         moimPhotoRepository.save(
                 MoimPhoto.builder()
                         .id(moim.getId())
                         .moim(moim)
                         .originalName(multipartFile.getOriginalFilename())
-                        .name(name)
+                        .name(generatedFileName)
                         .contentType(multipartFile.getContentType())
                         .build()
                 );
@@ -238,30 +224,33 @@ public class MoimService {
 
     @SuppressWarnings("ConstantConditions")
     public void validateImageFile(final MultipartFile multipartFile) {
-        if (!multipartFile.getOriginalFilename().contains(".")) {
-            throw new MoimException(MOIM_PHOTO_NOT_VALID);
-        }
-        if (!multipartFile.getContentType().contains("image")) {
+        if (!multipartFile.getOriginalFilename().contains(".") || !multipartFile.getContentType().contains("image")) {
             throw new MoimException(MOIM_PHOTO_NOT_VALID);
         }
     }
 
     public List<MoimSearchResponse> getSummaryMoim(final List<Moim> moimList) throws IOException {
+        if (moimList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         List<Long> moimIds = moimList.stream()
                 .map(Moim::getId)
                 .collect(Collectors.toList());
+        List<MoimPhoto> moimPhotoList = moimPhotoRepository.findAllByIds(moimIds);
+        return assembleSearchResponseList(moimList, moimPhotoList);
+    }
 
-        List<MoimPhoto> photos = moimPhotoRepository.findAllByIds(moimIds);
-
+    private List<MoimSearchResponse> assembleSearchResponseList(List<Moim> moimList, List<MoimPhoto> moimPhotoList) throws IOException {
         List<MoimSearchResponse> result = new ArrayList<>();
 
         for (Moim moim : moimList) {
             boolean isAdded = false;
-            for (MoimPhoto photo : photos) {
+            for (MoimPhoto photo : moimPhotoList) {
                 if (moim.getId().equals(photo.getId())) {
                     byte[] photoBytes = fileTransferor.getFile(photo.getName(), path);
                     result.add(new MoimSearchResponse(moim, photo, photoBytes));
-                    photos.remove(photo);
+                    moimPhotoList.remove(photo);
                     isAdded = true;
                     break;
                 }
@@ -276,31 +265,29 @@ public class MoimService {
     public MoimDetailResponse getDetail(final Long moimId, final Long memberId) throws IOException {
         Moim moim = getMoimById(moimId);
 
-        MoimDetailResponse result;
         Optional<MoimMember> optionalMoimMember = moimMemberRepository.findByMoimIdAndMemberId(moimId, memberId);
 
-        result = optionalMoimMember
+        MoimDetailResponse response = optionalMoimMember
                 .map(moimMember -> MoimDetailResponse.generateInstance(moim, moimMember))
                 .orElseGet(() -> MoimDetailResponse.generateInstance(moim, false, false));
 
         Optional<MoimPhoto> optionalMoimPhoto = moimPhotoRepository.findById(moimId);
         if (optionalMoimPhoto.isPresent()) {
             MoimPhoto moimPhoto = optionalMoimPhoto.get();
-            result.setPhoto(moimPhoto, fileTransferor.getFile(moimPhoto.getName(), path));
+            response.setPhoto(moimPhoto, fileTransferor.getFile(moimPhoto.getName(), path));
         }
-        return result;
+        return response;
     }
 
     public MoimModificationResponse getDetailForModification(final Long moimId, final Long loggedInMemberId) throws IOException {
         Moim moim = getMoimById(moimId);
 
         MoimMember moimMember = getMoimMemberByMoimIdAndMemberId(moimId, loggedInMemberId);
-
-        List<ApplicationQuestion> applicationQuestionList = applicationQuestionRepository.findAllByMoimId(moimId);
-
         if (!moimMember.canManage()) {
             throw new MoimException(MOIM_FORBIDDEN);
         }
+
+        List<ApplicationQuestion> applicationQuestionList = applicationQuestionRepository.findAllByMoimId(moimId);
         MoimModificationResponse result = MoimModificationResponse.generate(moim, applicationQuestionList);
 
         Optional<MoimPhoto> optionalMoimPhoto = moimPhotoRepository.findById(moimId);
@@ -329,8 +316,8 @@ public class MoimService {
     }
 
     @Transactional
-    public void modifyMoimMember(final Long moimId, final List<MoimMemberModificationRequest> requestMoimMember, final Long loggedInMember) {
-        MoimMember moimMember = getMoimMemberByMoimIdAndMemberId(moimId, loggedInMember);
+    public void modifyMoimMember(final Long moimId, final List<MoimMemberModificationRequest> requestMoimMember, final Long loggedInMemberId) {
+        MoimMember moimMember = getMoimMemberByMoimIdAndMemberId(moimId, loggedInMemberId);
         if (!moimMember.canManage()) {
             throw new MoimException(MOIM_FORBIDDEN);
         }
@@ -383,7 +370,6 @@ public class MoimService {
             throw new MoimException(MOIM_MEMBER_FORBIDDN);
         }
         MoimMember moimMember = getMoimMemberById(moimMemberId);
-
         if (moimMember.getRole().isLeader()) {
             throw new MoimException(MOIM_FORBIDDEN);
         }

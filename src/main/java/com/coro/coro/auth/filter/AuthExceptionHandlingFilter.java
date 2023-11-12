@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +17,9 @@ import java.io.PrintWriter;
 @Slf4j
 public class AuthExceptionHandlingFilter extends GenericFilterBean {
 
+    /**
+     * 인증 오류가 있을 경우 해당 오류에 맞는 Response를 보낸다.
+     */
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException {
         try {

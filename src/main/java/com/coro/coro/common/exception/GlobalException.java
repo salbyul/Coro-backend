@@ -14,5 +14,4 @@ public class GlobalException extends RuntimeException {
         this.domain = domain;
         this.errorType = errorType;
     }
-
 }
