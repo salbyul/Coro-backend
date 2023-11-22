@@ -42,3 +42,9 @@
 ## <img src="https://github.com/salbyul/Coro-backend/assets/103320798/d76761f9-b4d0-46c8-99da-932e3ad1df8c" width="35"> Infrastructure
 
 ![infrastructure](https://github.com/salbyul/Coro-backend/assets/103320798/1bee0b90-33df-460b-b5b0-c3079ab21482)
+
+## <img src="https://github.com/salbyul/Coro-backend/assets/103320798/2e783fae-fde1-4993-8a6d-e4a41a7cb875" width="35"> Achievement
+
+![test](https://github.com/salbyul/Coro-backend/assets/103320798/66615895-2f2c-4a3d-a606-f4c0a291d054)
+
+![deploy](https://github.com/salbyul/Coro-backend/assets/103320798/6f087ee4-28c8-49bf-a59d-3da54f0aa20c)
