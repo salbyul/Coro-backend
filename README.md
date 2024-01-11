@@ -2,7 +2,6 @@
 
 소모임을 만들고, 일정을 계획할 수 있는 애플리케이션입니다.
 
-<a href="https://moim.ddns.net"><img src="https://img.shields.io/badge/moim.ddns.net-green?style=flat&logo=google-chrome&logoColor=white"/></a>
 <a href="https://docs.google.com/presentation/d/1f03y7rBJ5tpDzdI2Xu8-OQXZ8tXkoaUd/edit?usp=sharing&ouid=114684528043505558187&rtpof=true&sd=true"><img src="https://img.shields.io/badge/portfolio-orange?style=flat&logo=google-chrome&logoColor=white"/></a>
 
 ---
